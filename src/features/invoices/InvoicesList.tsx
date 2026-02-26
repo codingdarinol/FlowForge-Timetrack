@@ -18,6 +18,9 @@ import {
   productService,
 } from '../../services';
 import { invoiceLogger } from '../../lib/logger';
+import { generateCSV, downloadCSV } from '../../lib/exportUtils';
+import { ListSkeleton } from '../../components/ui';
+import { useUndoableAction } from '../../hooks/useUndoableAction';
 import {
   Button,
   Card,
@@ -56,7 +59,8 @@ export function InvoicesList() {
   const [viewingInvoice, setViewingInvoice] = useState<InvoiceWithDetails | null>(null);
   const [editingInvoice, setEditingInvoice] = useState<InvoiceWithDetails | null>(null);
   const [deletingInvoice, setDeletingInvoice] = useState<InvoiceWithDetails | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+
+  const { execute: executeUndoable } = useUndoableAction();
 
   const loadData = async () => {
     try {
@@ -72,7 +76,7 @@ export function InvoicesList() {
       // Track total count: either from filtered or all data
       setAllInvoicesCount(statusFilter ? allInvoicesData.length : invoicesData.length);
     } catch (err) {
-      console.error('Failed to load data:', err);
+      invoiceLogger.error('Failed to load data:', err);
     } finally {
       setLoading(false);
     }
@@ -82,17 +86,41 @@ export function InvoicesList() {
     loadData();
   }, [statusFilter]);
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!deletingInvoice) return;
-    setSubmitting(true);
+    const invoiceToDelete = deletingInvoice;
+    setDeletingInvoice(null);
+
+    setInvoices((prev) => prev.filter((i) => i.id !== invoiceToDelete.id));
+
+    executeUndoable({
+      message: `Deleted invoice "${invoiceToDelete.invoiceNumber}"`,
+      action: async () => {
+        await invoiceService.delete(invoiceToDelete.id);
+      },
+      onUndo: () => {
+        loadData();
+      },
+    });
+  };
+
+  const handleExportCSV = async () => {
     try {
-      await invoiceService.delete(deletingInvoice.id);
-      await loadData();
-      setDeletingInvoice(null);
+      const headers = ['Invoice #', 'Client', 'Issue Date', 'Due Date', 'Status', 'Subtotal', 'Tax', 'Total'];
+      const rows = invoices.map((inv) => [
+        inv.invoiceNumber,
+        inv.clientName,
+        new Date(inv.issueDate).toLocaleDateString(),
+        new Date(inv.dueDate).toLocaleDateString(),
+        inv.status,
+        inv.subtotal.toFixed(2),
+        inv.taxAmount.toFixed(2),
+        inv.total.toFixed(2),
+      ]);
+      const csv = generateCSV(headers, rows);
+      await downloadCSV(`invoices-${new Date().toISOString().split('T')[0]}.csv`, csv);
     } catch (error) {
-      console.error('Failed to delete invoice:', error);
-    } finally {
-      setSubmitting(false);
+      invoiceLogger.error('Failed to export CSV', error);
     }
   };
 
@@ -101,7 +129,7 @@ export function InvoicesList() {
       await invoiceService.update(invoiceId, { status: newStatus });
       await loadData();
     } catch (error) {
-      console.error('Failed to update invoice status:', error);
+      invoiceLogger.error('Failed to update invoice status:', error);
     }
   };
 
@@ -126,11 +154,7 @@ export function InvoicesList() {
   ];
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center h-64'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
-      </div>
-    );
+    return <ListSkeleton />;
   }
 
   return (
@@ -138,10 +162,16 @@ export function InvoicesList() {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <h1 className='text-2xl font-bold text-foreground'>Invoices</h1>
-        <Button onClick={() => setShowCreate(true)} disabled={clients.length === 0}>
-          <Plus className='w-4 h-4' />
-          New Invoice
-        </Button>
+        <div className='flex items-center gap-2'>
+          <Button variant='outline' size='sm' onClick={handleExportCSV} disabled={invoices.length === 0}>
+            <Download className='w-4 h-4' />
+            Export CSV
+          </Button>
+          <Button onClick={() => setShowCreate(true)} disabled={clients.length === 0}>
+            <Plus className='w-4 h-4' />
+            New Invoice
+          </Button>
+        </div>
       </div>
 
       {/* Filter - always show when there are any invoices or filter is active */}
@@ -291,7 +321,6 @@ export function InvoicesList() {
         message={`Are you sure you want to delete invoice ${deletingInvoice?.invoiceNumber}?`}
         confirmLabel='Delete'
         variant='danger'
-        loading={submitting}
       />
     </div>
   );
@@ -351,7 +380,7 @@ function CreateInvoiceModal({
           .then((settings) => {
             setPaymentTerms(settings.paymentTerms || '');
           })
-          .catch(console.error);
+          .catch((err) => invoiceLogger.error('Failed to load settings:', err));
       } else {
         // Creation mode
         setClientId('');
@@ -378,7 +407,7 @@ function CreateInvoiceModal({
             }
             setPaymentTerms(settings.paymentTerms || '');
           })
-          .catch(console.error);
+          .catch((err) => invoiceLogger.error('Failed to load settings:', err));
       }
     }
   }, [isOpen, initialData]);
@@ -386,7 +415,7 @@ function CreateInvoiceModal({
   // Load products
   useEffect(() => {
     if (isOpen) {
-      productService.getAll().then(setProducts).catch(console.error);
+      productService.getAll().then(setProducts).catch((err) => invoiceLogger.error('Failed to load products:', err));
     }
   }, [isOpen]);
 
@@ -537,7 +566,7 @@ function CreateInvoiceModal({
       onCreated();
       onClose();
     } catch (err) {
-      console.error('Failed to save invoice:', err);
+      invoiceLogger.error('Failed to save invoice:', err);
     } finally {
       setSaving(false);
     }
@@ -747,7 +776,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
-    settingsService.load().then(setSettings).catch(console.error);
+    settingsService.load().then(setSettings).catch((err) => invoiceLogger.error('Failed to load settings for preview:', err));
   }, []);
 
   const formatDate = (isoString: string) => {
@@ -772,7 +801,31 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
 
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
-      let y = 20;
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const MARGIN_TOP = 20;
+      const MARGIN_BOTTOM = 25; // Reserve space for footer
+      let y = MARGIN_TOP;
+
+      const checkPageBreak = (currentY: number, requiredSpace: number): number => {
+        if (currentY + requiredSpace > pageHeight - MARGIN_BOTTOM) {
+          doc.addPage();
+          return MARGIN_TOP;
+        }
+        return currentY;
+      };
+
+      const drawTableHeader = (atY: number): number => {
+        doc.setFillColor(240, 240, 240);
+        doc.rect(15, atY - 4, pageWidth - 30, 8, 'F');
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Description', 17, atY);
+        doc.text('Qty', pageWidth - 75, atY, { align: 'right' });
+        doc.text('Price', pageWidth - 50, atY, { align: 'right' });
+        doc.text('Amount', pageWidth - 17, atY, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+        return atY + 8;
+      };
 
       // Logo (if set)
       if (settings?.businessLogo) {
@@ -850,6 +903,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       y = Math.max(y, rightY) + 15;
 
       // Bill To section
+      y = checkPageBreak(y, 40);
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.text('Bill To:', 15, y);
@@ -880,21 +934,20 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       y += 10;
 
       // Table Header
-      doc.setFillColor(240, 240, 240);
-      doc.rect(15, y - 4, pageWidth - 30, 8, 'F');
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Description', 17, y);
-      doc.text('Qty', pageWidth - 75, y, { align: 'right' });
-      doc.text('Price', pageWidth - 50, y, { align: 'right' });
-      doc.text('Amount', pageWidth - 17, y, { align: 'right' });
-      y += 8;
+      y = checkPageBreak(y, 16);
+      y = drawTableHeader(y);
 
       // Table Body
       doc.setFont('helvetica', 'normal');
       const invoiceCurrency = clients.find((c) => c.id === invoice.clientId)?.currency || 'EUR';
       const currencySymbol = CURRENCY_SYMBOLS[invoiceCurrency] || '€';
       invoice.lineItems.forEach((item) => {
+        const prevY = y;
+        y = checkPageBreak(y, 6);
+        if (y < prevY) {
+          y = drawTableHeader(y);
+        }
+        doc.setFontSize(9);
         doc.text(item.description.substring(0, 50), 17, y);
         doc.text(item.quantity.toString(), pageWidth - 75, y, { align: 'right' });
         doc.text(`${currencySymbol}${item.unitPrice.toFixed(2)}`, pageWidth - 50, y, {
@@ -910,6 +963,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       });
 
       // Totals
+      y = checkPageBreak(y, 30);
       y += 5;
       doc.setDrawColor(200, 200, 200);
       doc.line(pageWidth - 80, y, pageWidth - 15, y);
@@ -936,6 +990,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
 
       // Notes
       if (invoice.notes) {
+        y = checkPageBreak(y, 20);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
         doc.text('Notes:', 15, y);
@@ -949,6 +1004,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
 
       // Payment Terms
       if (settings?.paymentTerms) {
+        y = checkPageBreak(y, 20);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
         doc.text('Payment Terms:', 15, y);
@@ -962,6 +1018,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
 
       // Payment Links
       const drawLink = (label: string, url: string) => {
+        y = checkPageBreak(y, 20);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(14);
         doc.setTextColor(0, 0, 0); // Black for title
@@ -985,11 +1042,15 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         drawLink(settings.paymentLink2Title || 'Payment Link 2', settings.paymentLink2);
       }
 
-      // Footer
-      const pageHeight = doc.internal.pageSize.getHeight();
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text('Generated by FlowForge-Track', pageWidth / 2, pageHeight - 10, { align: 'center' });
+      // Footer — rendered on every page
+      const totalPages = doc.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Generated by FlowForge-Track', pageWidth / 2, pageHeight - 10, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+      }
 
       // Get PDF as bytes
       const pdfOutput = doc.output('arraybuffer');
@@ -1038,7 +1099,6 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       }
     } catch (error) {
       invoiceLogger.error('Failed to export PDF', error);
-      console.error('Failed to export PDF:', error);
       alert(`Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setExporting(false);
