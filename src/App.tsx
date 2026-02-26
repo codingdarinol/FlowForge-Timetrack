@@ -13,14 +13,29 @@ import { Widget } from './pages/Widget';
 
 import { SettingsProvider } from './contexts/SettingsContext';
 import { useShortcuts } from './hooks/useShortcuts';
+import { ToastContainer } from './components/ui/Toast';
+import { KeyboardShortcutsDialog } from './components/ui/KeyboardShortcutsDialog';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTimerStore } from './stores/timerStore';
 
 // Component that uses hooks requiring SettingsProvider context
 function AppContent() {
   // Enable global keyboard shortcuts
   useShortcuts();
+
+  const [showShortcuts, setShowShortcuts] = useState(false);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === '?' && !['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) {
+        e.preventDefault();
+        setShowShortcuts(true);
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, []);
 
   return (
     <>
@@ -46,6 +61,8 @@ function AppContent() {
         {/* Debug panel - only visible during development */}
         {import.meta.env.DEV && <DebugPanel />}
       </BrowserRouter>
+      <ToastContainer />
+      <KeyboardShortcutsDialog isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </>
   );
 }

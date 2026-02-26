@@ -331,4 +331,34 @@ export const timeEntryService = {
     const placeholders = ids.map((_, i) => `$${i + 1}`).join(', ');
     await db.execute(`DELETE FROM time_entries WHERE id IN (${placeholders})`, ids);
   },
+
+  async bulkDelete(ids: string[]): Promise<void> {
+    if (ids.length === 0) return;
+    const db = await getDb();
+    const placeholders = ids.map((_, i) => `$${i + 1}`).join(', ');
+    await db.execute(`DELETE FROM time_entries WHERE id IN (${placeholders})`, ids);
+    timeEntryLogger.info('Bulk deleted time entries', { count: ids.length });
+  },
+
+  async bulkUpdateBillable(ids: string[], isBillable: boolean): Promise<void> {
+    if (ids.length === 0) return;
+    const db = await getDb();
+    const placeholders = ids.map((_, i) => `$${i + 2}`).join(', ');
+    await db.execute(
+      `UPDATE time_entries SET is_billable = $1 WHERE id IN (${placeholders})`,
+      [isBillable ? 1 : 0, ...ids],
+    );
+    timeEntryLogger.info('Bulk updated billable status', { count: ids.length, isBillable });
+  },
+
+  async bulkUpdateBilled(ids: string[], isBilled: boolean): Promise<void> {
+    if (ids.length === 0) return;
+    const db = await getDb();
+    const placeholders = ids.map((_, i) => `$${i + 2}`).join(', ');
+    await db.execute(
+      `UPDATE time_entries SET is_billed = $1 WHERE id IN (${placeholders})`,
+      [isBilled ? 1 : 0, ...ids],
+    );
+    timeEntryLogger.info('Bulk updated billed status', { count: ids.length, isBilled });
+  },
 };

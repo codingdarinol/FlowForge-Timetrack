@@ -12,6 +12,12 @@ vi.mock('../../contexts/SettingsContext', () => ({
   }),
 }));
 
+vi.mock('../../services', () => ({
+  clientService: { getAll: vi.fn().mockResolvedValue([]) },
+  projectService: { getAll: vi.fn().mockResolvedValue([]) },
+  invoiceService: { getAll: vi.fn().mockResolvedValue([]) },
+}));
+
 describe('Brand Verification', () => {
   it('Sidebar displays FlowForge-Track', () => {
     render(
@@ -23,7 +29,11 @@ describe('Brand Verification', () => {
   });
 
   it('Header displays FlowForge-Track', () => {
-    render(<Header />);
+    render(
+      <BrowserRouter>
+        <Header />
+      </BrowserRouter>,
+    );
     expect(screen.getByText('FlowForge-Track')).toBeInTheDocument();
   });
 });

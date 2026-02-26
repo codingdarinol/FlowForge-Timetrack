@@ -5,6 +5,14 @@ import { persist } from 'zustand/middleware';
 
 export type TimerState = 'idle' | 'running' | 'paused';
 
+interface LastStoppedState {
+  projectId: string;
+  projectName: string;
+  projectColor: string;
+  startTime: string;
+  accumulatedPauseDuration: number;
+}
+
 interface TimerStore {
   // State
   state: TimerState;
@@ -14,6 +22,7 @@ interface TimerStore {
   startTime: string | null; // ISO string
   pauseStartTime: string | null; // When current pause started
   accumulatedPauseDuration: number; // Total pause time in seconds
+  lastStoppedState: LastStoppedState | null;
 
   // Actions
   start: (projectId: string, projectName: string, projectColor: string) => void;
@@ -21,6 +30,8 @@ interface TimerStore {
   resume: () => void;
   stop: () => { projectId: string; startTime: string; pauseDuration: number } | null;
   reset: () => void;
+  undoStop: () => boolean;
+  clearLastStopped: () => void;
 
   // Computed (not stored, but helper)
   getElapsedSeconds: () => number;
@@ -37,6 +48,7 @@ export const useTimerStore = create<TimerStore>()(
       startTime: null,
       pauseStartTime: null,
       accumulatedPauseDuration: 0,
+      lastStoppedState: null,
 
       start: (projectId, projectName, projectColor) => {
         set({
@@ -47,6 +59,7 @@ export const useTimerStore = create<TimerStore>()(
           startTime: new Date().toISOString(),
           pauseStartTime: null,
           accumulatedPauseDuration: 0,
+          lastStoppedState: null,
         });
       },
 
@@ -76,7 +89,7 @@ export const useTimerStore = create<TimerStore>()(
       },
 
       stop: () => {
-        const { state, projectId, startTime, pauseStartTime, accumulatedPauseDuration } = get();
+        const { state, projectId, projectName, projectColor, startTime, pauseStartTime, accumulatedPauseDuration } = get();
         if (state === 'idle' || !projectId || !startTime) return null;
 
         // Calculate final pause duration
@@ -93,8 +106,14 @@ export const useTimerStore = create<TimerStore>()(
           pauseDuration: Math.round(totalPauseDuration),
         };
 
-        // Reset state
         set({
+          lastStoppedState: {
+            projectId: projectId!,
+            projectName: projectName!,
+            projectColor: projectColor!,
+            startTime: startTime!,
+            accumulatedPauseDuration,
+          },
           state: 'idle',
           projectId: null,
           projectName: null,
@@ -116,7 +135,30 @@ export const useTimerStore = create<TimerStore>()(
           startTime: null,
           pauseStartTime: null,
           accumulatedPauseDuration: 0,
+          lastStoppedState: null,
         });
+      },
+
+      undoStop: () => {
+        const { lastStoppedState } = get();
+        if (!lastStoppedState) return false;
+
+        set({
+          state: 'running',
+          projectId: lastStoppedState.projectId,
+          projectName: lastStoppedState.projectName,
+          projectColor: lastStoppedState.projectColor,
+          startTime: lastStoppedState.startTime,
+          pauseStartTime: null,
+          accumulatedPauseDuration: lastStoppedState.accumulatedPauseDuration,
+          lastStoppedState: null,
+        });
+
+        return true;
+      },
+
+      clearLastStopped: () => {
+        set({ lastStoppedState: null });
       },
 
       getElapsedSeconds: () => {
@@ -164,6 +206,7 @@ export const useTimerStore = create<TimerStore>()(
         startTime: state.startTime,
         pauseStartTime: state.pauseStartTime,
         accumulatedPauseDuration: state.accumulatedPauseDuration,
+        lastStoppedState: state.lastStoppedState,
       }),
     },
   ),
