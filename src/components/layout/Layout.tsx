@@ -5,6 +5,7 @@ import { UpdateBanner } from '../UpdateBanner';
 import { useThemeEffect } from '../../hooks/useThemeEffect';
 import { useFontSizeEffect } from '../../hooks/useFontSizeEffect';
 import { TimerSync } from '../../features/timer/TimerSync';
+import { ErrorBoundary } from '../ui/ErrorBoundary';
 
 export function Layout() {
   // Initialize global effects here
@@ -19,9 +20,11 @@ export function Layout() {
         <UpdateBanner />
         <Header />
         <main className='flex-1 overflow-auto p-8'>
-          <div className='page-enter'>
-            <Outlet />
-          </div>
+          <ErrorBoundary name='page-content'>
+            <div className='page-enter'>
+              <Outlet />
+            </div>
+          </ErrorBoundary>
         </main>
       </div>
     </div>

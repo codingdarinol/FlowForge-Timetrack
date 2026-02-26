@@ -47,8 +47,6 @@ export function ProjectForm({
   // Reset form when modal opens with new data
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore - Suppressing set-state-in-effect warning as this is a deliberate reset pattern
       // eslint-disable-next-line react-hooks/exhaustive-deps
       setFormData({
         name: initialData?.name || '',

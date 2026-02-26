@@ -1,9 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Trash2, Clock, Calendar, CheckCircle, XCircle, Pencil } from 'lucide-react';
+import { Search, Trash2, Clock, Calendar, CheckCircle, XCircle, Pencil, Download } from 'lucide-react';
 import type { TimeEntryWithProject, TimeEntry } from '../../types';
 import { formatDurationShort, calculateDuration } from '../../types';
 import { timeEntryService, projectService, clientService } from '../../services';
 import type { Project, Client } from '../../types';
+import { timeEntryLogger } from '../../lib/logger';
+import { generateCSV, downloadCSV } from '../../lib/exportUtils';
+import { ListSkeleton } from '../../components/ui';
+import { useUndoableAction } from '../../hooks/useUndoableAction';
 import {
   Button,
   Card,
@@ -33,6 +37,8 @@ export function TimeEntriesList() {
   const [deletingEntries, setDeletingEntries] = useState<TimeEntryWithProject[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const { execute: executeUndoable } = useUndoableAction();
+
   // Edit modal state
   const [editingEntry, setEditingEntry] = useState<TimeEntryWithProject | null>(null);
 
@@ -53,7 +59,7 @@ export function TimeEntriesList() {
       setProjects(projectsData);
       setClients(clientsData);
     } catch (err) {
-      console.error('Failed to load data:', err);
+      timeEntryLogger.error('Failed to load data:', err);
     } finally {
       setLoading(false);
     }
@@ -188,14 +194,33 @@ export function TimeEntriesList() {
   const handleConfirmDelete = async () => {
     if (!deletingEntries) return;
 
-    setSubmitting(true);
-    try {
-      await timeEntryService.deleteMany(deletingEntries.map((e) => e.id));
-      setSelectedIds(new Set());
-      await loadData();
-      setDeletingEntries(null);
-    } finally {
-      setSubmitting(false);
+    const entriesToDelete = deletingEntries;
+    setDeletingEntries(null);
+    setSelectedIds(new Set());
+
+    if (entriesToDelete.length === 1) {
+      const entry = entriesToDelete[0];
+      // Optimistic remove
+      setEntries((prev) => prev.filter((e) => e.id !== entry.id));
+      executeUndoable({
+        message: `Deleted time entry for "${entry.projectName}"`,
+        action: async () => {
+          await timeEntryService.bulkDelete([entry.id]);
+        },
+        onUndo: () => {
+          loadData();
+        },
+      });
+    } else {
+      setSubmitting(true);
+      try {
+        await timeEntryService.bulkDelete(entriesToDelete.map((e) => e.id));
+        await loadData();
+      } catch (error) {
+        timeEntryLogger.error('Failed to delete entries', error);
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -221,6 +246,29 @@ export function TimeEntriesList() {
     }
   };
 
+  const handleExportCSV = async () => {
+    try {
+      const headers = ['Date', 'Project', 'Client', 'Start', 'End', 'Duration', 'Billable', 'Billed', 'Notes'];
+      const rows = filteredEntries.map((entry) => [
+        new Date(entry.startTime).toLocaleDateString(),
+        entry.projectName || '',
+        entry.clientName || '',
+        new Date(entry.startTime).toLocaleTimeString(),
+        entry.endTime ? new Date(entry.endTime).toLocaleTimeString() : '',
+        entry.endTime
+          ? formatDurationShort(calculateDuration(entry))
+          : '',
+        entry.isBillable ? 'Yes' : 'No',
+        entry.isBilled ? 'Yes' : 'No',
+        entry.notes || '',
+      ]);
+      const csv = generateCSV(headers, rows);
+      await downloadCSV(`time-entries-${new Date().toISOString().split('T')[0]}.csv`, csv);
+    } catch (error) {
+      timeEntryLogger.error('Failed to export CSV', error);
+    }
+  };
+
   // Check if any selected entries are billed (to show Unbill button)
   const hasSelectedBilledEntries = useMemo(() => {
     return filteredEntries.some((e) => selectedIds.has(e.id) && e.isBilled);
@@ -238,11 +286,7 @@ export function TimeEntriesList() {
   }, [filteredEntries, selectedIds]);
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center h-64'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
-      </div>
-    );
+    return <ListSkeleton />;
   }
 
   return (
@@ -250,7 +294,17 @@ export function TimeEntriesList() {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <h1 className='text-2xl font-bold text-foreground'>Time Entries</h1>
-        {selectedIds.size > 0 && (
+        <div className='flex items-center gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleExportCSV}
+            disabled={filteredEntries.length === 0}
+          >
+            <Download className='w-4 h-4' />
+            Export CSV
+          </Button>
+          {selectedIds.size > 0 && (
           <div className='flex items-center gap-2'>
             <span className='text-sm text-muted-foreground'>
               {selectedIds.size} selected ({formatDurationShort(selectedTotal)})
@@ -283,6 +337,7 @@ export function TimeEntriesList() {
             </Button>
           </div>
         )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -659,7 +714,7 @@ const EditTimeEntryModal = ({
         isBillable,
       });
     } catch (error) {
-      console.error('Failed to save entry:', error);
+      timeEntryLogger.error('Failed to save entry:', error);
     } finally {
       setSaving(false);
     }

@@ -4,6 +4,7 @@ import { useTimerStore } from '../../stores/timerStore';
 import { useTimerWithEffects } from '../../hooks/useTimerWithEffects';
 import { listen, emit } from '@tauri-apps/api/event';
 import { timeEntryService } from '../../services';
+import { uiLogger } from '../../lib/logger';
 
 export function TimerSync() {
   const { state, projectId, projectName, projectColor, getElapsedSeconds } = useTimerStore();
@@ -18,7 +19,7 @@ export function TimerSync() {
         projectName,
         projectColor,
         elapsedSeconds: getElapsedSeconds(),
-      }).catch(console.error);
+      }).catch((err) => uiLogger.error('Failed to emit timer sync:', err));
     };
 
     // Sync immediately on change
@@ -40,7 +41,7 @@ export function TimerSync() {
     const unlistenCommand = listen<{ action: string }>('timer-command', async (event) => {
       const { action } = event.payload;
 
-      console.log('[TimerSync] Received command:', action);
+      uiLogger.debug('Received command:', action);
 
       if (action === 'pause') {
         pause();
@@ -60,9 +61,9 @@ export function TimerSync() {
               isBilled: false,
             });
             await emit('time-entry-saved');
-            console.log('[TimerSync] Saved time entry from widget stop');
+            uiLogger.debug('Saved time entry from widget stop');
           } catch (err) {
-            console.error('Failed to save time entry from widget:', err);
+            uiLogger.error('Failed to save time entry from widget:', err);
           }
         }
       }
@@ -75,7 +76,7 @@ export function TimerSync() {
         projectName,
         projectColor,
         elapsedSeconds: getElapsedSeconds(),
-      }).catch(console.error);
+      }).catch((err) => uiLogger.error('Failed to emit timer sync:', err));
     });
 
     return () => {

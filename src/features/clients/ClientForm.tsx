@@ -35,8 +35,6 @@ export function ClientForm({
   // Reset form when modal opens/closes or initialData changes
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore - Suppressing set-state-in-effect warning as this is a deliberate reset pattern
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         name: initialData?.name || '',

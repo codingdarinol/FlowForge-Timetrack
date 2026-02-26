@@ -1,5 +1,6 @@
 // Shortcut service using Tauri's global-shortcut plugin JavaScript API
 import { register, unregister, isRegistered } from '@tauri-apps/plugin-global-shortcut';
+import { shortcutLogger } from '../lib/logger';
 
 export type ShortcutAction = 'start' | 'pause' | 'stop' | 'toggle-widget' | 'toggle-sound';
 
@@ -18,7 +19,7 @@ export interface ShortcutService {
 
 export const shortcutService: ShortcutService = {
   subscribe: async (callback) => {
-    console.log('[Shortcuts] Registering global shortcuts via JS API...');
+    shortcutLogger.debug('Registering global shortcuts via JS API...');
 
     const registeredKeys: string[] = [];
 
@@ -27,39 +28,39 @@ export const shortcutService: ShortcutService = {
         // Check if already registered
         const alreadyRegistered = await isRegistered(key);
         if (alreadyRegistered) {
-          console.log(`[Shortcuts] ${key} already registered, unregistering first`);
+          shortcutLogger.debug(`${key} already registered, unregistering first`);
           await unregister(key);
         }
 
         await register(key, (event) => {
           // Only trigger on keydown (not keyup)
           if (event.state === 'Pressed') {
-            console.log(`[Shortcuts] Triggered: ${key} -> ${action}`);
+            shortcutLogger.debug(`Triggered: ${key} -> ${action}`);
             callback(action);
           }
         });
         registeredKeys.push(key);
-        console.log(`[Shortcuts] Registered: ${key} -> ${action}`);
+        shortcutLogger.debug(`Registered: ${key} -> ${action}`);
       } catch (error) {
         // Ignore HMR race conditions where key is briefly unavailable
         if (String(error).includes('RegisterEventHotKey failed')) {
-          console.warn(`[Shortcuts] Skipped duplicate registration for ${key} (harmless in dev)`);
+          shortcutLogger.warn(`Skipped duplicate registration for ${key} (harmless in dev)`);
         } else {
-          console.error(`[Shortcuts] Failed to register ${key}:`, error);
+          shortcutLogger.error(`Failed to register ${key}:`, error);
         }
       }
     }
 
-    console.log('[Shortcuts] All shortcuts registered!');
+    shortcutLogger.debug('All shortcuts registered!');
 
     // Return cleanup function
     return async () => {
-      console.log('[Shortcuts] Unregistering shortcuts...');
+      shortcutLogger.debug('Unregistering shortcuts...');
       for (const key of registeredKeys) {
         try {
           await unregister(key);
         } catch (error) {
-          console.error(`[Shortcuts] Failed to unregister ${key}:`, error);
+          shortcutLogger.error(`Failed to unregister ${key}:`, error);
         }
       }
     };

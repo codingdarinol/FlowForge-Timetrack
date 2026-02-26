@@ -1,6 +1,8 @@
 // Window control utilities for Tauri
 // Handles showing/hiding the floating timer widget
 
+import { uiLogger } from './logger';
+
 // Widget dimensions (logical pixels)
 const WIDGET_WIDTH = 260;
 const MARGIN_FROM_EDGE = 20; // Margin from window edge
@@ -10,7 +12,7 @@ export async function showWidget(): Promise<void> {
   const isTauri = '__TAURI__' in window || '__TAURI_INTERNALS__' in window;
 
   if (!isTauri) {
-    console.warn('Widget is only available in Tauri app');
+    uiLogger.debug('Widget is only available in Tauri app');
     return;
   }
 
@@ -50,7 +52,7 @@ export async function showWidget(): Promise<void> {
       }
     }
   } catch (error) {
-    console.warn('Failed to show widget:', error);
+    uiLogger.warn('Failed to show widget:', error);
   }
 }
 
@@ -82,7 +84,7 @@ async function positionWidgetRelativeToMainWindow(
     // y = main window top + margin for title bar
     const y = mainPos.y + topMarginPhysical;
 
-    console.log('[Widget] Positioning relative to main window:', {
+    uiLogger.debug('Positioning relative to main window:', {
       mainPos: { x: mainPos.x, y: mainPos.y },
       mainSize: { width: mainSize.width, height: mainSize.height },
       widgetPos: { x, y },
@@ -91,7 +93,7 @@ async function positionWidgetRelativeToMainWindow(
 
     await widget.setPosition(new PhysicalPosition(x, y));
   } catch (error) {
-    console.error('[Widget] Position calculation failed:', error);
+    uiLogger.error('Position calculation failed:', error);
   }
 }
 
@@ -109,7 +111,7 @@ export async function hideWidget(): Promise<void> {
       await widget.hide();
     }
   } catch (error) {
-    console.warn('Failed to hide widget:', error);
+    uiLogger.warn('Failed to hide widget:', error);
   }
 }
 

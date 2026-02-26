@@ -235,3 +235,19 @@ export const uiLogger = {
   warn: (msg: string, data?: unknown) => logger.warn('UI', msg, data),
   error: (msg: string, err?: Error | unknown, data?: unknown) => logger.error('UI', msg, err, data),
 };
+
+export const shortcutLogger = {
+  debug: (msg: string, data?: unknown) => logger.debug('Shortcut', msg, data),
+  info: (msg: string, data?: unknown) => logger.info('Shortcut', msg, data),
+  warn: (msg: string, data?: unknown) => logger.warn('Shortcut', msg, data),
+  error: (msg: string, err?: Error | unknown, data?: unknown) =>
+    logger.error('Shortcut', msg, err, data),
+};
+
+export const backupLogger = {
+  debug: (msg: string, data?: unknown) => logger.debug('Backup', msg, data),
+  info: (msg: string, data?: unknown) => logger.info('Backup', msg, data),
+  warn: (msg: string, data?: unknown) => logger.warn('Backup', msg, data),
+  error: (msg: string, err?: Error | unknown, data?: unknown) =>
+    logger.error('Backup', msg, err, data),
+};

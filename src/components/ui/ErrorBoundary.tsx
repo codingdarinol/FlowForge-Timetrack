@@ -34,6 +34,12 @@ export class ErrorBoundary extends Component<
           <pre className='mt-2 text-xs opacity-75 overflow-auto max-h-40'>
             {this.state.error?.stack}
           </pre>
+          <button
+            onClick={() => this.setState({ hasError: false, error: null })}
+            className='mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity'
+          >
+            Try Again
+          </button>
         </div>
       );
     }

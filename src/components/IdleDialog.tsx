@@ -1,9 +1,10 @@
 import { useRef, useEffect } from 'react';
 import { emit } from '@tauri-apps/api/event';
 import { useTimerStore } from '../stores/timerStore';
-import { Button, Card } from './ui';
+import { Button, Modal } from './ui';
 import { Clock, Trash2, Check } from 'lucide-react';
 import { formatDuration } from '../types';
+import { uiLogger } from '../lib/logger';
 
 interface IdleDialogProps {
   idleDuration: number; // seconds
@@ -19,12 +20,10 @@ export function IdleDialog({ idleDuration, onClose }: IdleDialogProps) {
     // Capture baseline on mount
     const store = useTimerStore.getState();
     baselineAccumulatedRef.current = store.accumulatedPauseDuration;
-    console.log(
-      '[IdleDialog] Mounted. Baseline accumulated:',
-      baselineAccumulatedRef.current,
-      'IdleDuration:',
+    uiLogger.debug('Mounted. Baseline accumulated:', {
+      baselineAccumulated: baselineAccumulatedRef.current,
       idleDuration,
-    );
+    });
   }, [idleDuration]);
 
   const handleDiscard = () => {
@@ -34,36 +33,31 @@ export function IdleDialog({ idleDuration, onClose }: IdleDialogProps) {
     // Target: baseline + idleDuration (treat idle as break, subtract from work time)
     const targetAccumulated = baseline + idleDuration;
 
-    console.log(
-      '[IdleDialog] Discard clicked. State:',
-      store.state,
-      'IdleDuration:',
+    uiLogger.debug('Discard clicked.', {
+      state: store.state,
       idleDuration,
-      'Baseline:',
       baseline,
-      'Current:',
-      store.accumulatedPauseDuration,
-      'Target:',
-      targetAccumulated,
-    );
+      current: store.accumulatedPauseDuration,
+      target: targetAccumulated,
+    });
 
     if (store.state === 'running') {
       // Timer was already manually resumed
       // Set to target value (which accounts for the idle duration as a break)
-      console.log('[IdleDialog] Retroactive discard. Setting accumulated to:', targetAccumulated);
+      uiLogger.debug('Retroactive discard. Setting accumulated to:', targetAccumulated);
       useTimerStore.setState({
         accumulatedPauseDuration: targetAccumulated,
       });
     } else if (store.state === 'paused') {
       // Standard case: Timer is still paused
-      console.log('[IdleDialog] Standard discard. Resuming with accumulated:', targetAccumulated);
+      uiLogger.debug('Standard discard. Resuming with accumulated:', targetAccumulated);
       useTimerStore.setState({
         state: 'running',
         pauseStartTime: null,
         accumulatedPauseDuration: targetAccumulated,
       });
     }
-    emit('timer-idle-toggle', { active: false }).catch(console.error);
+    emit('timer-idle-toggle', { active: false }).catch((err) => uiLogger.error('Failed to emit idle toggle:', err));
     onClose();
   };
 
@@ -74,52 +68,44 @@ export function IdleDialog({ idleDuration, onClose }: IdleDialogProps) {
     // Target: baseline only (idle time should count as work, not break)
     const targetAccumulated = baseline;
 
-    console.log(
-      '[IdleDialog] Keep All clicked. State:',
-      store.state,
-      'IdleDuration:',
+    uiLogger.debug('Keep All clicked.', {
+      state: store.state,
       idleDuration,
-      'Baseline:',
       baseline,
-      'Current:',
-      store.accumulatedPauseDuration,
-      'Target:',
-      targetAccumulated,
-    );
+      current: store.accumulatedPauseDuration,
+      target: targetAccumulated,
+    });
 
     if (store.state === 'running') {
       // Timer was already manually resumed
       // The resume() added pause duration, so we need to reset to baseline
-      console.log('[IdleDialog] Retroactive keep all. Setting accumulated to:', targetAccumulated);
+      uiLogger.debug('Retroactive keep all. Setting accumulated to:', targetAccumulated);
       useTimerStore.setState({
         accumulatedPauseDuration: targetAccumulated,
       });
     } else if (store.state === 'paused') {
       // Standard case: Timer is still paused
-      console.log('[IdleDialog] Standard keep all. Resuming with accumulated:', targetAccumulated);
+      uiLogger.debug('Standard keep all. Resuming with accumulated:', targetAccumulated);
       useTimerStore.setState({
         state: 'running',
         pauseStartTime: null,
         accumulatedPauseDuration: targetAccumulated,
       });
     }
-    emit('timer-idle-toggle', { active: false }).catch(console.error);
+    emit('timer-idle-toggle', { active: false }).catch((err) => uiLogger.error('Failed to emit idle toggle:', err));
     onClose();
   };
 
   return (
-    <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
-      <Card className='max-w-md w-full p-6 space-y-4'>
+    <Modal isOpen={true} onClose={onClose} title='Welcome Back!' size='sm'>
+      <div className='space-y-4'>
         <div className='flex items-center gap-3'>
           <div className='p-3 bg-amber-500/10 rounded-full'>
             <Clock className='w-6 h-6 text-amber-600 dark:text-amber-400' />
           </div>
-          <div>
-            <h2 className='text-lg font-semibold'>Welcome Back!</h2>
-            <p className='text-sm text-muted-foreground'>
-              You were away for {formatDuration(idleDuration)}
-            </p>
-          </div>
+          <p className='text-sm text-muted-foreground'>
+            You were away for {formatDuration(idleDuration)}
+          </p>
         </div>
 
         <p className='text-sm'>
@@ -136,7 +122,7 @@ export function IdleDialog({ idleDuration, onClose }: IdleDialogProps) {
             Keep all time
           </Button>
         </div>
-      </Card>
-    </div>
+      </div>
+    </Modal>
   );
 }

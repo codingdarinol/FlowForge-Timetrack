@@ -2,6 +2,7 @@
 // Run these on app startup to ensure schema is up to date
 
 import { getDb } from './db';
+import { dbLogger } from './logger';
 
 export async function runMigrations(): Promise<void> {
   const db = await getDb();
@@ -130,5 +131,5 @@ export async function runMigrations(): Promise<void> {
     // Column already exists, ignore error
   }
 
-  console.log('Database migrations completed successfully');
+  dbLogger.info('Database migrations completed successfully');
 }

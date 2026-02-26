@@ -5,6 +5,7 @@ import { WeeklyChart } from './WeeklyChart';
 import { QuickStats } from './QuickStats';
 
 import { listen } from '@tauri-apps/api/event';
+import { uiLogger } from '../../lib/logger';
 
 export function DashboardSummary() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -29,7 +30,7 @@ export function DashboardSummary() {
         setChartData(monthData);
       }
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      uiLogger.error('Failed to load dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -43,7 +44,7 @@ export function DashboardSummary() {
         const summary = await dashboardService.getWeekSummary(chartRange);
         setChartData(summary);
       } catch (error) {
-        console.error('Failed to load chart data:', error);
+        uiLogger.error('Failed to load chart data:', error);
       }
     };
     fetchChart();
@@ -57,7 +58,7 @@ export function DashboardSummary() {
 
     // Listen for updates from timer stop
     const unlisten = listen('time-entry-saved', () => {
-      console.log('[Dashboard] New time entry saved, refreshing data...');
+      uiLogger.debug('New time entry saved, refreshing data...');
       loadData();
     });
 

@@ -4,6 +4,7 @@
 import { save, open } from '@tauri-apps/plugin-dialog';
 import { copyFile, exists, BaseDirectory } from '@tauri-apps/plugin-fs';
 import Database from '@tauri-apps/plugin-sql';
+import { backupLogger } from '../lib/logger';
 // import { appDataDir, join } from '@tauri-apps/api/path'; // Unused
 
 const DB_FILENAME = 'flowforge.db';
@@ -43,9 +44,9 @@ export const backupService = {
         const db = await Database.load(`sqlite:${DB_FILENAME}`);
         await db.execute('PRAGMA wal_checkpoint(TRUNCATE);');
         // Optional: VACUUM to minimize size, but checkpoint is enough for consistency
-        console.log('WAL Checkpoint complete');
+        backupLogger.debug('WAL Checkpoint complete');
       } catch (dbError) {
-        console.warn('Failed to checkpoint WAL, backup might be stale:', dbError);
+        backupLogger.warn('Failed to checkpoint WAL, backup might be stale:', dbError);
         // Continue anyway as we want to try to backup what we can
       }
 
@@ -55,7 +56,7 @@ export const backupService = {
       return savePath;
       return savePath;
     } catch (error: unknown) {
-      console.error('Backup export failed:', error);
+      backupLogger.error('Backup export failed:', error);
       // Ensure we throw a proper Error object with a message
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(message || 'Unknown error during backup export');
@@ -68,9 +69,9 @@ export const backupService = {
    * NOTE: App should be restarted after import for changes to take effect
    */
   async importBackup(): Promise<boolean> {
-    console.log('backupService: importBackup started');
+    backupLogger.debug('importBackup started');
     try {
-      console.log('backupService: Opening file dialog...');
+      backupLogger.debug('Opening file dialog...');
       // Open file dialog
       const selectedPath = await open({
         title: 'Import FlowForge Backup',
@@ -82,7 +83,7 @@ export const backupService = {
           },
         ],
       });
-      console.log('backupService: Dialog closed. Path:', selectedPath);
+      backupLogger.debug('Dialog closed. Path:', selectedPath);
 
       if (!selectedPath) {
         return false; // User cancelled
@@ -109,9 +110,9 @@ export const backupService = {
               // Import remove from correct plugin
               const { remove } = await import('@tauri-apps/plugin-fs');
               await remove(file, { baseDir: BaseDirectory.AppData });
-              console.log(`Deleted existing ${file}`);
+              backupLogger.debug(`Deleted existing ${file}`);
             } catch (e) {
-              console.warn(`Failed to delete ${file} (might be in use or not exist):`, e);
+              backupLogger.warn(`Failed to delete ${file} (might be in use or not exist):`, e);
             }
           }
         }
@@ -130,7 +131,7 @@ export const backupService = {
         throw copyError;
       }
     } catch (error: unknown) {
-      console.error('Backup import failed:', error);
+      backupLogger.error('Backup import failed:', error);
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(message || 'Unknown error during backup import');
     }

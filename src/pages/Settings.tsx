@@ -44,6 +44,7 @@ import {
 import clsx from 'clsx';
 
 import { emit } from '@tauri-apps/api/event';
+import { uiLogger } from '../lib/logger';
 
 type TabId = 'general' | 'appearance' | 'accessibility' | 'business' | 'guide';
 
@@ -91,7 +92,7 @@ export function Settings() {
       // Notify other windows to reload settings
       await emit('settings-sync');
     } catch (error) {
-      console.error(`Failed to auto-save ${key}:`, error);
+      uiLogger.error(`Failed to auto-save ${key}:`, error);
     }
   };
 
@@ -139,7 +140,7 @@ export function Settings() {
                 checked={localSettings.showFloatingWidget}
                 onChange={(v) => {
                   handleAutoSave('showFloatingWidget', v);
-                  toggleWidget(v).catch(console.error);
+                  toggleWidget(v).catch((err) => uiLogger.error('Failed to toggle widget:', err));
                 }}
                 icon={<Bell className='w-5 h-5' />}
               />
@@ -641,9 +642,9 @@ export function Settings() {
               setImporting(true);
               try {
                 const { backupService } = await import('../services/backupService');
-                console.log('Calling backupService.importBackup...');
+                uiLogger.debug('Calling backupService.importBackup...');
                 const success = await backupService.importBackup();
-                console.log('importBackup result:', success);
+                uiLogger.debug('importBackup result:', success);
                 if (success) {
                   try {
                     const { message } = await import('@tauri-apps/plugin-dialog');
@@ -652,7 +653,7 @@ export function Settings() {
                       kind: 'info',
                     });
                   } catch (e) {
-                    console.error('Failed to show success message:', e);
+                    uiLogger.error('Failed to show success message:', e);
                   }
                   // Small delay to ensure dialog closes cleanly
                   setTimeout(() => {
@@ -660,7 +661,7 @@ export function Settings() {
                   }, 100);
                 }
               } catch (error) {
-                console.error('Import error in UI:', error);
+                uiLogger.error('Import error in UI:', error);
                 alert('Import failed: ' + (error as Error).message);
               } finally {
                 setImporting(false);

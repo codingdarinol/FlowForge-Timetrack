@@ -8,10 +8,12 @@ import type {
 } from '../../types';
 import { PROJECT_STATUS_OPTIONS } from '../../types';
 import { projectService } from '../../services';
-import { Button, EmptyState, ConfirmDialog, Select } from '../../components/ui';
+import { Button, EmptyState, ConfirmDialog, Select, ListSkeleton } from '../../components/ui';
 import { ErrorBoundary } from '../../components/ui/ErrorBoundary';
 import { ProjectForm } from './ProjectForm';
 import { ClientGroup } from './ClientGroup';
+import { projectLogger } from '../../lib/logger';
+import { useUndoableAction } from '../../hooks/useUndoableAction';
 
 function ProjectsListContent() {
   const [projects, setProjects] = useState<ProjectWithStats[]>([]);
@@ -27,15 +29,17 @@ function ProjectsListContent() {
   const [deletingProject, setDeletingProject] = useState<ProjectWithStats | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const { execute: executeUndoable } = useUndoableAction();
+
   const loadProjects = async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await projectService.getAllWithStats();
-      console.log('Loaded projects:', data);
+      projectLogger.debug('Loaded projects:', data);
       setProjects(data);
     } catch (err) {
-      console.error('Failed to load projects:', err);
+      projectLogger.error('Failed to load projects:', err);
       setError(err instanceof Error ? err.message : 'Failed to load projects');
     } finally {
       setLoading(false);
@@ -95,13 +99,13 @@ function ProjectsListContent() {
   const handleCreate = async (data: CreateProjectInput) => {
     setSubmitting(true);
     try {
-      console.log('Creating project with data:', data);
+      projectLogger.debug('Creating project with data:', data);
       const result = await projectService.create(data);
-      console.log('Created project:', result);
+      projectLogger.debug('Created project:', result);
       await loadProjects();
       setShowForm(false);
     } catch (err) {
-      console.error('Failed to create project:', err);
+      projectLogger.error('Failed to create project:', err);
       throw err;
     } finally {
       setSubmitting(false);
@@ -112,12 +116,12 @@ function ProjectsListContent() {
     if (!editingProject) return;
     setSubmitting(true);
     try {
-      console.log('Updating project:', editingProject.id, data);
+      projectLogger.debug('Updating project:', { id: editingProject.id, data });
       await projectService.update(editingProject.id, data);
       await loadProjects();
       setEditingProject(null);
     } catch (err) {
-      console.error('Failed to update project:', err);
+      projectLogger.error('Failed to update project:', err);
       throw err;
     } finally {
       setSubmitting(false);
@@ -132,26 +136,29 @@ function ProjectsListContent() {
         prev.map((p) => (p.id === projectId ? { ...p, status: newStatus } : p)),
       );
     } catch (err) {
-      console.error('Failed to update project status:', err);
+      projectLogger.error('Failed to update project status:', err);
       // Revert or show error
       setError('Failed to update status');
       loadProjects(); // Reload to ensure consistent state
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!deletingProject) return;
-    setSubmitting(true);
-    try {
-      await projectService.delete(deletingProject.id);
-      await loadProjects();
-      setDeletingProject(null);
-    } catch (err) {
-      console.error('Failed to delete project:', err);
-      setError(err instanceof Error ? err.message : 'Failed to delete project');
-    } finally {
-      setSubmitting(false);
-    }
+    const projectToDelete = deletingProject;
+    setDeletingProject(null);
+
+    setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
+
+    executeUndoable({
+      message: `Deleted project "${projectToDelete.name}"`,
+      action: async () => {
+        await projectService.delete(projectToDelete.id);
+      },
+      onUndo: () => {
+        loadProjects();
+      },
+    });
   };
 
   const statusOptions = [
@@ -160,11 +167,7 @@ function ProjectsListContent() {
   ];
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center h-64'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
-      </div>
-    );
+    return <ListSkeleton />;
   }
 
   return (

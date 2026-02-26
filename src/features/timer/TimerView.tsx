@@ -2,13 +2,16 @@ import { useState, useEffect, useMemo } from 'react';
 import { Play, Pause, Square, Coffee, AlertTriangle } from 'lucide-react';
 import { emit, listen } from '@tauri-apps/api/event';
 import { useTimerWithEffects } from '../../hooks/useTimerWithEffects';
+import { useTimerStore } from '../../stores/timerStore';
 import { projectService, timeEntryService } from '../../services';
 import type { Project } from '../../types';
 import { formatDuration } from '../../types';
 import { Button, Select, Card } from '../../components/ui';
 import { playBreakSound, playWorkResumeSound } from '../../lib/sounds';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useToastStore } from '../../stores/toastStore';
 import clsx from 'clsx';
+import { timeEntryLogger } from '../../lib/logger';
 
 export function TimerView() {
   const {
@@ -24,6 +27,8 @@ export function TimerView() {
   } = useTimerWithEffects();
 
   const { settings } = useSettings();
+  const addToast = useToastStore((state) => state.addToast);
+  const undoStop = useTimerStore((state) => state.undoStop);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -41,7 +46,7 @@ export function TimerView() {
 
   // Load active projects
   useEffect(() => {
-    projectService.getActive().then(setProjects).catch(console.error);
+    projectService.getActive().then(setProjects).catch((err) => timeEntryLogger.error('Failed to load active projects:', err));
   }, []);
 
   // Update elapsed time every second when running
@@ -102,7 +107,7 @@ export function TimerView() {
 
   // Emit break status to widget
   useEffect(() => {
-    emit('timer-break-toggle', { active: showBreakReminder || isOnBreak }).catch(console.error);
+    emit('timer-break-toggle', { active: showBreakReminder || isOnBreak }).catch((err) => timeEntryLogger.error('Failed to emit break toggle:', err));
   }, [showBreakReminder, isOnBreak]);
 
   // Listen for idle toggle events
@@ -180,11 +185,22 @@ export function TimerView() {
         isBillable: true,
         isBilled: false,
       };
-      console.log('[Timer] Creating time entry with data:', entryData);
+      timeEntryLogger.debug('Creating time entry with data:', entryData);
       await timeEntryService.create(entryData);
       await emit('time-entry-saved');
+
+      addToast({
+        message: 'Timer stopped',
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            undoStop();
+          },
+        },
+        duration: 10000,
+      });
     } catch (err) {
-      console.error('Failed to save time entry:', err);
+      timeEntryLogger.error('Failed to save time entry:', err);
     } finally {
       setSaving(false);
     }

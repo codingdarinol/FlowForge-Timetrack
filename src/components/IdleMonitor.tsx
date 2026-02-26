@@ -4,6 +4,7 @@ import { emit } from '@tauri-apps/api/event';
 import { useTimerStore } from '../stores/timerStore';
 import { useSettings } from '../contexts/SettingsContext';
 import { IdleDialog } from './IdleDialog';
+import { uiLogger } from '../lib/logger';
 
 const POLL_INTERVAL = 5000; // Check every 5 seconds for responsiveness
 const DEFAULT_IDLE_THRESHOLD = 300; // 5 minutes in seconds
@@ -35,22 +36,20 @@ export function IdleMonitor() {
 
     try {
       const idleSeconds = await invoke<number>('get_idle_time');
-      // console.log(`[IdleMonitor] Idle: ${idleSeconds}s`); // Uncomment for verbose debugging
-
       // User is idle and timer is running - pause it
       if (idleSeconds >= idleThreshold && timerState === 'running' && !pausedByIdleRef.current) {
-        console.log(`[IdleMonitor] Pausing timer (idle ${idleSeconds}s)`);
+        uiLogger.debug(`Pausing timer (idle ${idleSeconds}s)`);
         idleStartRef.current = new Date(Date.now() - idleSeconds * 1000);
         wasRunningRef.current = true;
         pausedByIdleRef.current = true;
         timerPause();
         // Emit idle state for flashing animation
-        emit('timer-idle-toggle', { active: true }).catch(console.error);
+        emit('timer-idle-toggle', { active: true }).catch((err) => uiLogger.error('Failed to emit idle toggle:', err));
       }
 
       // User returned from being idle - show dialog
       if (idleSeconds < MIN_ACTIVE_TIME && pausedByIdleRef.current && idleStartRef.current) {
-        console.log('[IdleMonitor] User returned. Showing dialog.');
+        uiLogger.debug('User returned. Showing dialog.');
         const totalIdleMs = Date.now() - idleStartRef.current.getTime();
         const totalIdleSeconds = Math.round(totalIdleMs / 1000);
 
@@ -62,14 +61,14 @@ export function IdleMonitor() {
           pausedByIdleRef.current = false;
           wasRunningRef.current = false;
         } else {
-          console.log('[IdleMonitor] Idle duration too short for dialog:', totalIdleSeconds);
+          uiLogger.debug('Idle duration too short for dialog:', totalIdleSeconds);
           // Reset flags anyway
           pausedByIdleRef.current = false;
           wasRunningRef.current = false;
         }
       }
     } catch (error) {
-      console.error('[IdleMonitor] Failed to check idle time:', error);
+      uiLogger.error('Failed to check idle time:', error);
     }
   }, [timerState, timerPause, settings.enableIdleDetection, idleThreshold]);
 

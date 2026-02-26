@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { Plus, Search, Pencil, Trash2, Users, StickyNote } from 'lucide-react';
 import type { ClientWithStats, CreateClientInput, UpdateClientInput } from '../../types';
 import { clientService } from '../../services';
-import { Button, Card, EmptyState, ConfirmDialog } from '../../components/ui';
+import { Button, Card, EmptyState, ConfirmDialog, ListSkeleton } from '../../components/ui';
 import { ClientForm } from './ClientForm';
+import { clientLogger } from '../../lib/logger';
+import { useUndoableAction } from '../../hooks/useUndoableAction';
 
 export function ClientsList() {
   const [clients, setClients] = useState<ClientWithStats[]>([]);
@@ -18,16 +20,18 @@ export function ClientsList() {
   const [deletingClient, setDeletingClient] = useState<ClientWithStats | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const { execute: executeUndoable } = useUndoableAction();
+
   // Load clients
   const loadClients = async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await clientService.getAllWithStats();
-      console.log('Loaded clients:', data);
+      clientLogger.debug('Loaded clients:', data);
       setClients(data);
     } catch (err) {
-      console.error('Failed to load clients:', err);
+      clientLogger.error('Failed to load clients:', err);
       setError(err instanceof Error ? err.message : 'Failed to load clients');
     } finally {
       setLoading(false);
@@ -51,13 +55,13 @@ export function ClientsList() {
   const handleCreate = async (data: CreateClientInput) => {
     setSubmitting(true);
     try {
-      console.log('Creating client with data:', data);
+      clientLogger.debug('Creating client with data:', data);
       const result = await clientService.create(data);
-      console.log('Created client:', result);
+      clientLogger.debug('Created client:', result);
       await loadClients();
       setShowForm(false);
     } catch (err) {
-      console.error('Failed to create client:', err);
+      clientLogger.error('Failed to create client:', err);
       // Rethrow so the form can display the error
       throw err;
     } finally {
@@ -69,31 +73,34 @@ export function ClientsList() {
     if (!editingClient) return;
     setSubmitting(true);
     try {
-      console.log('Updating client:', editingClient.id, data);
+      clientLogger.debug('Updating client:', { id: editingClient.id, data });
       await clientService.update(editingClient.id, data);
       await loadClients();
       setEditingClient(null);
     } catch (err) {
-      console.error('Failed to update client:', err);
+      clientLogger.error('Failed to update client:', err);
       throw err;
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!deletingClient) return;
-    setSubmitting(true);
-    try {
-      await clientService.delete(deletingClient.id);
-      await loadClients();
-      setDeletingClient(null);
-    } catch (err) {
-      console.error('Failed to delete client:', err);
-      setError(err instanceof Error ? err.message : 'Failed to delete client');
-    } finally {
-      setSubmitting(false);
-    }
+    const clientToDelete = deletingClient;
+    setDeletingClient(null);
+
+    setClients((prev) => prev.filter((c) => c.id !== clientToDelete.id));
+
+    executeUndoable({
+      message: `Deleted client "${clientToDelete.name}"`,
+      action: async () => {
+        await clientService.delete(clientToDelete.id);
+      },
+      onUndo: () => {
+        loadClients();
+      },
+    });
   };
 
   const formatCurrency = (amount: number) => {
@@ -119,11 +126,7 @@ export function ClientsList() {
   };
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center h-64'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
-      </div>
-    );
+    return <ListSkeleton />;
   }
 
   return (
