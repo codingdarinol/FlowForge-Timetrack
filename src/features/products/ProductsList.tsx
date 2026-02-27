@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Package, Pencil, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, Package, Pencil, Trash2, Eye, ChevronDown, ChevronRight } from 'lucide-react';
 import type { Product } from '../../types';
 import { productService } from '../../services';
+import { PRODUCT_TEMPLATES } from '../../services/productService';
+import type { ProductTemplate } from '../../services/productService';
 import {
   Button,
   Card,
@@ -20,10 +22,12 @@ export function ProductsList() {
 
   // Modal states
   const [showCreate, setShowCreate] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [templateData, setTemplateData] = useState<ProductTemplate | null>(null);
 
   const loadData = async () => {
     try {
@@ -75,10 +79,16 @@ export function ProductsList() {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <h1 className='text-2xl font-bold text-foreground'>Products & Services</h1>
-        <Button onClick={() => setShowCreate(true)}>
-          <Plus className='w-4 h-4' />
-          New Item
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowTemplates(true)}>
+            <Package className='w-4 h-4' />
+            Quick Add
+          </Button>
+          <Button onClick={() => setShowCreate(true)}>
+            <Plus className='w-4 h-4' />
+            New Item
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -153,9 +163,11 @@ export function ProductsList() {
           onClose={() => {
             setShowCreate(false);
             setEditingProduct(null);
+            setTemplateData(null);
           }}
           onSaved={loadData}
           initialData={editingProduct}
+          templateData={templateData}
         />
       )}
 
@@ -200,6 +212,19 @@ export function ProductsList() {
         variant='danger'
         loading={submitting}
       />
+
+      {showTemplates && (
+        <TemplatesModal
+          isOpen={showTemplates}
+          onClose={() => setShowTemplates(false)}
+          onSelect={(template) => {
+            setShowTemplates(false);
+            setTemplateData(template);
+            setShowCreate(true);
+          }}
+          existingNames={products.map(p => p.name.toLowerCase())}
+        />
+      )}
     </div>
   );
 }
@@ -209,9 +234,10 @@ interface CreateProductModalProps {
   onClose: () => void;
   onSaved: () => void;
   initialData: Product | null;
+  templateData?: ProductTemplate | null;
 }
 
-function CreateProductModal({ isOpen, onClose, onSaved, initialData }: CreateProductModalProps) {
+function CreateProductModal({ isOpen, onClose, onSaved, initialData, templateData }: CreateProductModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState<number>(0);
@@ -224,13 +250,18 @@ function CreateProductModal({ isOpen, onClose, onSaved, initialData }: CreatePro
       setDescription(initialData.description);
       setPrice(initialData.price);
       setSku(initialData.sku || '');
+    } else if (templateData) {
+      setName(templateData.name);
+      setDescription(templateData.description);
+      setPrice(templateData.price);
+      setSku('');
     } else {
       setName('');
       setDescription('');
       setPrice(0);
       setSku('');
     }
-  }, [initialData, isOpen]);
+  }, [initialData, templateData, isOpen]);
 
   const handleSubmit = async () => {
     if (!name) return;
@@ -297,6 +328,93 @@ function CreateProductModal({ isOpen, onClose, onSaved, initialData }: CreatePro
           </Button>
         </ModalFooter>
       </div>
+    </Modal>
+  );
+}
+
+interface TemplatesModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelect: (template: ProductTemplate) => void;
+  existingNames: string[];
+}
+
+function TemplatesModal({ isOpen, onClose, onSelect, existingNames }: TemplatesModalProps) {
+  const [expandedFields, setExpandedFields] = useState<Set<string>>(new Set());
+
+  const fields = [...new Set(PRODUCT_TEMPLATES.map(t => t.field))];
+
+  const toggleField = (field: string) => {
+    setExpandedFields(prev => {
+      const next = new Set(prev);
+      if (next.has(field)) {
+        next.delete(field);
+      } else {
+        next.add(field);
+      }
+      return next;
+    });
+  };
+
+  // Expand all by default on mount
+  useEffect(() => {
+    setExpandedFields(new Set(fields));
+  }, []);
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Quick Add from Templates">
+      <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+        {fields.map(field => (
+          <div key={field} className="border border-border rounded-lg overflow-hidden">
+            <button
+              onClick={() => toggleField(field)}
+              className="w-full flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors"
+            >
+              <span className="font-medium text-sm text-foreground">{field}</span>
+              {expandedFields.has(field) ? (
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              )}
+            </button>
+            {expandedFields.has(field) && (
+              <div className="border-t border-border">
+                {PRODUCT_TEMPLATES.filter(t => t.field === field).map(template => {
+                  const exists = existingNames.includes(template.name.toLowerCase());
+                  return (
+                    <button
+                      key={template.name}
+                      onClick={() => !exists && onSelect(template)}
+                      disabled={exists}
+                      className={`w-full text-left p-3 border-b border-border last:border-b-0 transition-colors ${
+                        exists
+                          ? 'opacity-50 cursor-not-allowed bg-muted/30'
+                          : 'hover:bg-primary/5 cursor-pointer'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 mr-3">
+                          <div className="text-sm font-medium text-foreground">
+                            {template.name}
+                            {exists && <span className="ml-2 text-xs text-muted-foreground">(already exists)</span>}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{template.description}</p>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground whitespace-nowrap">
+                          ${template.price.toLocaleString()}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <ModalFooter>
+        <Button variant="outline" onClick={onClose}>Close</Button>
+      </ModalFooter>
     </Modal>
   );
 }

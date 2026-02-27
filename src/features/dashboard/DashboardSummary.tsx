@@ -3,6 +3,9 @@ import { dashboardService, DashboardData } from '../../services/dashboardService
 import { TodaySummary } from './TodaySummary';
 import { WeeklyChart } from './WeeklyChart';
 import { QuickStats } from './QuickStats';
+import { ClientBreakdown } from './ClientBreakdown';
+import { MonthlyStats } from './MonthlyStats';
+import { ProjectBreakdown } from './ProjectBreakdown';
 
 import { listen } from '@tauri-apps/api/event';
 import { uiLogger } from '../../lib/logger';
@@ -38,16 +41,22 @@ export function DashboardSummary() {
 
   // Effect to handle range changes
   useEffect(() => {
+    let cancelled = false;
     const fetchChart = async () => {
       if (!data) return; // Wait for initial load
       try {
         const summary = await dashboardService.getWeekSummary(chartRange);
-        setChartData(summary);
+        if (!cancelled) {
+          setChartData(summary);
+        }
       } catch (error) {
-        uiLogger.error('Failed to load chart data:', error);
+        if (!cancelled) {
+          uiLogger.error('Failed to load chart data:', error);
+        }
       }
     };
     fetchChart();
+    return () => { cancelled = true; };
   }, [chartRange]);
 
   useEffect(() => {
@@ -99,6 +108,9 @@ export function DashboardSummary() {
         weeklySeconds={data.week.totalSeconds}
         totalSeconds={data.total.totalSeconds}
       />
+      <ClientBreakdown clients={data.clientBreakdown} />
+      {data.monthSummary && <MonthlyStats initialData={data.monthSummary} />}
+      {data.projectBreakdown.length > 0 && <ProjectBreakdown projects={data.projectBreakdown} />}
     </div>
   );
 }

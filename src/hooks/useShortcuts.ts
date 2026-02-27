@@ -97,18 +97,24 @@ export function useShortcuts() {
       }
     };
 
+    let cancelled = false;
     let cleanup: (() => void) | null = null;
 
     shortcutService
       .subscribe(handleAction)
       .then((fn) => {
-        cleanup = fn;
+        if (cancelled) {
+          fn(); // StrictMode already unmounted — immediately unregister
+        } else {
+          cleanup = fn;
+        }
       })
       .catch((error) => {
         console.error('Failed to subscribe to shortcuts:', error);
       });
 
     return () => {
+      cancelled = true;
       cleanup?.();
     };
   }, [timerPause, timerResume, timerStop, updateSetting]);

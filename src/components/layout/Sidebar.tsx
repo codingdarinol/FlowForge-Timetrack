@@ -83,6 +83,16 @@ export function Sidebar() {
           <Settings className='w-5 h-5' />
           <span>Settings</span>
         </NavLink>
+        <div className='px-4 pt-3 pb-1'>
+          <a href='https://flowforge.emmi.zone/' target='_blank' rel='noopener noreferrer'
+             className='block text-xs text-muted-foreground hover:text-foreground transition-colors'>
+            flowforge.emmi.zone
+          </a>
+          <a href='https://emmi.engineer' target='_blank' rel='noopener noreferrer'
+             className='block text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors mt-0.5'>
+            by emmi.engineer
+          </a>
+        </div>
       </div>
     </aside>
   );

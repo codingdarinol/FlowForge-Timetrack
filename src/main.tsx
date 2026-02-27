@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles/globals.css';
+import '@fontsource-variable/lexend';
 import { runMigrations } from './lib/migrations';
 import { dbLogger } from './lib/logger';
 

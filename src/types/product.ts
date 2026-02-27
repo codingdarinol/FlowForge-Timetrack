@@ -5,7 +5,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  sku?: string;
+  sku: string;
   createdAt: string; // ISO date
   updatedAt: string; // ISO date
 }

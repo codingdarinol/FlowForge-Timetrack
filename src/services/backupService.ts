@@ -54,7 +54,6 @@ export const backupService = {
       await copyFile(DB_FILENAME, savePath, { fromPathBaseDir: BaseDirectory.AppData });
 
       return savePath;
-      return savePath;
     } catch (error: unknown) {
       backupLogger.error('Backup export failed:', error);
       // Ensure we throw a proper Error object with a message

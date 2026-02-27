@@ -41,6 +41,10 @@ export interface AppSettings {
   paymentLinkTitle: string;
   paymentLink2: string;
   paymentLink2Title: string;
+  paymentQrCode: string | null;  // base64 image of QR code
+  businessWebsite: string;
+  businessTagline: string;
+  paymentBankDetails: string;   // IBAN, BIC, bank name (multi-line)
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -68,6 +72,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
   paymentLinkTitle: 'Payment Link 1',
   paymentLink2: '',
   paymentLink2Title: 'Payment Link 2',
+  paymentQrCode: null,
+  businessWebsite: '',
+  businessTagline: '',
+  paymentBankDetails: '',
 };
 
 export const FONT_SIZE_SCALE: Record<FontSize, number> = {

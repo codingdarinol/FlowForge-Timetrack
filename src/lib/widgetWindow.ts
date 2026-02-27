@@ -4,7 +4,7 @@
 import { uiLogger } from './logger';
 
 // Widget dimensions (logical pixels)
-const WIDGET_WIDTH = 260;
+const WIDGET_WIDTH = 280;
 const MARGIN_FROM_EDGE = 20; // Margin from window edge
 const TOP_MARGIN = 50; // Top margin to clear title bar
 

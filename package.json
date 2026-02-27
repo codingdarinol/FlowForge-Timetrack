@@ -10,6 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@fontsource-variable/lexend": "^5.2.11",
     "@tauri-apps/api": "^2.9.1",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-fs": "^2.4.5",

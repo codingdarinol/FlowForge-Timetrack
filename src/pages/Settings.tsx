@@ -25,6 +25,8 @@ import {
   BarChart3,
   PauseCircle,
   Eye,
+  Globe,
+  QrCode,
 } from 'lucide-react';
 import type { AppSettings, Theme, FontSize, Density } from '../types';
 import { FONT_SIZE_OPTIONS, DENSITY_OPTIONS, DEFAULT_SETTINGS } from '../types';
@@ -594,6 +596,85 @@ export function Settings() {
                 placeholder='Payment is due within 30 days of invoice date.&#10;&#10;Bank Transfer Details:&#10;IBAN: ...&#10;BIC: ...'
                 rows={6}
               />
+
+              {/* QR Code Upload */}
+              <div>
+                <label className='block text-sm font-medium text-foreground mb-2'>
+                  Payment QR Code
+                </label>
+                {localSettings.paymentQrCode ? (
+                  <div className='flex items-center gap-4'>
+                    <img
+                      src={localSettings.paymentQrCode}
+                      alt='Payment QR Code'
+                      className='w-24 h-24 object-contain border border-border rounded-lg p-2 bg-background'
+                    />
+                    <Button
+                      variant='destructive'
+                      size='sm'
+                      onClick={() => handleAutoSave('paymentQrCode', null)}
+                    >
+                      Remove QR Code
+                    </Button>
+                  </div>
+                ) : (
+                  <label className='flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors'>
+                    <div className='flex flex-col items-center justify-center pt-5 pb-6'>
+                      <QrCode className='w-8 h-8 text-muted-foreground mb-2' />
+                      <p className='text-sm text-muted-foreground'>
+                        <span className='font-medium text-primary'>Click to upload</span> or drag
+                        and drop
+                      </p>
+                      <p className='text-xs text-muted-foreground mt-1'>PNG, JPG up to 1MB. Used on all invoices.</p>
+                    </div>
+                    <input
+                      type='file'
+                      accept='image/png,image/jpeg,image/jpg'
+                      className='hidden'
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 1024 * 1024) {
+                            alert('File size must be less than 1MB');
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            const base64 = event.target?.result as string;
+                            handleAutoSave('paymentQrCode', base64);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
+
+              <Input
+                label='Website'
+                value={localSettings.businessWebsite}
+                onChange={(e) => handleLocalChange('businessWebsite', e.target.value)}
+                onBlur={() => handleAutoSave('businessWebsite', localSettings.businessWebsite)}
+                placeholder='https://yourwebsite.com'
+              />
+
+              <Input
+                label='Tagline'
+                value={localSettings.businessTagline}
+                onChange={(e) => handleLocalChange('businessTagline', e.target.value)}
+                onBlur={() => handleAutoSave('businessTagline', localSettings.businessTagline)}
+                placeholder='Your business tagline'
+              />
+
+              <Textarea
+                label='Bank Transfer Details'
+                value={localSettings.paymentBankDetails}
+                onChange={(e) => handleLocalChange('paymentBankDetails', e.target.value)}
+                onBlur={() => handleAutoSave('paymentBankDetails', localSettings.paymentBankDetails)}
+                placeholder={'IBAN: NL00 BANK 0000 0000 00\nBIC: BANKCODE\nBank Name'}
+                rows={4}
+              />
             </CardContent>
           </Card>
 
@@ -1007,6 +1088,14 @@ export function Settings() {
                   </li>
                 </ul>
               </div>
+              <div>
+                <h4 className='font-medium mb-2'>PDF Design</h4>
+                <p className='text-sm text-muted-foreground'>
+                  Exported PDFs feature a professional teal-accented header with your business logo,
+                  a clear FROM/BILL TO layout, itemized line items with tax calculations, and a
+                  payment details box including your QR code for quick mobile payments.
+                </p>
+              </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
                 <strong>💡 Tip:</strong> Only the time entries included in the final saved invoice
                 are marked as "billed". If you remove an entry before saving, it stays unbilled.
@@ -1043,6 +1132,14 @@ export function Settings() {
                   <li>Select a product – it's added with preset name and price!</li>
                   <li>Adjust quantity as needed</li>
                 </ol>
+              </div>
+              <div>
+                <h4 className='font-medium mb-2'>Quick Add Templates</h4>
+                <p className='text-sm text-muted-foreground'>
+                  Use the "Quick Add" button to instantly create products from pre-filled templates.
+                  Templates provide suggested names, descriptions, and prices for common service types
+                  that you can customize before saving.
+                </p>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
                 <strong>💡 Tip:</strong> Click the eye icon on any product card to view its full
@@ -1091,6 +1188,25 @@ export function Settings() {
                   </li>
                   <li>
                     • <strong>Payment Terms:</strong> Bank details, IBAN, instructions, etc.
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className='font-medium mb-2'>Additional Business Info</h4>
+                <ul className='space-y-1 text-sm text-muted-foreground'>
+                  <li>
+                    • <strong>Website:</strong> Your business website URL, displayed on invoices.
+                  </li>
+                  <li>
+                    • <strong>Tagline:</strong> A short description or slogan for your business.
+                  </li>
+                  <li>
+                    • <strong>Payment QR Code:</strong> Upload a QR code image for quick mobile
+                    payments (appears on PDF invoices).
+                  </li>
+                  <li>
+                    • <strong>Bank Transfer Details:</strong> Add IBAN, bank name, and reference info
+                    for direct transfers.
                   </li>
                 </ul>
               </div>
@@ -1209,6 +1325,19 @@ export function Settings() {
                     • <strong>Quick Stats:</strong> At-a-glance view of unbilled revenue and total
                     weekly hours.
                   </li>
+                  <li>
+                    • <strong>Client Breakdown:</strong> See hours and billing split for each client
+                    with visual progress bars.
+                  </li>
+                  <li>
+                    • <strong>Monthly Hours:</strong> Navigate between months with prev/next arrows.
+                    Shows total hours, days worked, and average per day with percentage change vs
+                    previous month.
+                  </li>
+                  <li>
+                    • <strong>Project Breakdown:</strong> All-time hours per project with color-coded
+                    progress bars showing each project's share of total time.
+                  </li>
                 </ul>
               </div>
             </div>
@@ -1274,6 +1403,55 @@ export function Settings() {
                   available, a <strong>banner</strong> will appear at the top of the screen with a
                   link to download the latest release.
                 </p>
+              </div>
+            </div>
+          </GuideSection>
+
+          <GuideSection icon={<Globe className='w-5 h-5' />} title='About FlowForge-Track'>
+            <div className='space-y-4'>
+              <p className='text-sm text-muted-foreground'>
+                FlowForge-Track is built by{' '}
+                <a
+                  href='https://emmi.engineer'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-primary hover:underline'
+                >
+                  emmi.engineer
+                </a>{' '}
+                — a freelance-first time tracking and invoicing app designed for simplicity and speed.
+              </p>
+              <div>
+                <h4 className='font-medium mb-2'>Links</h4>
+                <ul className='space-y-1 text-sm text-muted-foreground'>
+                  <li>
+                    •{' '}
+                    <a
+                      href='https://flowforge.emmi.zone/'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-primary hover:underline'
+                    >
+                      flowforge.emmi.zone
+                    </a>{' '}
+                    — Product website
+                  </li>
+                  <li>
+                    •{' '}
+                    <a
+                      href='https://emmi.engineer'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-primary hover:underline'
+                    >
+                      emmi.engineer
+                    </a>{' '}
+                    — Developer portfolio
+                  </li>
+                </ul>
+              </div>
+              <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
+                <strong>Version:</strong> 0.2.0
               </div>
             </div>
           </GuideSection>

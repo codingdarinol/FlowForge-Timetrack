@@ -22,6 +22,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  --font-sans: 'Lexend Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
@@ -591,14 +593,14 @@
   height: 100vh;
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 16px;
   gap: 8px;
-  background: var(--background);
+  background: linear-gradient(135deg, var(--background) 0%, var(--secondary) 100%);
   color: var(--foreground);
-  border-radius: 0px;
-  border: 1px solid;
-  border-color: var(--border);
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
   backdrop-filter: blur(12px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.08);
   user-select: none;
   cursor: grab;
   box-sizing: border-box;
@@ -668,10 +670,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   background: rgba(37, 99, 235, 0.1);
   color: rgb(37, 99, 235);
   /* Blue 600 */

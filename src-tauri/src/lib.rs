@@ -28,11 +28,11 @@ pub fn run() {
                 CREATE TABLE IF NOT EXISTS clients (
                     id TEXT PRIMARY KEY,
                     name TEXT NOT NULL,
-                    email TEXT,
-                    address TEXT,
-                    phone TEXT,
-                    hourly_rate REAL,
-                    notes TEXT,
+                    email TEXT DEFAULT '',
+                    address TEXT DEFAULT '',
+                    phone TEXT DEFAULT '',
+                    hourly_rate REAL DEFAULT 0,
+                    notes TEXT DEFAULT '',
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
                 );
@@ -95,13 +95,27 @@ pub fn run() {
         Migration {
             version: 2,
             description: "add_vat_number_to_clients",
-            sql: "ALTER TABLE clients ADD COLUMN vat_number TEXT;",
+            sql: "ALTER TABLE clients ADD COLUMN vat_number TEXT DEFAULT '';",
             kind: MigrationKind::Up,
         },
         Migration {
             version: 3,
             description: "add_currency_to_clients",
             sql: "ALTER TABLE clients ADD COLUMN currency TEXT DEFAULT 'EUR';",
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 4,
+            description: "create_products_table",
+            sql: "CREATE TABLE IF NOT EXISTS products (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT DEFAULT '',
+                price REAL DEFAULT 0,
+                sku TEXT DEFAULT '',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );",
             kind: MigrationKind::Up,
         },
     ];
