@@ -131,6 +131,12 @@ pub fn run() {
             ",
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 6,
+            description: "add_down_payment_to_invoices",
+            sql: "ALTER TABLE invoices ADD COLUMN down_payment REAL DEFAULT 0;",
+            kind: MigrationKind::Up,
+        },
     ];
 
     let mut builder = tauri::Builder::default()

@@ -106,7 +106,7 @@ export function InvoicesList() {
 
   const handleExportCSV = async () => {
     try {
-      const headers = ['Invoice #', 'Client', 'Issue Date', 'Due Date', 'Status', 'Currency', 'Subtotal', 'Tax', 'Total'];
+      const headers = ['Invoice #', 'Client', 'Issue Date', 'Due Date', 'Status', 'Currency', 'Subtotal', 'Tax', 'Down Payment', 'Total'];
       const rows = invoices.map((inv) => {
         const currency = clients.find((c) => c.id === inv.clientId)?.currency || 'EUR';
         return [
@@ -118,6 +118,7 @@ export function InvoicesList() {
           currency,
           inv.subtotal.toFixed(2),
           inv.taxAmount.toFixed(2),
+          (inv.downPayment || 0).toFixed(2),
           inv.total.toFixed(2),
         ];
       });
@@ -350,6 +351,7 @@ function CreateInvoiceModal({
   const [notes, setNotes] = useState('');
   const [paymentTerms, setPaymentTerms] = useState('');
   const [taxRate, setTaxRate] = useState(0);
+  const [downPayment, setDownPayment] = useState(0);
   const [saving, setSaving] = useState(false);
 
   // Reset form when opened and load settings or initial data
@@ -371,6 +373,7 @@ function CreateInvoiceModal({
         setDueDate(initialData.dueDate);
         setNotes(initialData.notes || '');
         setTaxRate(initialData.taxRate * 100);
+        setDownPayment(initialData.downPayment || 0);
         // Load payment terms from settings for existing invoices
         settingsService
           .load()
@@ -392,6 +395,7 @@ function CreateInvoiceModal({
         setIssueDate(todayStr);
         setDueDate(dueStr);
         setNotes('');
+        setDownPayment(0);
 
         // Load default options from settings
         settingsService
@@ -497,8 +501,9 @@ function CreateInvoiceModal({
       calculateInvoiceTotals(
         lineItems.map((item) => ({ ...item, id: '', invoiceId: '' })),
         taxRate / 100,
+        downPayment,
       ),
-    [lineItems, taxRate],
+    [lineItems, taxRate, downPayment],
   );
 
   const handleSubmit = async () => {
@@ -524,6 +529,7 @@ function CreateInvoiceModal({
           status: initialData.status, // Keep existing status or allow change? Usually keep for edits unless explicit.
           notes,
           taxRate: taxRate / 100,
+          downPayment,
         });
 
         await invoiceService.replaceLineItems(
@@ -547,6 +553,7 @@ function CreateInvoiceModal({
             status: 'draft',
             notes,
             taxRate: taxRate / 100,
+            downPayment,
           },
           lineItemsToSave.map((item) => ({
             invoiceId: '',
@@ -671,6 +678,19 @@ function CreateInvoiceModal({
             )}
           </div>
 
+          {/* Down Payment */}
+          <div className='pt-4 border-t border-border'>
+            <Input
+              label='Down Payment'
+              type='number'
+              value={downPayment || ''}
+              onChange={(e) => setDownPayment(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+              min={0}
+              step={0.01}
+              helperText='Amount already paid upfront (subtracted from total)'
+            />
+          </div>
+
           <ModalFooter>
             <Button variant='outline' onClick={() => setStep(1)}>
               Back
@@ -739,8 +759,16 @@ function CreateInvoiceModal({
                 {formatCurrency(totals.taxAmount, clients.find((c) => c.id === clientId)?.currency)}
               </span>
             </div>
+            {downPayment > 0 && (
+              <div className='flex justify-between text-sm text-green-600 dark:text-green-400'>
+                <span>Down Payment:</span>
+                <span>
+                  -{formatCurrency(downPayment, clients.find((c) => c.id === clientId)?.currency)}
+                </span>
+              </div>
+            )}
             <div className='flex justify-between font-medium mt-2 pt-2 border-t border-border'>
-              <span>Total:</span>
+              <span>{downPayment > 0 ? 'Amount Due:' : 'Total:'}</span>
               <span>
                 {formatCurrency(totals.total, clients.find((c) => c.id === clientId)?.currency)}
               </span>
@@ -1036,11 +1064,22 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         y += 8;
       }
 
+      if (invoice.downPayment > 0) {
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...GRAY_TEXT);
+        doc.text('Down Payment', totalsX, y);
+        doc.setTextColor(22, 163, 74); // green-600
+        doc.text(`-${currencySymbol}${invoice.downPayment.toFixed(2)}`, totalsValX, y, { align: 'right' });
+        doc.setTextColor(...BLACK);
+        y += 8;
+      }
+
       // Total Due (teal, bold, larger)
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...TEAL);
-      doc.text('Total Due', totalsX, y);
+      doc.text(invoice.downPayment > 0 ? 'Amount Due' : 'Total Due', totalsX, y);
       doc.text(`${currencySymbol}${invoice.total.toFixed(2)}`, totalsValX, y, { align: 'right' });
       doc.setTextColor(...BLACK);
       y += 15;
@@ -1348,8 +1387,19 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
                 )}
               </span>
             </div>
+            {invoice.downPayment > 0 && (
+              <div className='flex justify-between py-1 text-green-600 dark:text-green-400'>
+                <span>Down Payment:</span>
+                <span>
+                  -{formatCurrency(
+                    invoice.downPayment,
+                    clients.find((c) => c.id === invoice.clientId)?.currency,
+                  )}
+                </span>
+              </div>
+            )}
             <div className='flex justify-between py-2 border-t border-border font-medium'>
-              <span>Total:</span>
+              <span>{invoice.downPayment > 0 ? 'Amount Due:' : 'Total:'}</span>
               <span>
                 {formatCurrency(
                   invoice.total,

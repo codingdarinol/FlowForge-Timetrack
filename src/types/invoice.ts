@@ -11,6 +11,7 @@ export interface Invoice {
   status: InvoiceStatus;
   notes: string;
   taxRate: number; // decimal, e.g., 0.20 for 20%
+  downPayment: number; // deposit already paid, subtracted from total
   createdAt: string;
   updatedAt: string;
 }
@@ -66,9 +67,13 @@ export function generateInvoiceNumber(existingInvoices: Invoice[]): string {
 }
 
 // Calculate invoice totals
-export function calculateInvoiceTotals(lineItems: InvoiceLineItem[], taxRate: number) {
+export function calculateInvoiceTotals(
+  lineItems: InvoiceLineItem[],
+  taxRate: number,
+  downPayment: number = 0,
+) {
   const subtotal = lineItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const taxAmount = subtotal * taxRate;
-  const total = subtotal + taxAmount;
+  const total = subtotal + taxAmount - downPayment;
   return { subtotal, taxAmount, total };
 }

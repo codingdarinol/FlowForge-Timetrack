@@ -131,5 +131,12 @@ export async function runMigrations(): Promise<void> {
     // Column already exists, ignore error
   }
 
+  // Migration: Add down_payment column to invoices if it doesn't exist
+  try {
+    await db.execute(`ALTER TABLE invoices ADD COLUMN down_payment REAL DEFAULT 0`);
+  } catch {
+    // Column already exists, ignore error
+  }
+
   dbLogger.info('Database migrations completed successfully');
 }

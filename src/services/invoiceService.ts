@@ -34,6 +34,7 @@ export const invoiceService = {
         i.status,
         i.notes,
         i.tax_rate as taxRate,
+        i.down_payment as downPayment,
         i.created_at as createdAt,
         i.updated_at as updatedAt,
         c.name as clientName,
@@ -58,7 +59,7 @@ export const invoiceService = {
     // Load line items for each invoice
     for (const invoice of invoices) {
       const lineItems = await this.getLineItems(invoice.id);
-      const totals = calculateInvoiceTotals(lineItems, invoice.taxRate);
+      const totals = calculateInvoiceTotals(lineItems, invoice.taxRate, invoice.downPayment || 0);
       invoice.lineItems = lineItems;
       invoice.subtotal = totals.subtotal;
       invoice.taxAmount = totals.taxAmount;
@@ -82,6 +83,7 @@ export const invoiceService = {
         i.status,
         i.notes,
         i.tax_rate as taxRate,
+        i.down_payment as downPayment,
         i.created_at as createdAt,
         i.updated_at as updatedAt,
         c.name as clientName,
@@ -100,7 +102,7 @@ export const invoiceService = {
 
     const invoice = result[0];
     const lineItems = await this.getLineItems(id);
-    const totals = calculateInvoiceTotals(lineItems, invoice.taxRate);
+    const totals = calculateInvoiceTotals(lineItems, invoice.taxRate, invoice.downPayment || 0);
 
     return {
       ...invoice,
@@ -138,8 +140,8 @@ export const invoiceService = {
 
     await db.execute(
       `
-      INSERT INTO invoices (id, client_id, invoice_number, issue_date, due_date, status, notes, tax_rate, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      INSERT INTO invoices (id, client_id, invoice_number, issue_date, due_date, status, notes, tax_rate, down_payment, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     `,
       [
         id,
@@ -150,6 +152,7 @@ export const invoiceService = {
         input.status || 'draft',
         input.notes || '',
         input.taxRate || 0,
+        input.downPayment || 0,
         timestamp,
         timestamp,
       ],
@@ -172,6 +175,7 @@ export const invoiceService = {
       status: input.status || 'draft',
       notes: input.notes || '',
       taxRate: input.taxRate || 0,
+      downPayment: input.downPayment || 0,
       createdAt: timestamp,
       updatedAt: timestamp,
     };
@@ -191,6 +195,7 @@ export const invoiceService = {
         status,
         notes,
         tax_rate as taxRate,
+        down_payment as downPayment,
         created_at as createdAt,
         updated_at as updatedAt
       FROM invoices
@@ -216,8 +221,9 @@ export const invoiceService = {
         status = $4,
         notes = $5,
         tax_rate = $6,
-        updated_at = $7
-      WHERE id = $8
+        down_payment = $7,
+        updated_at = $8
+      WHERE id = $9
     `,
       [
         updated.invoiceNumber,
@@ -226,6 +232,7 @@ export const invoiceService = {
         updated.status,
         updated.notes,
         updated.taxRate,
+        updated.downPayment || 0,
         updated.updatedAt,
         id,
       ],
@@ -300,6 +307,7 @@ export const invoiceService = {
         status,
         notes,
         tax_rate as taxRate,
+        down_payment as downPayment,
         created_at as createdAt,
         updated_at as updatedAt
       FROM invoices
