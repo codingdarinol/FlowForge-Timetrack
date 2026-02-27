@@ -26,6 +26,7 @@ export interface ClientSummary {
   totalSeconds: number;
   unbilledAmount: number;
   billedAmount: number;
+  downPaymentTotal: number;
   currency: string;
 }
 
@@ -285,61 +286,77 @@ export const dashboardService = {
     };
   },
 
+  async getDownPaymentTotalsByClient(): Promise<Array<{ clientId: string; total: number }>> {
+    const db = await getDb();
+    const result = await db.select<Array<{ client_id: string; total: number }>>(
+      `SELECT client_id, COALESCE(SUM(amount), 0) as total
+       FROM down_payments
+       GROUP BY client_id`,
+    );
+    return result.map((r) => ({ clientId: r.client_id, total: r.total || 0 }));
+  },
+
   async getClientBreakdown(): Promise<ClientSummary[]> {
     const db = await getDb();
-    const result = await db.select<Array<{
-      client_id: string;
-      client_name: string;
-      currency: string;
-      total_seconds: number;
-      unbilled_amount: number;
-      billed_amount: number;
-    }>>(
-      `SELECT
-        c.id as client_id,
-        c.name as client_name,
-        COALESCE(c.currency, 'EUR') as currency,
-        COALESCE(SUM(
-          CASE
-            WHEN te.end_time IS NULL THEN
-              (strftime('%s', 'now') - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
-            ELSE
-              (strftime('%s', te.end_time) - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
-          END
-        ), 0) as total_seconds,
-        COALESCE(SUM(
-          CASE WHEN te.is_billable = 1 AND te.is_billed = 0 THEN
-            (CASE
+    const [timeResult, paymentTotals] = await Promise.all([
+      db.select<Array<{
+        client_id: string;
+        client_name: string;
+        currency: string;
+        total_seconds: number;
+        unbilled_amount: number;
+        billed_amount: number;
+      }>>(
+        `SELECT
+          c.id as client_id,
+          c.name as client_name,
+          COALESCE(c.currency, 'EUR') as currency,
+          COALESCE(SUM(
+            CASE
               WHEN te.end_time IS NULL THEN
                 (strftime('%s', 'now') - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
               ELSE
                 (strftime('%s', te.end_time) - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
-            END) / 3600.0 * COALESCE(c.hourly_rate, 0)
-          ELSE 0 END
-        ), 0) as unbilled_amount,
-        COALESCE(SUM(
-          CASE WHEN te.is_billed = 1 THEN
-            (CASE
-              WHEN te.end_time IS NULL THEN
-                (strftime('%s', 'now') - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
-              ELSE
-                (strftime('%s', te.end_time) - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
-            END) / 3600.0 * COALESCE(c.hourly_rate, 0)
-          ELSE 0 END
-        ), 0) as billed_amount
-      FROM time_entries te
-      JOIN projects p ON te.project_id = p.id
-      JOIN clients c ON p.client_id = c.id
-      GROUP BY c.id
-      ORDER BY total_seconds DESC`
-    );
+            END
+          ), 0) as total_seconds,
+          COALESCE(SUM(
+            CASE WHEN te.is_billable = 1 AND te.is_billed = 0 THEN
+              (CASE
+                WHEN te.end_time IS NULL THEN
+                  (strftime('%s', 'now') - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
+                ELSE
+                  (strftime('%s', te.end_time) - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
+              END) / 3600.0 * COALESCE(c.hourly_rate, 0)
+            ELSE 0 END
+          ), 0) as unbilled_amount,
+          COALESCE(SUM(
+            CASE WHEN te.is_billed = 1 THEN
+              (CASE
+                WHEN te.end_time IS NULL THEN
+                  (strftime('%s', 'now') - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
+                ELSE
+                  (strftime('%s', te.end_time) - strftime('%s', te.start_time) - COALESCE(te.pause_duration, 0))
+              END) / 3600.0 * COALESCE(c.hourly_rate, 0)
+            ELSE 0 END
+          ), 0) as billed_amount
+        FROM time_entries te
+        JOIN projects p ON te.project_id = p.id
+        JOIN clients c ON p.client_id = c.id
+        GROUP BY c.id
+        ORDER BY total_seconds DESC`,
+      ),
+      this.getDownPaymentTotalsByClient(),
+    ]);
 
-    return result.map(r => ({
+    const paymentMap = new Map(paymentTotals.map((p) => [p.clientId, p.total]));
+
+    return timeResult.map((r) => ({
       clientId: r.client_id,
       clientName: r.client_name,
       totalSeconds: r.total_seconds || 0,
       unbilledAmount: r.unbilled_amount || 0,
       billedAmount: r.billed_amount || 0,
+      downPaymentTotal: paymentMap.get(r.client_id) || 0,
       currency: r.currency,
     }));
   },

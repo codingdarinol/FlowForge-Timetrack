@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Search, Pencil, Trash2, Users, StickyNote } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, Users, StickyNote, Banknote } from 'lucide-react';
 import type { ClientWithStats, CreateClientInput, UpdateClientInput } from '../../types';
 import { clientService } from '../../services';
 import { Button, Card, EmptyState, ConfirmDialog, ListSkeleton } from '../../components/ui';
 import { ClientForm } from './ClientForm';
+import { ClientPayments } from './ClientPayments';
 import { clientLogger } from '../../lib/logger';
 import { useUndoableAction } from '../../hooks/useUndoableAction';
 
@@ -13,6 +14,7 @@ export function ClientsList() {
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
+  const [expandedPayments, setExpandedPayments] = useState<Set<string>>(new Set());
 
   // Modal states
   const [showForm, setShowForm] = useState(false);
@@ -125,6 +127,16 @@ export function ClientsList() {
     setExpandedNotes(newExpanded);
   };
 
+  const togglePayments = (clientId: string) => {
+    const newExpanded = new Set(expandedPayments);
+    if (newExpanded.has(clientId)) {
+      newExpanded.delete(clientId);
+    } else {
+      newExpanded.add(clientId);
+    }
+    setExpandedPayments(newExpanded);
+  };
+
   if (loading) {
     return <ListSkeleton />;
   }
@@ -216,6 +228,20 @@ export function ClientsList() {
 
                   {/* Actions */}
                   <div className='flex items-center gap-1'>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      onClick={() => togglePayments(client.id)}
+                      className={
+                        expandedPayments.has(client.id)
+                          ? 'bg-muted text-primary'
+                          : 'text-muted-foreground'
+                      }
+                      aria-label='View payments'
+                      title='Down payments'
+                    >
+                      <Banknote className='w-4 h-4' />
+                    </Button>
                     {client.notes && (
                       <Button
                         variant='ghost'
@@ -251,6 +277,13 @@ export function ClientsList() {
                   </div>
                 </div>
               </div>
+
+              {/* Payments Section */}
+              {expandedPayments.has(client.id) && (
+                <div className='mt-4 pt-3 border-t border-border animate-in slide-in-from-top-2 fade-in duration-200'>
+                  <ClientPayments clientId={client.id} currency={client.currency} />
+                </div>
+              )}
 
               {/* Notes Section */}
               {expandedNotes.has(client.id) && client.notes && (

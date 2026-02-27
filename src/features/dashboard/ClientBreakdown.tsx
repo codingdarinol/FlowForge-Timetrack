@@ -55,6 +55,11 @@ export function ClientBreakdown({ clients }: ClientBreakdownProps) {
                   <span className="text-primary font-medium">
                     {formatAmount(client.billedAmount, client.currency)} billed
                   </span>
+                  {client.downPaymentTotal > 0 && (
+                    <span className="text-teal-600 dark:text-teal-400 font-medium">
+                      {formatAmount(client.downPaymentTotal, client.currency)} deposits
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

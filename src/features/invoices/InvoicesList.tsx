@@ -16,6 +16,7 @@ import {
   timeEntryService,
   settingsService,
   productService,
+  downPaymentService,
 } from '../../services';
 import { invoiceLogger } from '../../lib/logger';
 import { generateCSV, downloadCSV } from '../../lib/exportUtils';
@@ -601,8 +602,17 @@ function CreateInvoiceModal({
               Cancel
             </Button>
             <Button
-              onClick={() => {
-                if (!initialData) handleLoadHours(); // Only auto-load on create
+              onClick={async () => {
+                if (!initialData) {
+                  handleLoadHours();
+                  // Auto-populate down payment from client's deposit ledger
+                  try {
+                    const total = await downPaymentService.getTotalByClientId(clientId);
+                    if (total > 0) setDownPayment(total);
+                  } catch (err) {
+                    invoiceLogger.error('Failed to load client deposits:', err);
+                  }
+                }
                 setStep(2);
               }}
               disabled={!clientId}

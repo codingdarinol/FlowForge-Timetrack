@@ -45,6 +45,9 @@ export interface AppSettings {
   businessWebsite: string;
   businessTagline: string;
   paymentBankDetails: string;   // IBAN, BIC, bank name (multi-line)
+
+  // Version tracking
+  seenChangelogVersion: string;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -76,6 +79,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   businessWebsite: '',
   businessTagline: '',
   paymentBankDetails: '',
+  seenChangelogVersion: '',
 };
 
 export const FONT_SIZE_SCALE: Record<FontSize, number> = {

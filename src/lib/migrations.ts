@@ -138,5 +138,27 @@ export async function runMigrations(): Promise<void> {
     // Column already exists, ignore error
   }
 
+  // Create down_payments table (payment ledger)
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS down_payments (
+      id TEXT PRIMARY KEY,
+      client_id TEXT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+      project_id TEXT REFERENCES projects(id) ON DELETE SET NULL,
+      amount REAL NOT NULL,
+      payment_date TEXT NOT NULL,
+      notes TEXT DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `);
+
+  await db.execute(`
+    CREATE INDEX IF NOT EXISTS idx_down_payments_client_id ON down_payments(client_id)
+  `);
+
+  await db.execute(`
+    CREATE INDEX IF NOT EXISTS idx_down_payments_payment_date ON down_payments(payment_date)
+  `);
+
   dbLogger.info('Database migrations completed successfully');
 }

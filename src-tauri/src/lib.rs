@@ -137,6 +137,23 @@ pub fn run() {
             sql: "ALTER TABLE invoices ADD COLUMN down_payment REAL DEFAULT 0;",
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 7,
+            description: "create_down_payments_table",
+            sql: "CREATE TABLE IF NOT EXISTS down_payments (
+                id TEXT PRIMARY KEY,
+                client_id TEXT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+                project_id TEXT REFERENCES projects(id) ON DELETE SET NULL,
+                amount REAL NOT NULL,
+                payment_date TEXT NOT NULL,
+                notes TEXT DEFAULT '',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_down_payments_client_id ON down_payments(client_id);
+            CREATE INDEX IF NOT EXISTS idx_down_payments_payment_date ON down_payments(payment_date);",
+            kind: MigrationKind::Up,
+        },
     ];
 
     let mut builder = tauri::Builder::default()

@@ -30,6 +30,7 @@ For a complete walkthrough of features and settings, read the **[FlowForge-Track
 - **Client & Project Management** — Organize your work with clients and projects
 - **Product Catalog** — Manage reusable products/services with descriptions, prices, and SKUs
 - **Offline Invoicing** — Create professional PDF invoices with multi-page support
+- **Down Payment Support** — Record deposits on invoices, subtracted from total on PDF and preview
 - **CSV Export** — Export invoice data to CSV for spreadsheets and accounting tools
 - **Global Keyboard Shortcuts** — Control the timer from anywhere:
   - `Cmd+Shift+S` (Mac) / `Ctrl+Shift+S` (Win/Linux) — Start/Resume

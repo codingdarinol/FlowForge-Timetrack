@@ -251,3 +251,11 @@ export const backupLogger = {
   error: (msg: string, err?: Error | unknown, data?: unknown) =>
     logger.error('Backup', msg, err, data),
 };
+
+export const downPaymentLogger = {
+  debug: (msg: string, data?: unknown) => logger.debug('DownPayment', msg, data),
+  info: (msg: string, data?: unknown) => logger.info('DownPayment', msg, data),
+  warn: (msg: string, data?: unknown) => logger.warn('DownPayment', msg, data),
+  error: (msg: string, err?: Error | unknown, data?: unknown) =>
+    logger.error('DownPayment', msg, err, data),
+};

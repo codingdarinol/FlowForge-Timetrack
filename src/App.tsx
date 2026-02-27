@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { DebugPanel } from './components/debug/DebugPanel';
 import { IdleMonitor } from './components/IdleMonitor';
+import { WhatsNewModal } from './components/WhatsNewModal';
 import { Dashboard } from './pages/Dashboard';
 import { Clients } from './pages/Clients';
 import { Projects } from './pages/Projects';
@@ -41,6 +42,7 @@ function AppContent() {
     <>
       {/* Idle detection monitor */}
       <IdleMonitor />
+      <WhatsNewModal />
 
       <BrowserRouter>
         <Routes>

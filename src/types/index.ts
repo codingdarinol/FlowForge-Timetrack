@@ -6,3 +6,4 @@ export * from './timeEntry';
 export * from './invoice';
 export * from './settings';
 export * from './product';
+export * from './downPayment';
