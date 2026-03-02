@@ -1,7 +1,8 @@
 // UpdateBanner - shows when a new version is available
 
 import { useState, useEffect } from 'react';
-import { ExternalLink, X, RefreshCw } from 'lucide-react';
+import { Download, X, Sparkles } from 'lucide-react';
+import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { updateService, type UpdateCheckResult } from '../services/updateService';
 
@@ -24,34 +25,43 @@ export function UpdateBanner() {
     return null;
   }
 
-  const handleOpenRelease = () => {
-    window.open(updateInfo.releaseUrl, '_blank');
+  const handleOpenRelease = async () => {
+    try {
+      await openUrl(updateInfo.releaseUrl);
+    } catch {
+      // Fallback for non-Tauri environments (dev mode in browser)
+      window.open(updateInfo.releaseUrl, '_blank');
+    }
   };
 
   return (
-    <div className='bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20 px-4 py-2'>
+    <div className='bg-primary/15 border-b-2 border-primary/40 px-4 py-3'>
       <div className='max-w-4xl mx-auto flex items-center justify-between gap-4'>
         <div className='flex items-center gap-3'>
-          <RefreshCw className='w-4 h-4 text-primary animate-spin-slow' />
-          <span className='text-sm'>
-            <strong>FlowForge-Track {updateInfo.latestVersion}</strong> is available!
-            <span className='text-muted-foreground ml-2'>
+          <div className='flex items-center justify-center w-8 h-8 rounded-full bg-primary/20'>
+            <Sparkles className='w-4 h-4 text-primary' />
+          </div>
+          <div>
+            <span className='text-sm font-semibold text-foreground'>
+              FlowForge-Track {updateInfo.latestVersion} is available!
+            </span>
+            <span className='text-xs text-muted-foreground ml-2'>
               (You have {updateInfo.currentVersion})
             </span>
-          </span>
+          </div>
         </div>
 
         <div className='flex items-center gap-2'>
           <button
             onClick={handleOpenRelease}
-            className='flex items-center gap-1 text-sm text-primary hover:underline'
+            className='flex items-center gap-1.5 text-sm font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:bg-primary/90 transition-colors'
           >
-            <ExternalLink className='w-3 h-3' />
-            View Release & Download
+            <Download className='w-3.5 h-3.5' />
+            Download Update
           </button>
           <button
             onClick={() => setDismissed(true)}
-            className='p-1 hover:bg-muted rounded'
+            className='p-1.5 hover:bg-muted rounded-md transition-colors'
             aria-label='Dismiss'
           >
             <X className='w-4 h-4 text-muted-foreground' />
