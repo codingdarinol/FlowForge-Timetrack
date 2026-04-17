@@ -1,11 +1,10 @@
 // Client data model
 
-export type Currency = 'EUR' | 'USD' | 'GBP';
+export type Currency = 'IDR' | 'USD';
 
 export const CURRENCY_OPTIONS: { value: Currency; label: string; symbol: string }[] = [
-  { value: 'EUR', label: 'Euro (€)', symbol: '€' },
+  { value: 'IDR', label: 'Rupiah (Rp)', symbol: 'Rp' },
   { value: 'USD', label: 'US Dollar ($)', symbol: '$' },
-  { value: 'GBP', label: 'British Pound (£)', symbol: '£' },
 ];
 
 export interface Client {

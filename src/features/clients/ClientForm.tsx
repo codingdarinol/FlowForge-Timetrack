@@ -25,7 +25,7 @@ export function ClientForm({
     phone: '',
     vatNumber: '',
     hourlyRate: 0,
-    currency: 'EUR',
+    currency: 'IDR',
     notes: '',
   });
 
@@ -43,7 +43,7 @@ export function ClientForm({
         phone: initialData?.phone || '',
         vatNumber: initialData?.vatNumber || '',
         hourlyRate: initialData?.hourlyRate || 0,
-        currency: initialData?.currency || 'EUR',
+        currency: initialData?.currency || 'IDR',
         notes: initialData?.notes || '',
       });
       setErrors({});
@@ -64,15 +64,15 @@ export function ClientForm({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = 'Nama wajib diisi';
     }
 
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
+      newErrors.email = 'Format email tidak valid';
     }
 
     if (formData.hourlyRate < 0) {
-      newErrors.hourlyRate = 'Rate cannot be negative';
+      newErrors.hourlyRate = 'Tarif tidak boleh negatif';
     }
 
     setErrors(newErrors);
@@ -90,7 +90,7 @@ export function ClientForm({
     } catch (err) {
       console.error('Failed to save client:', err);
       setSubmitError(
-        err instanceof Error ? err.message : 'Failed to save client. Please try again.',
+        err instanceof Error ? err.message : 'Gagal menyimpan klien. Coba lagi.',
       );
     }
   };
@@ -101,7 +101,7 @@ export function ClientForm({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Edit Client' : 'New Client'}
+      title={isEditing ? 'Ubah Klien' : 'Klien Baru'}
       size='lg'
     >
       <form onSubmit={handleSubmit} className='space-y-4'>
@@ -112,11 +112,11 @@ export function ClientForm({
         )}
 
         <Input
-          label='Name *'
+          label='Nama *'
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
           error={errors.name}
-          placeholder='Client or company name'
+          placeholder='Nama klien atau perusahaan'
           autoFocus
         />
 
@@ -131,7 +131,7 @@ export function ClientForm({
           />
 
           <Input
-            label='Phone'
+            label='Telepon'
             type='tel'
             value={formData.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
@@ -140,24 +140,24 @@ export function ClientForm({
         </div>
 
         <Textarea
-          label='Address'
+          label='Alamat'
           value={formData.address}
           onChange={(e) => handleChange('address', e.target.value)}
-          placeholder='Full billing address'
+          placeholder='Alamat penagihan lengkap'
           rows={3}
         />
 
         <Input
-          label='VAT Number'
+          label='NPWP / Nomor Pajak'
           value={formData.vatNumber}
           onChange={(e) => handleChange('vatNumber', e.target.value)}
-          placeholder='e.g., GB123456789'
-          helperText='Used for invoicing purposes'
+          placeholder='Contoh: 12.345.678.9-012.000'
+          helperText='Dipakai untuk kebutuhan invoice'
         />
 
         <div className='grid grid-cols-2 gap-4'>
           <Input
-            label='Hourly Rate'
+            label='Tarif per Jam'
             type='number'
             min={0}
             max={1000000}
@@ -177,7 +177,7 @@ export function ClientForm({
           />
 
           <Select
-            label='Currency'
+            label='Mata Uang'
             value={formData.currency}
             onChange={(e) => handleChange('currency', e.target.value as Currency)}
             options={CURRENCY_OPTIONS.map((c) => ({ value: c.value, label: c.label }))}
@@ -185,19 +185,19 @@ export function ClientForm({
         </div>
 
         <Textarea
-          label='Notes'
+          label='Catatan'
           value={formData.notes}
           onChange={(e) => handleChange('notes', e.target.value)}
-          placeholder='Internal notes about this client'
+          placeholder='Catatan internal untuk klien ini'
           rows={2}
         />
 
         <ModalFooter>
           <Button type='button' variant='outline' onClick={onClose} disabled={loading}>
-            Cancel
+            Batal
           </Button>
           <Button type='submit' loading={loading}>
-            {isEditing ? 'Save Changes' : 'Create Client'}
+            {isEditing ? 'Simpan Perubahan' : 'Buat Klien'}
           </Button>
         </ModalFooter>
       </form>

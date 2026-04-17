@@ -5,6 +5,7 @@ import { clientService } from '../../services';
 import { Button, Card, EmptyState, ConfirmDialog, ListSkeleton } from '../../components/ui';
 import { ClientForm } from './ClientForm';
 import { ClientPayments } from './ClientPayments';
+import { formatCurrency } from '../../lib/formatters';
 import { clientLogger } from '../../lib/logger';
 import { useUndoableAction } from '../../hooks/useUndoableAction';
 
@@ -34,7 +35,7 @@ export function ClientsList() {
       setClients(data);
     } catch (err) {
       clientLogger.error('Failed to load clients:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load clients');
+      setError(err instanceof Error ? err.message : 'Gagal memuat klien');
     } finally {
       setLoading(false);
     }
@@ -95,7 +96,7 @@ export function ClientsList() {
     setClients((prev) => prev.filter((c) => c.id !== clientToDelete.id));
 
     executeUndoable({
-      message: `Deleted client "${clientToDelete.name}"`,
+      message: `Klien "${clientToDelete.name}" dihapus`,
       action: async () => {
         await clientService.delete(clientToDelete.id);
       },
@@ -103,13 +104,6 @@ export function ClientsList() {
         loadClients();
       },
     });
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
   };
 
   const formatHours = (hours: number) => {
@@ -145,10 +139,10 @@ export function ClientsList() {
     <div className='space-y-6'>
       {/* Header */}
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-foreground'>Clients</h1>
+        <h1 className='text-2xl font-bold text-foreground'>Klien</h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus className='w-4 h-4' />
-          New Client
+          Klien Baru
         </Button>
       </div>
 
@@ -157,7 +151,7 @@ export function ClientsList() {
         <div className='p-4 rounded-lg bg-destructive/10 border border-destructive text-destructive'>
           {error}
           <button onClick={() => setError(null)} className='ml-2 underline'>
-            Dismiss
+            Tutup
           </button>
         </div>
       )}
@@ -168,7 +162,7 @@ export function ClientsList() {
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
           <input
             type='text'
-            placeholder='Search clients...'
+            placeholder='Cari klien...'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className='w-full h-10 pl-10 pr-4 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary'
@@ -180,20 +174,20 @@ export function ClientsList() {
       {clients.length === 0 ? (
         <EmptyState
           icon={<Users className='w-8 h-8' />}
-          title='No clients yet'
-          description='Add your first client to start tracking time and generating invoices.'
+          title='Belum ada klien'
+          description='Tambahkan klien pertama untuk mulai mencatat waktu dan membuat invoice.'
           action={
             <Button onClick={() => setShowForm(true)}>
               <Plus className='w-4 h-4' />
-              Add Client
+              Tambah Klien
             </Button>
           }
         />
       ) : filteredClients.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
-          title='No results'
-          description={`No clients found matching "${searchQuery}"`}
+          title='Tidak ada hasil'
+          description={`Tidak ada klien yang cocok dengan "${searchQuery}"`}
         />
       ) : (
         <div className='space-y-3'>
@@ -213,17 +207,17 @@ export function ClientsList() {
                     <p className='text-sm font-medium text-foreground'>
                       {formatHours(client.totalHours)}
                     </p>
-                    <p className='text-xs text-muted-foreground'>tracked</p>
+                    <p className='text-xs text-muted-foreground'>tercatat</p>
                   </div>
                   <div className='text-right'>
                     <p className='text-sm font-medium text-foreground'>
-                      {formatCurrency(client.totalBillable)}
+                      {formatCurrency(client.totalBillable, client.currency)}
                     </p>
-                    <p className='text-xs text-muted-foreground'>billable</p>
+                    <p className='text-xs text-muted-foreground'>dapat ditagih</p>
                   </div>
                   <div className='text-right'>
                     <p className='text-sm font-medium text-foreground'>{client.projectCount}</p>
-                    <p className='text-xs text-muted-foreground'>projects</p>
+                    <p className='text-xs text-muted-foreground'>proyek</p>
                   </div>
 
                   {/* Actions */}

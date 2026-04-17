@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Users, FolderKanban, FileText, X } from 'lucide-react';
 import { useGlobalSearch, type SearchResult } from '../../hooks/useGlobalSearch';
@@ -13,7 +13,7 @@ const TYPE_ICONS: Record<string, typeof Users> = {
 export function Header() {
   const navigate = useNavigate();
   const { query, setQuery, isOpen, open, close, results } = useGlobalSearch();
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setPilihedIndex] = useState(0);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -27,10 +27,10 @@ export function Header() {
   }, [open]);
 
   useEffect(() => {
-    setSelectedIndex(0);
+    setPilihedIndex(0);
   }, [results]);
 
-  const handleSelect = (result: SearchResult) => {
+  const handlePilih = (result: SearchResult) => {
     navigate(result.route);
     close();
   };
@@ -38,12 +38,12 @@ export function Header() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
+      setPilihedIndex((i) => Math.min(i + 1, results.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex((i) => Math.max(i - 1, 0));
+      setPilihedIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === 'Enter' && results[selectedIndex]) {
-      handleSelect(results[selectedIndex]);
+      handlePilih(results[selectedIndex]);
     } else if (e.key === 'Escape') {
       close();
     }
@@ -51,7 +51,7 @@ export function Header() {
 
   return (
     <header className='h-16 border-b border-border flex items-center px-8 bg-background shrink-0'>
-      <h1 className='text-xl font-semibold'>FlowForge-Track</h1>
+      <h1 className='text-xl font-semibold'>yuk-kerja</h1>
 
       <div className='ml-auto relative'>
         <button
@@ -59,9 +59,9 @@ export function Header() {
           className='flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-secondary border border-border rounded-lg hover:bg-secondary/80 transition-colors'
         >
           <Search className='w-4 h-4' />
-          <span>Search...</span>
+          <span>Cari...</span>
           <kbd className='ml-2 px-1.5 py-0.5 text-xs font-mono bg-background border border-border rounded'>
-            {/Mac/.test(navigator.userAgent) ? '⌘' : 'Ctrl'}+K
+            {/Mac/.test(navigator.userAgent) ? 'âŒ˜' : 'Ctrl'}+K
           </kbd>
         </button>
 
@@ -77,7 +77,7 @@ export function Header() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder='Search clients, projects, invoices...'
+                    placeholder='Cari klien, proyek, invoice...'
                     className='flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground'
                   />
                   {query && (
@@ -91,7 +91,7 @@ export function Header() {
                   <div className='max-h-64 overflow-y-auto'>
                     {results.length === 0 ? (
                       <div className='px-4 py-8 text-center text-sm text-muted-foreground'>
-                        No results found
+                        Tidak ada hasil
                       </div>
                     ) : (
                       results.map((result, index) => {
@@ -99,7 +99,7 @@ export function Header() {
                         return (
                           <button
                             key={result.id}
-                            onClick={() => handleSelect(result)}
+                            onClick={() => handlePilih(result)}
                             className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-secondary transition-colors ${
                               index === selectedIndex ? 'bg-secondary' : ''
                             }`}
@@ -122,9 +122,9 @@ export function Header() {
                 )}
 
                 <div className='px-4 py-2 border-t border-border flex items-center gap-4 text-xs text-muted-foreground'>
-                  <span><kbd className='px-1 bg-secondary rounded'>↑↓</kbd> Navigate</span>
-                  <span><kbd className='px-1 bg-secondary rounded'>↵</kbd> Select</span>
-                  <span><kbd className='px-1 bg-secondary rounded'>Esc</kbd> Close</span>
+                  <span><kbd className='px-1 bg-secondary rounded'>â†‘â†“</kbd> Navigasi</span>
+                  <span><kbd className='px-1 bg-secondary rounded'>â†µ</kbd> Pilih</span>
+                  <span><kbd className='px-1 bg-secondary rounded'>Esc</kbd> Tutup</span>
                 </div>
               </div>
             </div>
@@ -134,3 +134,5 @@ export function Header() {
     </header>
   );
 }
+
+

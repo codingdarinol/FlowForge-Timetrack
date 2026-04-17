@@ -205,7 +205,7 @@ export const dashboardService = {
       }>
     >(
       `SELECT 
-        COALESCE(c.currency, 'EUR') as currency,
+        CASE WHEN c.currency = 'USD' THEN 'USD' ELSE 'IDR' END as currency,
         SUM(
           (CASE 
             WHEN te.end_time IS NULL THEN 
@@ -218,7 +218,7 @@ export const dashboardService = {
       JOIN projects p ON te.project_id = p.id
       JOIN clients c ON p.client_id = c.id
       WHERE te.is_billable = 1 AND te.is_billed = 0
-      GROUP BY COALESCE(c.currency, 'EUR')`,
+      GROUP BY CASE WHEN c.currency = 'USD' THEN 'USD' ELSE 'IDR' END`,
     );
 
     // Get total hours
@@ -262,7 +262,7 @@ export const dashboardService = {
       }>
     >(
       `SELECT 
-        COALESCE(c.currency, 'EUR') as currency,
+        CASE WHEN c.currency = 'USD' THEN 'USD' ELSE 'IDR' END as currency,
         SUM(
           (CASE 
             WHEN te.end_time IS NULL THEN 
@@ -275,7 +275,7 @@ export const dashboardService = {
       JOIN projects p ON te.project_id = p.id
       JOIN clients c ON p.client_id = c.id
       WHERE te.is_billed = 1
-      GROUP BY COALESCE(c.currency, 'EUR')`,
+      GROUP BY CASE WHEN c.currency = 'USD' THEN 'USD' ELSE 'IDR' END`,
     );
 
     return {
@@ -310,7 +310,7 @@ export const dashboardService = {
         `SELECT
           c.id as client_id,
           c.name as client_name,
-          COALESCE(c.currency, 'EUR') as currency,
+          CASE WHEN c.currency = 'USD' THEN 'USD' ELSE 'IDR' END as currency,
           COALESCE(SUM(
             CASE
               WHEN te.end_time IS NULL THEN

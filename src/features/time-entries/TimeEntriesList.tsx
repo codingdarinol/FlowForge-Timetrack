@@ -4,6 +4,7 @@ import type { TimeEntryWithProject, TimeEntry } from '../../types';
 import { formatDurationShort, calculateDuration } from '../../types';
 import { timeEntryService, projectService, clientService } from '../../services';
 import type { Project, Client } from '../../types';
+import { formatDate, formatTime } from '../../lib/formatters';
 import { timeEntryLogger } from '../../lib/logger';
 import { generateCSV, downloadCSV } from '../../lib/exportUtils';
 import { ListSkeleton } from '../../components/ui';
@@ -118,7 +119,7 @@ export function TimeEntriesList() {
 
     entriesToGroup.forEach((entry) => {
       const clientId = entry.clientId || 'no-client';
-      const clientName = entry.clientName || 'No Client';
+      const clientName = entry.clientName || 'Tanpa Klien';
       const projectId = entry.projectId;
       const projectName = entry.projectName;
       const projectColor = entry.projectColor;
@@ -148,19 +149,19 @@ export function TimeEntriesList() {
   const billedGroups = useMemo(() => groupEntries(billedEntries), [billedEntries]);
 
   const projectOptions = [
-    { value: '', label: 'All Projects' },
+    { value: '', label: 'Semua Proyek' },
     ...projects.map((p) => ({ value: p.id, label: p.name })),
   ];
 
   const clientOptions = [
-    { value: '', label: 'All Clients' },
+    { value: '', label: 'Semua Klien' },
     ...clients.map((c) => ({ value: c.id, label: c.name })),
   ];
 
   const statusOptions = [
-    { value: '', label: 'All Entries' },
-    { value: 'billed', label: 'Billed' },
-    { value: 'unbilled', label: 'Not Billed' },
+    { value: '', label: 'Semua Catatan' },
+    { value: 'billed', label: 'Sudah Ditagih' },
+    { value: 'unbilled', label: 'Belum Ditagih' },
   ];
 
   // handleSelectAll is available if needed for future use
@@ -203,7 +204,7 @@ export function TimeEntriesList() {
       // Optimistic remove
       setEntries((prev) => prev.filter((e) => e.id !== entry.id));
       executeUndoable({
-        message: `Deleted time entry for "${entry.projectName}"`,
+        message: `Catatan waktu untuk "${entry.projectName}" dihapus`,
         action: async () => {
           await timeEntryService.bulkDelete([entry.id]);
         },
@@ -248,18 +249,18 @@ export function TimeEntriesList() {
 
   const handleExportCSV = async () => {
     try {
-      const headers = ['Date', 'Project', 'Client', 'Start', 'End', 'Duration', 'Billable', 'Billed', 'Notes'];
+      const headers = ['Tanggal', 'Proyek', 'Klien', 'Mulai', 'Selesai', 'Durasi', 'Bisa Ditagih', 'Sudah Ditagih', 'Catatan'];
       const rows = filteredEntries.map((entry) => [
-        new Date(entry.startTime).toLocaleDateString(),
+        formatDate(entry.startTime),
         entry.projectName || '',
         entry.clientName || '',
-        new Date(entry.startTime).toLocaleTimeString(),
-        entry.endTime ? new Date(entry.endTime).toLocaleTimeString() : '',
+        formatTime(entry.startTime),
+        entry.endTime ? formatTime(entry.endTime) : '',
         entry.endTime
           ? formatDurationShort(calculateDuration(entry))
           : '',
-        entry.isBillable ? 'Yes' : 'No',
-        entry.isBilled ? 'Yes' : 'No',
+        entry.isBillable ? 'Ya' : 'Tidak',
+        entry.isBilled ? 'Ya' : 'Tidak',
         entry.notes || '',
       ]);
       const csv = generateCSV(headers, rows);
@@ -293,7 +294,7 @@ export function TimeEntriesList() {
     <div className='space-y-6'>
       {/* Header */}
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-foreground'>Time Entries</h1>
+        <h1 className='text-2xl font-bold text-foreground'>Catatan Waktu</h1>
         <div className='flex items-center gap-2'>
           <Button
             variant='outline'
@@ -307,7 +308,7 @@ export function TimeEntriesList() {
           {selectedIds.size > 0 && (
           <div className='flex items-center gap-2'>
             <span className='text-sm text-muted-foreground'>
-              {selectedIds.size} selected ({formatDurationShort(selectedTotal)})
+              {selectedIds.size} dipilih ({formatDurationShort(selectedTotal)})
             </span>
             {hasSelectedUnbilledEntries && (
               <Button
@@ -317,7 +318,7 @@ export function TimeEntriesList() {
                 loading={submitting}
               >
                 <CheckCircle className='w-4 h-4' />
-                Mark as Billed
+                Tandai Sudah Ditagih
               </Button>
             )}
             {hasSelectedBilledEntries && (
@@ -333,7 +334,7 @@ export function TimeEntriesList() {
             )}
             <Button variant='destructive' size='sm' onClick={handleDeleteSelected}>
               <Trash2 className='w-4 h-4' />
-              Delete
+              Hapus
             </Button>
           </div>
         )}
@@ -371,14 +372,14 @@ export function TimeEntriesList() {
       {entries.length === 0 ? (
         <EmptyState
           icon={<Clock className='w-8 h-8' />}
-          title='No time entries yet'
-          description='Start tracking time on a project to see entries here.'
+          title='Belum ada catatan waktu'
+          description='Mulai timer pada proyek untuk melihat catatan di sini.'
         />
       ) : filteredEntries.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
-          title='No matching entries'
-          description='Try adjusting your filters.'
+          title='Tidak ada catatan yang cocok'
+          description='Coba ubah filter.'
         />
       ) : (
         <div className='space-y-8'>
@@ -441,9 +442,9 @@ export function TimeEntriesList() {
         isOpen={!!deletingEntries}
         onClose={() => setDeletingEntries(null)}
         onConfirm={handleConfirmDelete}
-        title='Delete Time Entries'
-        message={`Are you sure you want to delete ${deletingEntries?.length || 0} time ${deletingEntries?.length === 1 ? 'entry' : 'entries'}? This action cannot be undone.`}
-        confirmLabel='Delete'
+        title='Hapus Catatan Waktu'
+        message={`Yakin ingin menghapus ${deletingEntries?.length || 0} catatan waktu? Tindakan ini tidak bisa dibatalkan.`}
+        confirmLabel='Hapus'
         variant='danger'
         loading={submitting}
       />
@@ -498,7 +499,7 @@ const ClientGroup = ({
           </span>
           {clientName}
         </div>
-        <div className='text-muted-foreground text-sm'>{Object.keys(projects).length} Projects</div>
+        <div className='text-muted-foreground text-sm'>{Object.keys(projects).length} Proyek</div>
       </button>
 
       {isExpanded && (
@@ -561,7 +562,7 @@ const ProjectGroup = ({
             />
             <span className='font-medium'>{project.projectName}</span>
           </div>
-          <div className='text-muted-foreground text-xs'>{project.entries.length} Entries</div>
+          <div className='text-muted-foreground text-xs'>{project.entries.length} Catatan</div>
         </button>
       </div>
 
@@ -595,21 +596,6 @@ const TimeEntryCard = ({
   onEdit: () => void;
 }) => {
   // Helper formats
-  const formatDate = (isoString: string) => {
-    return new Date(isoString).toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const formatTime = (isoString: string) => {
-    return new Date(isoString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   return (
     <Card className='flex items-center gap-4 p-4' onClick={onSelect} hover>
       <input
@@ -632,11 +618,11 @@ const TimeEntryCard = ({
           {entry.isBilled ? (
             <Badge variant='success' size='sm' className='gap-1'>
               <CheckCircle className='w-3 h-3' />
-              Billed
+              Sudah Ditagih
             </Badge>
           ) : entry.isBillable ? (
             <Badge variant='info' size='sm'>
-              Billable
+              Bisa Ditagih
             </Badge>
           ) : null}
         </div>
@@ -654,7 +640,7 @@ const TimeEntryCard = ({
           {formatDate(entry.startTime)}
         </div>
         <div className='text-xs text-muted-foreground'>
-          {formatTime(entry.startTime)} - {entry.endTime ? formatTime(entry.endTime) : 'Running'}
+          {formatTime(entry.startTime)} - {entry.endTime ? formatTime(entry.endTime) : 'Berjalan'}
         </div>
       </div>
 
@@ -672,7 +658,7 @@ const TimeEntryCard = ({
           e.stopPropagation();
           onEdit();
         }}
-        aria-label='Edit entry'
+        aria-label='Ubah catatan'
       >
         <Pencil className='w-4 h-4' />
       </Button>
@@ -729,7 +715,7 @@ const EditTimeEntryModal = ({
   }, [startTime, endTime, entry.pauseDuration]);
 
   return (
-    <Modal isOpen={true} onClose={onClose} title='Edit Time Entry' size='lg'>
+    <Modal isOpen={true} onClose={onClose} title='Ubah Catatan Waktu' size='lg'>
       <form onSubmit={handleSubmit} className='space-y-4'>
         <div className='p-3 bg-secondary rounded-lg'>
           <div className='flex items-center gap-2 text-sm'>
@@ -743,14 +729,14 @@ const EditTimeEntryModal = ({
 
         <div className='grid grid-cols-2 gap-4'>
           <Input
-            label='Start Time'
+            label='Waktu Mulai'
             type='datetime-local'
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             required
           />
           <Input
-            label='End Time'
+            label='Waktu Selesai'
             type='datetime-local'
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
@@ -759,21 +745,21 @@ const EditTimeEntryModal = ({
 
         {durationSeconds > 0 && (
           <div className='text-center p-3 bg-muted rounded-lg'>
-            <span className='text-sm text-muted-foreground'>Duration: </span>
+            <span className='text-sm text-muted-foreground'>Durasi: </span>
             <span className='font-mono font-medium'>{formatDurationShort(durationSeconds)}</span>
             {entry.pauseDuration > 0 && (
               <span className='text-xs text-muted-foreground ml-2'>
-                (excl. {Math.round(entry.pauseDuration / 60)}m pause)
+                (tanpa jeda {Math.round(entry.pauseDuration / 60)}m)
               </span>
             )}
           </div>
         )}
 
         <Textarea
-          label='Notes'
+          label='Catatan'
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder='Add notes about this time entry...'
+          placeholder='Tambahkan catatan untuk entri waktu ini...'
           rows={2}
         />
 
@@ -786,16 +772,16 @@ const EditTimeEntryModal = ({
             className='rounded border-border'
           />
           <label htmlFor='edit-billable' className='text-sm'>
-            This time is billable
+            Waktu ini bisa ditagih
           </label>
         </div>
 
         <ModalFooter>
           <Button type='button' variant='outline' onClick={onClose}>
-            Cancel
+            Batal
           </Button>
           <Button type='submit' loading={saving}>
-            Save Changes
+            Simpan Perubahan
           </Button>
         </ModalFooter>
       </form>

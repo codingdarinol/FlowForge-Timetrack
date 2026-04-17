@@ -4,6 +4,7 @@ import type { Product } from '../../types';
 import { productService } from '../../services';
 import { PRODUCT_TEMPLATES } from '../../services/productService';
 import type { ProductTemplate } from '../../services/productService';
+import { formatCurrency } from '../../lib/formatters';
 import {
   Button,
   Card,
@@ -78,15 +79,15 @@ export function ProductsList() {
     <div className='space-y-6'>
       {/* Header */}
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-foreground'>Products & Services</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowTemplates(true)}>
+        <h1 className='text-2xl font-bold text-foreground'>Produk & Layanan</h1>
+        <div className='flex gap-2'>
+          <Button variant='outline' onClick={() => setShowTemplates(true)}>
             <Package className='w-4 h-4' />
-            Quick Add
+            Tambah Cepat
           </Button>
           <Button onClick={() => setShowCreate(true)}>
             <Plus className='w-4 h-4' />
-            New Item
+            Item Baru
           </Button>
         </div>
       </div>
@@ -98,7 +99,7 @@ export function ProductsList() {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder='Search items...'
+            placeholder='Cari item...'
             className='pl-9'
           />
         </div>
@@ -108,20 +109,20 @@ export function ProductsList() {
       {products.length === 0 ? (
         <EmptyState
           icon={<Package className='w-8 h-8' />}
-          title='No items yet'
-          description='Create your first product or service to easily add them to invoices.'
+          title='Belum ada item'
+          description='Buat produk atau layanan pertama agar mudah ditambahkan ke invoice.'
           action={
             <Button onClick={() => setShowCreate(true)}>
               <Plus className='w-4 h-4' />
-              Create Item
+              Buat Item
             </Button>
           }
         />
       ) : filteredProducts.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
-          title='No matching items'
-          description='Try searching for something else.'
+          title='Tidak ada item yang cocok'
+          description='Coba kata kunci lain.'
         />
       ) : (
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
@@ -130,10 +131,12 @@ export function ProductsList() {
               <div>
                 <div className='flex justify-between items-start mb-2'>
                   <h3 className='font-semibold text-foreground truncate'>{product.name}</h3>
-                  <span className='font-mono text-sm font-medium'>${product.price.toFixed(2)}</span>
+                  <span className='font-mono text-sm font-medium'>
+                    {formatCurrency(product.price)}
+                  </span>
                 </div>
                 <p className='text-sm text-muted-foreground line-clamp-2 min-h-[2.5em]'>
-                  {product.description || 'No description'}
+                  {product.description || 'Tanpa deskripsi'}
                 </p>
                 {product.sku && (
                   <p className='text-xs text-muted-foreground mt-2 font-mono'>SKU: {product.sku}</p>
@@ -173,13 +176,11 @@ export function ProductsList() {
 
       {/* View Product Modal */}
       {viewingProduct && (
-        <Modal isOpen={true} onClose={() => setViewingProduct(null)} title='Product Details'>
+        <Modal isOpen={true} onClose={() => setViewingProduct(null)} title='Detail Produk'>
           <div className='space-y-4'>
             <div className='flex justify-between items-start'>
               <h3 className='text-xl font-bold text-foreground'>{viewingProduct.name}</h3>
-              <span className='font-mono text-lg font-medium'>
-                ${viewingProduct.price.toFixed(2)}
-              </span>
+              <span className='font-mono text-lg font-medium'>{formatCurrency(viewingProduct.price)}</span>
             </div>
 
             {viewingProduct.sku && (
@@ -190,12 +191,12 @@ export function ProductsList() {
 
             <div className='prose prose-sm dark:prose-invert max-w-none bg-secondary/50 p-4 rounded-lg'>
               <p className='whitespace-pre-wrap'>
-                {viewingProduct.description || 'No description provided.'}
+                {viewingProduct.description || 'Belum ada deskripsi.'}
               </p>
             </div>
 
             <ModalFooter>
-              <Button onClick={() => setViewingProduct(null)}>Close</Button>
+              <Button onClick={() => setViewingProduct(null)}>Tutup</Button>
             </ModalFooter>
           </div>
         </Modal>
@@ -206,9 +207,9 @@ export function ProductsList() {
         isOpen={!!deletingProduct}
         onClose={() => setDeletingProduct(null)}
         onConfirm={handleDelete}
-        title='Delete Item'
-        message={`Are you sure you want to delete "${deletingProduct?.name}"?`}
-        confirmLabel='Delete'
+        title='Hapus Item'
+        message={`Yakin ingin menghapus "${deletingProduct?.name}"?`}
+        confirmLabel='Hapus'
         variant='danger'
         loading={submitting}
       />
@@ -222,7 +223,7 @@ export function ProductsList() {
             setTemplateData(template);
             setShowCreate(true);
           }}
-          existingNames={products.map(p => p.name.toLowerCase())}
+          existingNames={products.map((p) => p.name.toLowerCase())}
         />
       )}
     </div>

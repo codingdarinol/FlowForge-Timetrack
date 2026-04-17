@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bug, X, Trash2, Download, ChevronDown, ChevronUp } from 'lucide-react';
+import { formatTime as formatAppTime } from '../../lib/formatters';
 import { logger, type LogEntry, type LogLevel } from '../../lib/logger';
 
 const LOG_LEVEL_COLORS: Record<LogLevel, string> = {
@@ -56,18 +57,13 @@ export function DebugPanel() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `flowforge-logs-${new Date().toISOString()}.json`;
+    a.download = `yuk-kerja-logs-${new Date().toISOString()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const formatTime = (date: Date) => {
-    const base = date.toLocaleTimeString('en-US', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
+    const base = formatAppTime(date);
     const ms = date.getMilliseconds().toString().padStart(3, '0');
     return `${base}.${ms}`;
   };
@@ -78,7 +74,7 @@ export function DebugPanel() {
       <button
         onClick={() => setIsOpen(true)}
         className='fixed bottom-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-surface border border-border rounded-lg shadow-lg hover:bg-surface-hover transition-colors'
-        title='Open Debug Panel'
+        title='Buka Panel Debug'
       >
         <Bug className='w-4 h-4' />
         {errorCount > 0 && (
@@ -105,7 +101,7 @@ export function DebugPanel() {
       <div className='flex items-center justify-between px-3 py-2 border-b border-border bg-surface-hover rounded-t-lg'>
         <div className='flex items-center gap-2'>
           <Bug className='w-4 h-4 text-muted-foreground' />
-          <span className='font-medium text-sm'>Debug Log</span>
+          <span className='font-medium text-sm'>Log Debug</span>
           <span className='text-xs text-muted-foreground'>
             ({filteredEntries.length} / {entries.length})
           </span>
@@ -114,21 +110,21 @@ export function DebugPanel() {
           <button
             onClick={handleExport}
             className='p-1 hover:bg-background rounded'
-            title='Export logs'
+            title='Ekspor log'
           >
             <Download className='w-4 h-4 text-muted-foreground' />
           </button>
           <button
             onClick={() => logger.clear()}
             className='p-1 hover:bg-background rounded'
-            title='Clear logs'
+            title='Hapus log'
           >
             <Trash2 className='w-4 h-4 text-muted-foreground' />
           </button>
           <button
             onClick={() => setIsMinimized(!isMinimized)}
             className='p-1 hover:bg-background rounded'
-            title={isMinimized ? 'Expand' : 'Minimize'}
+            title={isMinimized ? 'Buka' : 'Minimalkan'}
           >
             {isMinimized ? (
               <ChevronUp className='w-4 h-4 text-muted-foreground' />
@@ -139,7 +135,7 @@ export function DebugPanel() {
           <button
             onClick={() => setIsOpen(false)}
             className='p-1 hover:bg-background rounded'
-            title='Close'
+            title='Tutup'
           >
             <X className='w-4 h-4 text-muted-foreground' />
           </button>
@@ -155,10 +151,10 @@ export function DebugPanel() {
               onChange={(e) => setFilter(e.target.value as LogLevel | 'all')}
               className='text-xs px-2 py-1 bg-surface border border-border rounded'
             >
-              <option value='all'>All Levels</option>
+              <option value='all'>Semua Level</option>
               <option value='debug'>Debug</option>
               <option value='info'>Info</option>
-              <option value='warn'>Warning</option>
+              <option value='warn'>Peringatan</option>
               <option value='error'>Error</option>
             </select>
             <select
@@ -168,7 +164,7 @@ export function DebugPanel() {
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
+                  {cat === 'all' ? 'Semua Kategori' : cat}
                 </option>
               ))}
             </select>
@@ -178,7 +174,7 @@ export function DebugPanel() {
           <div className='h-64 overflow-y-auto font-mono text-xs'>
             {filteredEntries.length === 0 ? (
               <div className='flex items-center justify-center h-full text-muted-foreground'>
-                No log entries
+                Belum ada log
               </div>
             ) : (
               <div className='divide-y divide-border/50'>

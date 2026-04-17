@@ -43,10 +43,10 @@ export function UpdateBanner() {
           </div>
           <div>
             <span className='text-sm font-semibold text-foreground'>
-              FlowForge-Track {updateInfo.latestVersion} is available!
+              yuk-kerja {updateInfo.latestVersion} sudah tersedia!
             </span>
             <span className='text-xs text-muted-foreground ml-2'>
-              (You have {updateInfo.currentVersion})
+              (Versi Anda {updateInfo.currentVersion})
             </span>
           </div>
         </div>
@@ -57,12 +57,12 @@ export function UpdateBanner() {
             className='flex items-center gap-1.5 text-sm font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:bg-primary/90 transition-colors'
           >
             <Download className='w-3.5 h-3.5' />
-            Download Update
+            Unduh Update
           </button>
           <button
             onClick={() => setDismissed(true)}
             className='p-1.5 hover:bg-muted rounded-md transition-colors'
-            aria-label='Dismiss'
+            aria-label='Tutup'
           >
             <X className='w-4 h-4 text-muted-foreground' />
           </button>

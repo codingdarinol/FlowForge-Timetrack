@@ -19,21 +19,21 @@ vi.mock('../../services', () => ({
 }));
 
 describe('Brand Verification', () => {
-  it('Sidebar displays FlowForge-Track', () => {
+  it('Sidebar displays yuk-kerja', () => {
     render(
       <BrowserRouter>
         <Sidebar />
       </BrowserRouter>,
     );
-    expect(screen.getByText('FlowForge-Track')).toBeInTheDocument();
+    expect(screen.getByText('yuk-kerja')).toBeInTheDocument();
   });
 
-  it('Header displays FlowForge-Track', () => {
+  it('Header displays yuk-kerja', () => {
     render(
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
     );
-    expect(screen.getByText('FlowForge-Track')).toBeInTheDocument();
+    expect(screen.getByText('yuk-kerja')).toBeInTheDocument();
   });
 });

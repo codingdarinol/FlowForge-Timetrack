@@ -40,7 +40,7 @@ function ProjectsListContent() {
       setProjects(data);
     } catch (err) {
       projectLogger.error('Failed to load projects:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load projects');
+      setError(err instanceof Error ? err.message : 'Gagal memuat proyek');
     } finally {
       setLoading(false);
     }
@@ -138,7 +138,7 @@ function ProjectsListContent() {
     } catch (err) {
       projectLogger.error('Failed to update project status:', err);
       // Revert or show error
-      setError('Failed to update status');
+      setError('Gagal mengubah status');
       loadProjects(); // Reload to ensure consistent state
     }
   };
@@ -151,7 +151,7 @@ function ProjectsListContent() {
     setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
 
     executeUndoable({
-      message: `Deleted project "${projectToDelete.name}"`,
+      message: `Proyek "${projectToDelete.name}" dihapus`,
       action: async () => {
         await projectService.delete(projectToDelete.id);
       },
@@ -162,7 +162,7 @@ function ProjectsListContent() {
   };
 
   const statusOptions = [
-    { value: '', label: 'All Statuses' },
+    { value: '', label: 'Semua Status' },
     ...PROJECT_STATUS_OPTIONS.map((s) => ({ value: s.value, label: s.label })),
   ];
 
@@ -174,10 +174,10 @@ function ProjectsListContent() {
     <div className='space-y-6'>
       {/* Header */}
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-foreground'>Projects</h1>
+        <h1 className='text-2xl font-bold text-foreground'>Proyek</h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus className='w-4 h-4' />
-          New Project
+          Proyek Baru
         </Button>
       </div>
 
@@ -186,7 +186,7 @@ function ProjectsListContent() {
         <div className='p-4 rounded-lg bg-destructive/10 border border-destructive text-destructive'>
           {error}
           <button onClick={() => setError(null)} className='ml-2 underline'>
-            Dismiss
+            Tutup
           </button>
         </div>
       )}
@@ -198,7 +198,7 @@ function ProjectsListContent() {
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
             <input
               type='text'
-              placeholder='Search projects...'
+              placeholder='Cari proyek...'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className='w-full h-10 pl-10 pr-4 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary'
@@ -218,20 +218,20 @@ function ProjectsListContent() {
       {projects.length === 0 ? (
         <EmptyState
           icon={<Briefcase className='w-8 h-8' />}
-          title='No projects yet'
-          description='Create your first project to start tracking time.'
+          title='Belum ada proyek'
+          description='Buat proyek pertama untuk mulai mencatat waktu.'
           action={
             <Button onClick={() => setShowForm(true)}>
               <Plus className='w-4 h-4' />
-              Add Project
+              Tambah Proyek
             </Button>
           }
         />
       ) : filteredProjects.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
-          title='No results'
-          description='Try adjusting your search or filters.'
+          title='Tidak ada hasil'
+          description='Coba ubah pencarian atau filter.'
         />
       ) : (
         <div className='space-y-4'>
@@ -271,9 +271,9 @@ function ProjectsListContent() {
         isOpen={!!deletingProject}
         onClose={() => setDeletingProject(null)}
         onConfirm={handleDelete}
-        title='Delete Project'
-        message={`Are you sure you want to delete "${deletingProject?.name}"? This will also delete all time entries for this project.`}
-        confirmLabel='Delete'
+        title='Hapus Proyek'
+        message={`Yakin ingin menghapus "${deletingProject?.name}"? Semua catatan waktu untuk proyek ini juga akan ikut terhapus.`}
+        confirmLabel='Hapus'
         variant='danger'
         loading={submitting}
       />

@@ -1,4 +1,4 @@
-// Database migrations for FlowForge
+// Database migrations for yuk-kerja
 // Run these on app startup to ensure schema is up to date
 
 import { getDb } from './db';
@@ -126,7 +126,7 @@ export async function runMigrations(): Promise<void> {
 
   // Migration: Add currency column to clients if it doesn't exist
   try {
-    await db.execute(`ALTER TABLE clients ADD COLUMN currency TEXT DEFAULT 'EUR'`);
+    await db.execute(`ALTER TABLE clients ADD COLUMN currency TEXT DEFAULT 'IDR'`);
   } catch {
     // Column already exists, ignore error
   }

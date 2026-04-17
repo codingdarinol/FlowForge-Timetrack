@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import type { DownPaymentWithDetails, CreateDownPaymentInput, Currency } from '../../types';
-import { CURRENCY_OPTIONS } from '../../types';
+import { formatCurrency, formatDate } from '../../lib/formatters';
 import { downPaymentService } from '../../services';
 import { Button, ConfirmDialog } from '../../components/ui';
 import { PaymentForm } from './PaymentForm';
@@ -12,17 +12,6 @@ import { useUndoableAction } from '../../hooks/useUndoableAction';
 interface ClientPaymentsProps {
   clientId: string;
   currency: Currency;
-}
-
-function formatCurrency(amount: number, currency: Currency): string {
-  const opt = CURRENCY_OPTIONS.find((c) => c.value === currency);
-  const symbol = opt?.symbol || '€';
-  return `${symbol}${amount.toFixed(2)}`;
-}
-
-function formatDate(iso: string): string {
-  const date = new Date(iso + 'T00:00:00');
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
@@ -92,7 +81,7 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
     setPayments((prev) => prev.filter((p) => p.id !== paymentToDelete.id));
 
     executeUndoable({
-      message: `Deleted payment of ${formatCurrency(paymentToDelete.amount, currency)}`,
+      message: `Pembayaran ${formatCurrency(paymentToDelete.amount, currency)} dihapus`,
       action: async () => {
         await downPaymentService.delete(paymentToDelete.id);
       },
@@ -103,30 +92,30 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
   };
 
   if (loading) {
-    return <div className='py-2 text-sm text-muted-foreground'>Loading payments...</div>;
+    return <div className='py-2 text-sm text-muted-foreground'>Memuat pembayaran...</div>;
   }
 
   return (
     <div className='space-y-3'>
-      {/* Header with total and add button */}
       <div className='flex items-center justify-between'>
         <div className='text-sm text-muted-foreground'>
           {payments.length > 0 ? (
             <>
-              <span className='font-medium text-foreground'>{formatCurrency(totalDeposits, currency)}</span>
-              {' '}total deposits ({payments.length} payment{payments.length !== 1 ? 's' : ''})
+              <span className='font-medium text-foreground'>
+                {formatCurrency(totalDeposits, currency)}
+              </span>{' '}
+              total deposit ({payments.length} pembayaran)
             </>
           ) : (
-            'No payments recorded'
+            'Belum ada pembayaran'
           )}
         </div>
         <Button size='sm' variant='outline' onClick={() => setShowForm(true)}>
           <Plus className='w-3.5 h-3.5' />
-          Add
+          Tambah
         </Button>
       </div>
 
-      {/* Payment list */}
       {payments.length > 0 && (
         <div className='space-y-1.5'>
           {payments.map((payment) => (
@@ -136,7 +125,7 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
             >
               <div className='flex items-center gap-3 min-w-0 flex-1'>
                 <span className='text-xs text-muted-foreground whitespace-nowrap'>
-                  {formatDate(payment.paymentDate)}
+                  {formatDate(`${payment.paymentDate}T00:00:00`)}
                 </span>
                 <span className='text-sm font-medium text-foreground whitespace-nowrap'>
                   {formatCurrency(payment.amount, currency)}
@@ -148,7 +137,7 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
                 )}
                 {payment.notes && (
                   <span className='text-xs text-muted-foreground truncate hidden sm:inline'>
-                    — {payment.notes}
+                    - {payment.notes}
                   </span>
                 )}
               </div>
@@ -157,7 +146,7 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
                   variant='ghost'
                   size='sm'
                   onClick={() => setEditingPayment(payment)}
-                  aria-label='Edit payment'
+                  aria-label='Ubah pembayaran'
                 >
                   <Pencil className='w-3.5 h-3.5' />
                 </Button>
@@ -165,7 +154,7 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
                   variant='ghost'
                   size='sm'
                   onClick={() => setDeletingPayment(payment)}
-                  aria-label='Delete payment'
+                  aria-label='Hapus pembayaran'
                 >
                   <Trash2 className='w-3.5 h-3.5 text-destructive' />
                 </Button>
@@ -175,7 +164,6 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
         </div>
       )}
 
-      {/* Create form */}
       <PaymentForm
         isOpen={showForm}
         onClose={() => setShowForm(false)}
@@ -184,7 +172,6 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
         loading={submitting}
       />
 
-      {/* Edit form */}
       {editingPayment && (
         <PaymentForm
           isOpen={true}
@@ -196,14 +183,13 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
         />
       )}
 
-      {/* Delete confirmation */}
       <ConfirmDialog
         isOpen={!!deletingPayment}
         onClose={() => setDeletingPayment(null)}
         onConfirm={handleDelete}
-        title='Delete Payment'
-        message={`Delete payment of ${deletingPayment ? formatCurrency(deletingPayment.amount, currency) : ''} from ${deletingPayment ? formatDate(deletingPayment.paymentDate) : ''}?`}
-        confirmLabel='Delete'
+        title='Hapus pembayaran'
+        message={`Hapus pembayaran ${deletingPayment ? formatCurrency(deletingPayment.amount, currency) : ''} tanggal ${deletingPayment ? formatDate(`${deletingPayment.paymentDate}T00:00:00`) : ''}?`}
+        confirmLabel='Hapus'
         variant='danger'
         loading={submitting}
       />

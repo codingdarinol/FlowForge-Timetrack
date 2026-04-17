@@ -19,16 +19,16 @@ export function Sidebar() {
   const { settings, updateSetting } = useSettings();
   const mainLinks = [
     { to: '/', label: 'Timer', icon: Timer },
-    { to: '/clients', label: 'Clients', icon: Users },
-    { to: '/projects', label: 'Projects', icon: Briefcase },
-    { to: '/time-entries', label: 'Time Entries', icon: Clock },
-    { to: '/invoices', label: 'Invoices', icon: FileText },
-    { to: '/products', label: 'Products', icon: Package },
+    { to: '/clients', label: 'Klien', icon: Users },
+    { to: '/projects', label: 'Proyek', icon: Briefcase },
+    { to: '/time-entries', label: 'Catatan Waktu', icon: Clock },
+    { to: '/invoices', label: 'Invoice', icon: FileText },
+    { to: '/products', label: 'Produk', icon: Package },
   ];
 
   return (
     <aside className='w-64 bg-secondary border-r border-border h-screen flex flex-col p-4 shrink-0'>
-      <div className='text-2xl font-bold mb-8 px-4 text-primary'>FlowForge-Track</div>
+      <div className='text-2xl font-bold mb-8 px-4 text-primary'>yuk-kerja</div>
 
       <nav className='flex-1 space-y-1'>
         {mainLinks.map((link) => (
@@ -61,7 +61,7 @@ export function Sidebar() {
               <VolumeX className='w-5 h-5 text-muted-foreground' />
             )}
             <span className={clsx(!settings.enableSoundFeedback && 'text-muted-foreground')}>
-              Sound
+              Suara
             </span>
           </div>
           <Switch
@@ -81,16 +81,16 @@ export function Sidebar() {
           }
         >
           <Settings className='w-5 h-5' />
-          <span>Settings</span>
+          <span>Pengaturan</span>
         </NavLink>
         <div className='px-4 pt-3 pb-1'>
-          <a href='https://flowforge.emmi.zone/' target='_blank' rel='noopener noreferrer'
+          <a href='https://pahampajak.id' target='_blank' rel='noopener noreferrer'
              className='block text-xs text-muted-foreground hover:text-foreground transition-colors'>
-            flowforge.emmi.zone
+            pahampajak.id
           </a>
-          <a href='https://emmi.engineer' target='_blank' rel='noopener noreferrer'
+          <a href='https://pahampajak.id' target='_blank' rel='noopener noreferrer'
              className='block text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors mt-0.5'>
-            by emmi.engineer
+            by team pahampajak
           </a>
         </div>
       </div>

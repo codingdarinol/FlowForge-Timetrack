@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import {
   Moon,
   Sun,
@@ -405,7 +405,7 @@ export function Settings() {
                 Neurodivergent-Friendly Design
               </CardTitle>
               <CardDescription className='text-blue-700 dark:text-blue-400'>
-                FlowForge-Track was designed with neurodivergent users in mind. Features include:
+                yuk-kerja was designed with neurodivergent users in mind. Features include:
                 <ul className='list-disc list-inside mt-2 space-y-1'>
                   <li>Large touch targets (minimum 44pt)</li>
                   <li>Clear labels with icons</li>
@@ -681,7 +681,7 @@ export function Settings() {
           <Card>
             <CardTitle className='px-6 pt-6 text-base'>Data Management</CardTitle>
             <CardDescription className='px-6 pb-2'>
-              Export or import your FlowForge-Track database for backup purposes.
+              Export or import your yuk-kerja database for backup purposes.
             </CardDescription>
             <CardContent className='space-y-4'>
               <div className='flex gap-4'>
@@ -730,7 +730,7 @@ export function Settings() {
                   try {
                     const { message } = await import('@tauri-apps/plugin-dialog');
                     await message('Backup imported! The app will now restart.', {
-                      title: 'FlowForge-Track',
+                      title: 'yuk-kerja',
                       kind: 'info',
                     });
                   } catch (e) {
@@ -764,10 +764,10 @@ export function Settings() {
             <CardContent className='py-6'>
               <div className='flex items-center gap-3 mb-2'>
                 <Zap className='w-6 h-6 text-primary' />
-                <CardTitle className='text-xl'>Welcome to FlowForge-Track!</CardTitle>
+                <CardTitle className='text-xl'>Welcome to yuk-kerja!</CardTitle>
               </div>
               <CardDescription className='text-base'>
-                FlowForge-Track is your all-in-one time tracking and invoicing companion. This guide
+                yuk-kerja is your all-in-one time tracking and invoicing companion. This guide
                 will walk you through every feature step by step.
               </CardDescription>
             </CardContent>
@@ -795,18 +795,18 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Timer Controls</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Pause:</strong> Temporarily stop without finishing
+                    â€¢ <strong>Pause:</strong> Temporarily stop without finishing
                   </li>
                   <li>
-                    • <strong>Resume:</strong> Continue from where you paused
+                    â€¢ <strong>Resume:</strong> Continue from where you paused
                   </li>
                   <li>
-                    • <strong>Stop:</strong> End the session and save it as a time entry
+                    â€¢ <strong>Stop:</strong> End the session and save it as a time entry
                   </li>
                 </ul>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>💡 Tip:</strong> When you stop the timer, a time entry is automatically
+                <strong>ðŸ’¡ Tip:</strong> When you stop the timer, a time entry is automatically
                 created and saved.
               </div>
             </div>
@@ -819,28 +819,28 @@ export function Settings() {
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
                 The floating widget is a small, always-on-top window that shows your timer status
-                even when FlowForge-Track is minimized.
+                even when yuk-kerja is minimized.
               </p>
               <div>
                 <h4 className='font-medium mb-2'>Widget Features</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>• Shows current project name and elapsed time</li>
+                  <li>â€¢ Shows current project name and elapsed time</li>
                   <li>
-                    • <strong>Play/Pause button:</strong> Control your timer
+                    â€¢ <strong>Play/Pause button:</strong> Control your timer
                   </li>
                   <li>
-                    • <strong>Stop button:</strong> End the current session
+                    â€¢ <strong>Stop button:</strong> End the current session
                   </li>
                   <li>
-                    • <strong>Open App button:</strong> Bring FlowForge-Track to focus
+                    â€¢ <strong>Open App button:</strong> Bring yuk-kerja to focus
                   </li>
                   <li>
-                    • <strong>Drag handle:</strong> Move the widget anywhere on screen
+                    â€¢ <strong>Drag handle:</strong> Move the widget anywhere on screen
                   </li>
                 </ul>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>💡 Tip:</strong> Enable or disable the widget in Settings → General → "Show
+                <strong>ðŸ’¡ Tip:</strong> Enable or disable the widget in Settings â†’ General â†’ "Show
                 Floating Timer Widget"
               </div>
             </div>
@@ -864,10 +864,10 @@ export function Settings() {
               <div>
                 <h4 className='font-medium mb-2'>Customizing</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>• Go to Settings → General → Pomodoro Timer</li>
-                  <li>• Set your preferred work duration (1-120 minutes)</li>
-                  <li>• Set your preferred break duration (1-60 minutes)</li>
-                  <li>• Default is 25 minutes work / 5 minutes break</li>
+                  <li>â€¢ Go to Settings â†’ General â†’ Pomodoro Timer</li>
+                  <li>â€¢ Set your preferred work duration (1-120 minutes)</li>
+                  <li>â€¢ Set your preferred break duration (1-60 minutes)</li>
+                  <li>â€¢ Default is 25 minutes work / 5 minutes break</li>
                 </ul>
               </div>
             </div>
@@ -898,28 +898,28 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Client Details</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Name:</strong> Client or company name (required)
+                    â€¢ <strong>Name:</strong> Client or company name (required)
                   </li>
                   <li>
-                    • <strong>Currency:</strong> Select EUR (€), USD ($), or GBP (£) for this
-                    client's invoices
+                    â€¢ <strong>Currency:</strong> Pilih IDR (Rp) atau USD ($) untuk invoice klien
+                    ini
                   </li>
                   <li>
-                    • <strong>Hourly Rate:</strong> Default rate for this client
+                    â€¢ <strong>Hourly Rate:</strong> Default rate for this client
                   </li>
                   <li>
-                    • <strong>Email & Address:</strong> For invoice delivery
+                    â€¢ <strong>Email & Address:</strong> For invoice delivery
                   </li>
                   <li>
-                    • <strong>VAT Number:</strong> For tax purposes
+                    â€¢ <strong>VAT Number:</strong> For tax purposes
                   </li>
                   <li>
-                    • <strong>Notes:</strong> Private notes (click the note icon to view)
+                    â€¢ <strong>Notes:</strong> Private notes (click the note icon to view)
                   </li>
                 </ul>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>💡 Tip:</strong> The selected currency will automatically apply to all
+                <strong>ðŸ’¡ Tip:</strong> The selected currency will automatically apply to all
                 invoices created for this client.
               </div>
             </div>
@@ -952,18 +952,18 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Project Statuses</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Active:</strong> Currently working on this project
+                    â€¢ <strong>Active:</strong> Currently working on this project
                   </li>
                   <li>
-                    • <strong>Paused:</strong> Temporarily on hold
+                    â€¢ <strong>Paused:</strong> Temporarily on hold
                   </li>
                   <li>
-                    • <strong>Completed:</strong> Finished project (hidden from timer)
+                    â€¢ <strong>Completed:</strong> Finished project (hidden from timer)
                   </li>
                 </ul>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>💡 Tip:</strong> Only Active projects appear in the timer dropdown. Change
+                <strong>ðŸ’¡ Tip:</strong> Only Active projects appear in the timer dropdown. Change
                 status to control visibility.
               </div>
             </div>
@@ -978,19 +978,19 @@ export function Settings() {
               <div>
                 <h4 className='font-medium mb-2'>Viewing Entries</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>• Entries are grouped by Client → Project</li>
-                  <li>• Each entry shows date, time, and duration</li>
-                  <li>• Use filters to find specific entries</li>
+                  <li>â€¢ Entries are grouped by Client â†’ Project</li>
+                  <li>â€¢ Each entry shows date, time, and duration</li>
+                  <li>â€¢ Use filters to find specific entries</li>
                 </ul>
               </div>
               <div>
                 <h4 className='font-medium mb-2'>Billed vs Unbilled</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Unbilled (gray):</strong> Not yet added to an invoice
+                    â€¢ <strong>Unbilled (gray):</strong> Not yet added to an invoice
                   </li>
                   <li>
-                    • <strong>Billed (green):</strong> Already included in an invoice
+                    â€¢ <strong>Billed (green):</strong> Already included in an invoice
                   </li>
                 </ul>
               </div>
@@ -1002,13 +1002,13 @@ export function Settings() {
                 </ol>
                 <ul className='space-y-1 text-sm text-muted-foreground ml-6 mt-1'>
                   <li>
-                    • <strong>Mark as Billed:</strong> Manually mark entries as invoiced
+                    â€¢ <strong>Mark as Billed:</strong> Manually mark entries as invoiced
                   </li>
                   <li>
-                    • <strong>Mark as Unbilled:</strong> Revert billed entries
+                    â€¢ <strong>Mark as Unbilled:</strong> Revert billed entries
                   </li>
                   <li>
-                    • <strong>Delete:</strong> Remove selected entries
+                    â€¢ <strong>Delete:</strong> Remove selected entries
                   </li>
                 </ul>
               </div>
@@ -1019,10 +1019,10 @@ export function Settings() {
                   card to:
                 </p>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>• Adjust Start/End times</li>
-                  <li>• Edit the Duration directly</li>
-                  <li>• Toggle Billable status</li>
-                  <li>• Update notes</li>
+                  <li>â€¢ Adjust Start/End times</li>
+                  <li>â€¢ Edit the Duration directly</li>
+                  <li>â€¢ Toggle Billable status</li>
+                  <li>â€¢ Update notes</li>
                 </ul>
               </div>
             </div>
@@ -1031,7 +1031,7 @@ export function Settings() {
           <GuideSection icon={<FileText className='w-5 h-5' />} title='Creating Invoices'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                FlowForge-Track makes invoicing easy by automatically importing your unbilled time
+                yuk-kerja makes invoicing easy by automatically importing your unbilled time
                 entries.
               </p>
               <div>
@@ -1045,7 +1045,7 @@ export function Settings() {
                   </li>
                   <li>Select a client from the dropdown</li>
                   <li>
-                    Click <strong>Next</strong> – your unbilled hours are loaded automatically!
+                    Click <strong>Next</strong> â€“ your unbilled hours are loaded automatically!
                   </li>
                   <li>Review and edit line items as needed</li>
                   <li>
@@ -1062,28 +1062,28 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Adding Extra Items</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Add stored item:</strong> Select from your saved Products
+                    â€¢ <strong>Add stored item:</strong> Select from your saved Products
                   </li>
                   <li>
-                    • <strong>+ Add Line:</strong> Create a custom line item manually
+                    â€¢ <strong>+ Add Line:</strong> Create a custom line item manually
                   </li>
-                  <li>• You can edit descriptions, quantities, and prices freely</li>
+                  <li>â€¢ You can edit descriptions, quantities, and prices freely</li>
                 </ul>
               </div>
               <div>
                 <h4 className='font-medium mb-2'>Invoice Actions</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Preview:</strong> View the full invoice with your business details
+                    â€¢ <strong>Preview:</strong> View the full invoice with your business details
                   </li>
                   <li>
-                    • <strong>Export PDF:</strong> Download a professional PDF
+                    â€¢ <strong>Export PDF:</strong> Download a professional PDF
                   </li>
                   <li>
-                    • <strong>Edit:</strong> Modify invoice details
+                    â€¢ <strong>Edit:</strong> Modify invoice details
                   </li>
                   <li>
-                    • <strong>Change Status:</strong> Use the dropdown on each invoice card (Draft,
+                    â€¢ <strong>Change Status:</strong> Use the dropdown on each invoice card (Draft,
                     Sent, Paid, Overdue, Cancelled)
                   </li>
                 </ul>
@@ -1097,7 +1097,7 @@ export function Settings() {
                 </p>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>💡 Tip:</strong> Only the time entries included in the final saved invoice
+                <strong>ðŸ’¡ Tip:</strong> Only the time entries included in the final saved invoice
                 are marked as "billed". If you remove an entry before saving, it stays unbilled.
               </div>
             </div>
@@ -1129,7 +1129,7 @@ export function Settings() {
                 <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
                   <li>Create or edit an invoice</li>
                   <li>In the Line Items step, find the "Add stored item..." dropdown</li>
-                  <li>Select a product – it's added with preset name and price!</li>
+                  <li>Select a product â€“ it's added with preset name and price!</li>
                   <li>Adjust quantity as needed</li>
                 </ol>
               </div>
@@ -1142,7 +1142,7 @@ export function Settings() {
                 </p>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>💡 Tip:</strong> Click the eye icon on any product card to view its full
+                <strong>ðŸ’¡ Tip:</strong> Click the eye icon on any product card to view its full
                 description.
               </div>
             </div>
@@ -1157,22 +1157,22 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Available Fields</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Logo:</strong> Upload your business logo (PNG/JPG, max 1MB)
+                    â€¢ <strong>Logo:</strong> Upload your business logo (PNG/JPG, max 1MB)
                   </li>
                   <li>
-                    • <strong>Name:</strong> Your business or freelancer name
+                    â€¢ <strong>Name:</strong> Your business or freelancer name
                   </li>
                   <li>
-                    • <strong>Address:</strong> Full business address
+                    â€¢ <strong>Address:</strong> Full business address
                   </li>
                   <li>
-                    • <strong>Email & Phone:</strong> Contact information
+                    â€¢ <strong>Email & Phone:</strong> Contact information
                   </li>
                   <li>
-                    • <strong>VAT Number:</strong> For tax compliance
+                    â€¢ <strong>VAT Number:</strong> For tax compliance
                   </li>
                   <li>
-                    • <strong>Default Tax Rate:</strong> Auto-applied to new invoices
+                    â€¢ <strong>Default Tax Rate:</strong> Auto-applied to new invoices
                   </li>
                 </ul>
               </div>
@@ -1180,14 +1180,14 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Payment Options</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Payment Links (x2):</strong> Add links to PayPal, Stripe, Venmo, etc.
+                    â€¢ <strong>Payment Links (x2):</strong> Add links to PayPal, Stripe, Venmo, etc.
                   </li>
                   <li>
-                    • <strong>Custom Titles:</strong> Name each payment link (e.g., "Pay via
+                    â€¢ <strong>Custom Titles:</strong> Name each payment link (e.g., "Pay via
                     PayPal")
                   </li>
                   <li>
-                    • <strong>Payment Terms:</strong> Bank details, IBAN, instructions, etc.
+                    â€¢ <strong>Payment Terms:</strong> Bank details, IBAN, instructions, etc.
                   </li>
                 </ul>
               </div>
@@ -1195,17 +1195,17 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Additional Business Info</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Website:</strong> Your business website URL, displayed on invoices.
+                    â€¢ <strong>Website:</strong> Your business website URL, displayed on invoices.
                   </li>
                   <li>
-                    • <strong>Tagline:</strong> A short description or slogan for your business.
+                    â€¢ <strong>Tagline:</strong> A short description or slogan for your business.
                   </li>
                   <li>
-                    • <strong>Payment QR Code:</strong> Upload a QR code image for quick mobile
+                    â€¢ <strong>Payment QR Code:</strong> Upload a QR code image for quick mobile
                     payments (appears on PDF invoices).
                   </li>
                   <li>
-                    • <strong>Bank Transfer Details:</strong> Add IBAN, bank name, and reference info
+                    â€¢ <strong>Bank Transfer Details:</strong> Add IBAN, bank name, and reference info
                     for direct transfers.
                   </li>
                 </ul>
@@ -1219,17 +1219,17 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Theme</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Light:</strong> Bright, clean interface
+                    â€¢ <strong>Light:</strong> Bright, clean interface
                   </li>
                   <li>
-                    • <strong>Dark:</strong> Easy on the eyes, great for night work
+                    â€¢ <strong>Dark:</strong> Easy on the eyes, great for night work
                   </li>
                   <li>
-                    • <strong>High Contrast:</strong> optimized for accessibility with distinct
+                    â€¢ <strong>High Contrast:</strong> optimized for accessibility with distinct
                     borders and pure black backgrounds
                   </li>
                   <li>
-                    • <strong>System:</strong> Follows your OS settings automatically
+                    â€¢ <strong>System:</strong> Follows your OS settings automatically
                   </li>
                 </ul>
               </div>
@@ -1237,37 +1237,37 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Accessibility</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Disable Animations:</strong> Toggle this in the Accessibility tab to
+                    â€¢ <strong>Disable Animations:</strong> Toggle this in the Accessibility tab to
                     remove all motion effects
                   </li>
                   <li>
-                    • <strong>Font Size:</strong> Scale text up to Extra Large
+                    â€¢ <strong>Font Size:</strong> Scale text up to Extra Large
                   </li>
                 </ul>
               </div>
               <div>
                 <h4 className='font-medium mb-2'>Font Size</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>• Choose from Small, Medium, Large, or Extra Large</li>
-                  <li>• Affects all text throughout the app</li>
+                  <li>â€¢ Choose from Small, Medium, Large, or Extra Large</li>
+                  <li>â€¢ Affects all text throughout the app</li>
                 </ul>
               </div>
               <div>
                 <h4 className='font-medium mb-2'>Density</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Compact:</strong> More content, less spacing
+                    â€¢ <strong>Compact:</strong> More content, less spacing
                   </li>
                   <li>
-                    • <strong>Comfortable:</strong> Balanced (default)
+                    â€¢ <strong>Comfortable:</strong> Balanced (default)
                   </li>
                   <li>
-                    • <strong>Spacious:</strong> More breathing room
+                    â€¢ <strong>Spacious:</strong> More breathing room
                   </li>
                 </ul>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>💡 Tip:</strong> All appearance changes save automatically – no need to
+                <strong>ðŸ’¡ Tip:</strong> All appearance changes save automatically â€“ no need to
                 click Save!
               </div>
             </div>
@@ -1276,30 +1276,30 @@ export function Settings() {
           <GuideSection icon={<Keyboard className='w-5 h-5' />} title='Global Shortcuts'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Control FlowForge-Track from anywhere, even when the app is in the background.
+                Control yuk-kerja from anywhere, even when the app is in the background.
               </p>
               <div>
                 <h4 className='font-medium mb-2'>Available Shortcuts</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Cmd/Ctrl + Shift + S:</strong> Start or Resume timer
+                    â€¢ <strong>Cmd/Ctrl + Shift + S:</strong> Start or Resume timer
                   </li>
                   <li>
-                    • <strong>Cmd/Ctrl + Shift + P:</strong> Pause timer
+                    â€¢ <strong>Cmd/Ctrl + Shift + P:</strong> Pause timer
                   </li>
                   <li>
-                    • <strong>Cmd/Ctrl + Shift + X:</strong> Stop timer and save entry
+                    â€¢ <strong>Cmd/Ctrl + Shift + X:</strong> Stop timer and save entry
                   </li>
                   <li>
-                    • <strong>Cmd/Ctrl + Shift + W:</strong> Toggle floating widget
+                    â€¢ <strong>Cmd/Ctrl + Shift + W:</strong> Toggle floating widget
                   </li>
                   <li>
-                    • <strong>Cmd/Ctrl + Shift + M:</strong> Toggle sound feedback
+                    â€¢ <strong>Cmd/Ctrl + Shift + M:</strong> Toggle sound feedback
                   </li>
                 </ul>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>💡 Tip:</strong> These work globally! You don't need to have the FlowForge
+                <strong>ðŸ’¡ Tip:</strong> These work globally! You don't need to have the FlowForge
                 window focused.
               </div>
             </div>
@@ -1314,28 +1314,28 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Features</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Today's Summary:</strong> See exactly how your day is broken down by
+                    â€¢ <strong>Today's Summary:</strong> See exactly how your day is broken down by
                     project.
                   </li>
                   <li>
-                    • <strong>Weekly Progress:</strong> Visual bar chart of your hours for the last
+                    â€¢ <strong>Weekly Progress:</strong> Visual bar chart of your hours for the last
                     7 days.
                   </li>
                   <li>
-                    • <strong>Quick Stats:</strong> At-a-glance view of unbilled revenue and total
+                    â€¢ <strong>Quick Stats:</strong> At-a-glance view of unbilled revenue and total
                     weekly hours.
                   </li>
                   <li>
-                    • <strong>Client Breakdown:</strong> See hours and billing split for each client
+                    â€¢ <strong>Client Breakdown:</strong> See hours and billing split for each client
                     with visual progress bars.
                   </li>
                   <li>
-                    • <strong>Monthly Hours:</strong> Navigate between months with prev/next arrows.
+                    â€¢ <strong>Monthly Hours:</strong> Navigate between months with prev/next arrows.
                     Shows total hours, days worked, and average per day with percentage change vs
                     previous month.
                   </li>
                   <li>
-                    • <strong>Project Breakdown:</strong> All-time hours per project with color-coded
+                    â€¢ <strong>Project Breakdown:</strong> All-time hours per project with color-coded
                     progress bars showing each project's share of total time.
                   </li>
                 </ul>
@@ -1366,10 +1366,10 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Configuration</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • Go to <strong>Settings → General</strong> to enable/disable.
+                    â€¢ Go to <strong>Settings â†’ General</strong> to enable/disable.
                   </li>
                   <li>
-                    • Adjust the "Idle Threshold" to choose how long to wait before pausing (2-30
+                    â€¢ Adjust the "Idle Threshold" to choose how long to wait before pausing (2-30
                     minutes).
                   </li>
                 </ul>
@@ -1383,15 +1383,15 @@ export function Settings() {
                 <h4 className='font-medium mb-2'>Data Backup</h4>
                 <p className='text-sm text-muted-foreground mb-2'>
                   Protect your data by exporting regular backups from the{' '}
-                  <strong>Settings → Business</strong> tab.
+                  <strong>Settings â†’ Business</strong> tab.
                 </p>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    • <strong>Export:</strong> Saves your entire database as a file to your
+                    â€¢ <strong>Export:</strong> Saves your entire database as a file to your
                     computer.
                   </li>
                   <li>
-                    • <strong>Import:</strong> Restores your data from a backup file. (Note: This
+                    â€¢ <strong>Import:</strong> Restores your data from a backup file. (Note: This
                     replaces current data and restarts the app).
                   </li>
                 </ul>
@@ -1399,7 +1399,7 @@ export function Settings() {
               <div>
                 <h4 className='font-medium mb-2'>App Updates</h4>
                 <p className='text-sm text-muted-foreground'>
-                  FlowForge-Track automatically checks for updates on startup. If a new version is
+                  yuk-kerja automatically checks for updates on startup. If a new version is
                   available, a <strong>banner</strong> will appear at the top of the screen with a
                   link to download the latest release.
                 </p>
@@ -1407,46 +1407,46 @@ export function Settings() {
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Globe className='w-5 h-5' />} title='About FlowForge-Track'>
+          <GuideSection icon={<Globe className='w-5 h-5' />} title='Tentang yuk-kerja'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                FlowForge-Track is built by{' '}
+                yuk-kerja dikembangkan oleh{' '}
                 <a
-                  href='https://emmi.engineer'
+                  href='https://pahampajak.id'
                   target='_blank'
                   rel='noopener noreferrer'
                   className='text-primary hover:underline'
                 >
-                  emmi.engineer
+                  team pahampajak
                 </a>{' '}
-                — a freelance-first time tracking and invoicing app designed for simplicity and speed.
+                â€” a freelance-first time tracking and invoicing app designed for simplicity and speed.
               </p>
               <div>
                 <h4 className='font-medium mb-2'>Links</h4>
                 <ul className='space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    •{' '}
+                    â€¢{' '}
                     <a
-                      href='https://flowforge.emmi.zone/'
+                      href='https://pahampajak.id'
                       target='_blank'
                       rel='noopener noreferrer'
                       className='text-primary hover:underline'
                     >
-                      flowforge.emmi.zone
+                      pahampajak.id
                     </a>{' '}
-                    — Product website
+                    â€” Website produk
                   </li>
                   <li>
-                    •{' '}
+                    â€¢{' '}
                     <a
-                      href='https://emmi.engineer'
+                      href='https://pahampajak.id'
                       target='_blank'
                       rel='noopener noreferrer'
                       className='text-primary hover:underline'
                     >
-                      emmi.engineer
+                      team pahampajak
                     </a>{' '}
-                    — Developer portfolio
+                    â€” Developer portfolio
                   </li>
                 </ul>
               </div>
@@ -1459,10 +1459,10 @@ export function Settings() {
           <Card className='bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'>
             <CardContent className='py-6'>
               <CardTitle className='text-green-800 dark:text-green-300 mb-2'>
-                🎉 You're All Set!
+                ðŸŽ‰ You're All Set!
               </CardTitle>
               <CardDescription className='text-green-700 dark:text-green-400'>
-                You now know everything FlowForge-Track can do. Start tracking your time and
+                You now know everything yuk-kerja can do. Start tracking your time and
                 creating invoices with ease!
               </CardDescription>
             </CardContent>
@@ -1571,3 +1571,4 @@ function GuideSection({ icon, title, children, defaultOpen = false }: GuideSecti
     </Card>
   );
 }
+

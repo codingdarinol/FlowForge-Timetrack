@@ -52,10 +52,10 @@ export function PaymentForm({
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
     if (!amount || amount <= 0) {
-      newErrors.amount = 'Amount must be greater than 0';
+      newErrors.amount = 'Jumlah harus lebih dari 0';
     }
     if (!paymentDate) {
-      newErrors.paymentDate = 'Date is required';
+      newErrors.paymentDate = 'Tanggal wajib diisi';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -74,7 +74,7 @@ export function PaymentForm({
         notes,
       });
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Failed to save payment');
+      setSubmitError(err instanceof Error ? err.message : 'Gagal menyimpan pembayaran');
     }
   };
 
@@ -84,7 +84,7 @@ export function PaymentForm({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Edit Payment' : 'Record Payment'}
+      title={isEditing ? 'Ubah Pembayaran' : 'Catat Pembayaran'}
       size='sm'
     >
       <form onSubmit={handleSubmit} className='space-y-4'>
@@ -95,7 +95,7 @@ export function PaymentForm({
         )}
 
         <Input
-          label='Amount *'
+          label='Jumlah *'
           type='number'
           min={0}
           step={0.01}
@@ -110,7 +110,7 @@ export function PaymentForm({
         />
 
         <Input
-          label='Date *'
+          label='Tanggal *'
           type='date'
           value={paymentDate}
           onChange={(e) => {
@@ -122,30 +122,30 @@ export function PaymentForm({
 
         {projects.length > 0 && (
           <Select
-            label='Project (optional)'
+            label='Proyek (opsional)'
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
             options={[
-              { value: '', label: 'General (no project)' },
+              { value: '', label: 'Umum (tanpa proyek)' },
               ...projects.map((p) => ({ value: p.id, label: p.name })),
             ]}
           />
         )}
 
         <Textarea
-          label='Notes'
+          label='Catatan'
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder='Payment reference, method, etc.'
+          placeholder='Referensi pembayaran, metode, dll.'
           rows={2}
         />
 
         <ModalFooter>
           <Button type='button' variant='outline' onClick={onClose} disabled={loading}>
-            Cancel
+            Batal
           </Button>
           <Button type='submit' loading={loading}>
-            {isEditing ? 'Save Changes' : 'Record Payment'}
+            {isEditing ? 'Simpan Perubahan' : 'Catat Pembayaran'}
           </Button>
         </ModalFooter>
       </form>

@@ -1,6 +1,7 @@
 // Client CRUD service
 
 import { getDb } from '../lib/db';
+import { DEFAULT_CURRENCY, normalizeCurrency } from '../lib/formatters';
 import { clientLogger } from '../lib/logger';
 import type { Client, ClientWithStats, CreateClientInput, UpdateClientInput } from '../types';
 
@@ -22,7 +23,7 @@ export const clientService = {
         SELECT 
           id, name, email, address, phone, vat_number as vatNumber,
           hourly_rate as hourlyRate,
-          COALESCE(currency, 'EUR') as currency,
+          CASE WHEN currency = 'USD' THEN 'USD' ELSE 'IDR' END as currency,
           notes,
           created_at as createdAt,
           updated_at as updatedAt
@@ -46,7 +47,7 @@ export const clientService = {
         SELECT 
           c.id, c.name, c.email, c.address, c.phone, c.vat_number as vatNumber,
           c.hourly_rate as hourlyRate,
-          COALESCE(c.currency, 'EUR') as currency,
+          CASE WHEN c.currency = 'USD' THEN 'USD' ELSE 'IDR' END as currency,
           c.notes,
           c.created_at as createdAt,
           c.updated_at as updatedAt,
@@ -85,7 +86,7 @@ export const clientService = {
         SELECT 
           id, name, email, address, phone, vat_number as vatNumber,
           hourly_rate as hourlyRate,
-          COALESCE(currency, 'EUR') as currency,
+          CASE WHEN currency = 'USD' THEN 'USD' ELSE 'IDR' END as currency,
           notes,
           created_at as createdAt,
           updated_at as updatedAt
@@ -126,7 +127,7 @@ export const clientService = {
           input.phone || '',
           input.vatNumber || '',
           input.hourlyRate || 0,
-          input.currency || 'EUR',
+          normalizeCurrency(input.currency || DEFAULT_CURRENCY),
           input.notes || '',
           timestamp,
           timestamp,
@@ -142,7 +143,7 @@ export const clientService = {
         phone: input.phone || '',
         vatNumber: input.vatNumber || '',
         hourlyRate: input.hourlyRate || 0,
-        currency: input.currency || 'EUR',
+        currency: normalizeCurrency(input.currency || DEFAULT_CURRENCY),
         notes: input.notes || '',
         createdAt: timestamp,
         updatedAt: timestamp,
@@ -167,6 +168,7 @@ export const clientService = {
       const updated = {
         ...existing,
         ...input,
+        currency: normalizeCurrency(input.currency || existing.currency || DEFAULT_CURRENCY),
         updatedAt: now(),
       };
 
@@ -191,7 +193,7 @@ export const clientService = {
           updated.phone,
           updated.vatNumber,
           updated.hourlyRate,
-          updated.currency || 'EUR',
+          normalizeCurrency(updated.currency || DEFAULT_CURRENCY),
           updated.notes,
           updated.updatedAt,
           id,

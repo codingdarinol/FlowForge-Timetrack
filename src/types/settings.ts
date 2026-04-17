@@ -76,7 +76,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   paymentLink2: '',
   paymentLink2Title: 'Payment Link 2',
   paymentQrCode: null,
-  businessWebsite: '',
+  businessWebsite: 'https://pahampajak.id',
   businessTagline: '',
   paymentBankDetails: '',
   seenChangelogVersion: '',

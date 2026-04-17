@@ -101,7 +101,7 @@ pub fn run() {
         Migration {
             version: 3,
             description: "add_currency_to_clients",
-            sql: "ALTER TABLE clients ADD COLUMN currency TEXT DEFAULT 'EUR';",
+            sql: "ALTER TABLE clients ADD COLUMN currency TEXT DEFAULT 'IDR';",
             kind: MigrationKind::Up,
         },
         Migration {
