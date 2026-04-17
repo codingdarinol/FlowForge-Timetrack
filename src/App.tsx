@@ -26,6 +26,7 @@ function AppContent() {
   useShortcuts();
 
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const isWidgetRoute = window.location.pathname.startsWith('/widget');
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -60,8 +61,8 @@ function AppContent() {
             <Route path='settings' element={<Settings />} />
           </Route>
         </Routes>
-        {/* Debug panel - only visible during development */}
-        {import.meta.env.DEV && <DebugPanel />}
+        {/* Debug panel - only visible during development in the main app window */}
+        {import.meta.env.DEV && !isWidgetRoute && <DebugPanel />}
       </BrowserRouter>
       <ToastContainer />
       <KeyboardShortcutsDialog isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
