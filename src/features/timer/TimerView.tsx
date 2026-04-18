@@ -190,9 +190,9 @@ export function TimerView() {
       await emit('time-entry-saved');
 
       addToast({
-        message: 'Timer stopped',
+        message: 'Timer dihentikan',
         action: {
-          label: 'Undo',
+          label: 'Urungkan',
           onClick: () => {
             undoStop();
           },
@@ -213,15 +213,15 @@ export function TimerView() {
   };
 
   const statusLabels = {
-    idle: 'Ready',
-    running: 'Tracking',
-    paused: 'Paused',
+    idle: 'Siap',
+    running: 'Berjalan',
+    paused: 'Dijeda',
   };
 
   return (
     <div className='space-y-8'>
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-foreground'>Timer</h1>
+        <h1 className='text-2xl font-bold text-foreground'>Pelacak Waktu</h1>
       </div>
 
       {/* Idle Warning Banner */}
@@ -230,9 +230,9 @@ export function TimerView() {
           <div className='flex items-center gap-3'>
             <AlertTriangle className='w-6 h-6 text-amber-500' />
             <div>
-              <p className='font-medium text-amber-500'>IDLE - Timer Paused</p>
+              <p className='font-medium text-amber-500'>Tidak Aktif - Timer Dijeda</p>
               <p className='text-sm text-muted-foreground'>
-                You've been away. The timer has been automatically paused.
+                Anda sedang tidak aktif. Timer dijeda secara otomatis.
               </p>
             </div>
           </div>
@@ -249,14 +249,14 @@ export function TimerView() {
                 {isOnBreak ? (
                   <>
                     <p className='font-medium text-orange-500'>
-                      {breakSecondsRemaining === 0 ? 'Break Finished!' : 'On Break'}
+                      {breakSecondsRemaining === 0 ? 'Istirahat Selesai!' : 'Sedang Istirahat'}
                     </p>
                     <p className='text-sm text-muted-foreground'>
                       {breakSecondsRemaining === 0 ? (
-                        'Ready to resume working?'
+                        'Siap lanjut bekerja?'
                       ) : (
                         <span>
-                          Time remaining:{' '}
+                          Sisa waktu:{' '}
                           <span className='font-mono font-medium'>
                             {formatDuration(breakSecondsRemaining)}
                           </span>
@@ -266,10 +266,10 @@ export function TimerView() {
                   </>
                 ) : (
                   <>
-                    <p className='font-medium text-orange-500'>Time for a break!</p>
+                    <p className='font-medium text-orange-500'>Waktunya istirahat!</p>
                     <p className='text-sm text-muted-foreground'>
-                      You've been working for {settings?.pomodoroWorkMinutes || 25} minutes. Take a{' '}
-                      {settings?.pomodoroBreakMinutes || 5} minute break.
+                      Anda sudah bekerja selama {settings?.pomodoroWorkMinutes || 25} menit.
+                      Ambil istirahat {settings?.pomodoroBreakMinutes || 5} menit.
                     </p>
                   </>
                 )}
@@ -284,11 +284,11 @@ export function TimerView() {
                   disabled={breakSecondsRemaining > 0}
                   className={breakSecondsRemaining > 0 ? 'opacity-50 cursor-not-allowed' : ''}
                 >
-                  Resume Work
+                  Lanjut Bekerja
                 </Button>
               ) : (
                 <Button variant='primary' size='sm' onClick={handleStartBreak}>
-                  Start Break
+                  Mulai Istirahat
                 </Button>
               )}
               <Button
@@ -301,7 +301,7 @@ export function TimerView() {
                   setLastBreakTime(elapsedSeconds); // Reset cycle on dismiss
                 }}
               >
-                {isOnBreak ? 'Skip Break' : 'Dismiss'}
+                {isOnBreak ? 'Lewati Istirahat' : 'Tutup'}
               </Button>
             </div>
           </div>
@@ -355,11 +355,11 @@ export function TimerView() {
         ) : (
           <div className='max-w-sm mx-auto mb-8'>
             <Select
-              label='Project'
+              label='Proyek'
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
               options={projectOptions}
-              placeholder='Select a project...'
+              placeholder='Pilih proyek...'
             />
           </div>
         )}
@@ -374,7 +374,7 @@ export function TimerView() {
               className='gap-2 px-8'
             >
               <Play className='w-5 h-5' />
-              Start
+              Mulai
             </Button>
           )}
 
@@ -382,7 +382,7 @@ export function TimerView() {
             <>
               <Button size='lg' variant='secondary' onClick={handlePause} className='gap-2'>
                 <Pause className='w-5 h-5' />
-                Pause
+                Jeda
               </Button>
               <Button
                 size='lg'
@@ -392,7 +392,7 @@ export function TimerView() {
                 className='gap-2'
               >
                 <Square className='w-5 h-5' />
-                Stop
+                Hentikan
               </Button>
             </>
           )}
@@ -401,7 +401,7 @@ export function TimerView() {
             <>
               <Button size='lg' onClick={handleResume} className='gap-2'>
                 <Play className='w-5 h-5' />
-                Resume
+                Lanjutkan
               </Button>
               <Button
                 size='lg'
@@ -411,7 +411,7 @@ export function TimerView() {
                 className='gap-2'
               >
                 <Square className='w-5 h-5' />
-                Stop
+                Hentikan
               </Button>
             </>
           )}
@@ -420,7 +420,7 @@ export function TimerView() {
         {/* No projects hint */}
         {projects.length === 0 && timerState === 'idle' && (
           <p className='mt-6 text-sm text-muted-foreground'>
-            Create a project first to start tracking time.
+            Buat proyek terlebih dahulu untuk mulai mencatat waktu.
           </p>
         )}
       </Card>

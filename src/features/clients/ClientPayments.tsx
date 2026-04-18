@@ -104,7 +104,7 @@ export function ClientPayments({ clientId, currency }: ClientPaymentsProps) {
               <span className='font-medium text-foreground'>
                 {formatCurrency(totalDeposits, currency)}
               </span>{' '}
-              total deposit ({payments.length} pembayaran)
+              total pembayaran muka ({payments.length} pembayaran)
             </>
           ) : (
             'Belum ada pembayaran'

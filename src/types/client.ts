@@ -4,7 +4,7 @@ export type Currency = 'IDR' | 'USD';
 
 export const CURRENCY_OPTIONS: { value: Currency; label: string; symbol: string }[] = [
   { value: 'IDR', label: 'Rupiah (Rp)', symbol: 'Rp' },
-  { value: 'USD', label: 'US Dollar ($)', symbol: '$' },
+  { value: 'USD', label: 'Dolar AS ($)', symbol: '$' },
 ];
 
 export interface Client {

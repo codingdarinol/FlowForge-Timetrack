@@ -80,7 +80,7 @@ function ProjectsListContent() {
 
     filteredProjects.forEach((project) => {
       const clientId = project.clientId || 'no-client';
-      const clientName = project.clientName || 'No Client';
+      const clientName = project.clientName || 'Tanpa Klien';
 
       if (!groups[clientId]) {
         groups[clientId] = {

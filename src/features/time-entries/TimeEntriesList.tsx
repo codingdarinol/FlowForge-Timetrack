@@ -264,7 +264,7 @@ export function TimeEntriesList() {
         entry.notes || '',
       ]);
       const csv = generateCSV(headers, rows);
-      await downloadCSV(`time-entries-${new Date().toISOString().split('T')[0]}.csv`, csv);
+      await downloadCSV(`catatan-waktu-${new Date().toISOString().split('T')[0]}.csv`, csv);
     } catch (error) {
       timeEntryLogger.error('Failed to export CSV', error);
     }
@@ -303,7 +303,7 @@ export function TimeEntriesList() {
             disabled={filteredEntries.length === 0}
           >
             <Download className='w-4 h-4' />
-            Export CSV
+            Ekspor CSV
           </Button>
           {selectedIds.size > 0 && (
           <div className='flex items-center gap-2'>
@@ -329,7 +329,7 @@ export function TimeEntriesList() {
                 loading={submitting}
               >
                 <XCircle className='w-4 h-4' />
-                Unbill
+                Tandai Belum Ditagih
               </Button>
             )}
             <Button variant='destructive' size='sm' onClick={handleDeleteSelected}>
@@ -388,7 +388,7 @@ export function TimeEntriesList() {
             <div className='space-y-4'>
               <div className='flex items-center gap-2 pb-2 border-b border-border'>
                 <div className='w-2 h-2 rounded-full bg-yellow-500' />
-                <h2 className='font-semibold'>Unbilled</h2>
+                <h2 className='font-semibold'>Belum Ditagih</h2>
               </div>
               {Object.entries(unbilledGroups).map(([clientId, group]) => (
                 <ClientGroup
@@ -417,7 +417,7 @@ export function TimeEntriesList() {
                   ▶
                 </span>
                 <div className='w-2 h-2 rounded-full bg-green-500' />
-                <h2 className='font-semibold'>Billed</h2>
+                <h2 className='font-semibold'>Sudah Ditagih</h2>
               </button>
 
               {showBilledSection &&

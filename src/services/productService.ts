@@ -11,26 +11,116 @@ export interface ProductTemplate {
 }
 
 export const PRODUCT_TEMPLATES: ProductTemplate[] = [
-  // Software Development
-  { field: 'Software Development', name: 'Website Development', description: 'Custom website design and development including responsive layout, CMS integration, and deployment.', price: 2500 },
-  { field: 'Software Development', name: 'Mobile App Development', description: 'Native or cross-platform mobile application development with UI/UX design and app store deployment.', price: 5000 },
-  { field: 'Software Development', name: 'API Integration', description: 'Third-party API integration, custom middleware development, and data synchronization setup.', price: 1500 },
-  // Design & Creative
-  { field: 'Design & Creative', name: 'Logo & Brand Identity', description: 'Professional logo design with brand guidelines, color palette, and typography specifications.', price: 800 },
-  { field: 'Design & Creative', name: 'UI/UX Design', description: 'User interface and experience design including wireframes, prototypes, and design system.', price: 2000 },
-  { field: 'Design & Creative', name: 'Social Media Graphics', description: 'Custom social media post templates, banners, and visual content package.', price: 500 },
-  // Marketing
-  { field: 'Marketing', name: 'SEO Optimization', description: 'Technical and content SEO audit, keyword research, on-page optimization, and performance tracking.', price: 1200 },
-  { field: 'Marketing', name: 'Content Strategy', description: 'Content calendar creation, topic research, editorial guidelines, and distribution strategy.', price: 1500 },
-  { field: 'Marketing', name: 'Email Campaign', description: 'Email marketing campaign design, copywriting, automation setup, and analytics tracking.', price: 800 },
-  // Consulting
-  { field: 'Consulting', name: 'Business Strategy Session', description: 'One-on-one strategic consulting session covering business analysis, growth opportunities, and action planning.', price: 300 },
-  { field: 'Consulting', name: 'Technical Audit', description: 'Comprehensive review of technical infrastructure, codebase quality, security posture, and recommendations.', price: 2000 },
-  { field: 'Consulting', name: 'Training Workshop', description: 'Custom training workshop on specified topic, including materials, exercises, and follow-up resources.', price: 1000 },
-  // Education
-  { field: 'Education', name: 'Guest Lecture', description: 'Expert guest lecture on specified topic, including presentation materials and Q&A session.', price: 500 },
-  { field: 'Education', name: 'Online Course Module', description: 'Self-paced online learning module with video content, exercises, quizzes, and certificates.', price: 3000 },
-  { field: 'Education', name: '1-on-1 Mentoring', description: 'Personalized mentoring session covering career guidance, skill development, and project feedback.', price: 150 },
+  // Pengembangan Perangkat Lunak
+  {
+    field: 'Pengembangan Perangkat Lunak',
+    name: 'Pengembangan Website',
+    description:
+      'Desain dan pengembangan website kustom termasuk tata letak responsif, integrasi CMS, dan deployment.',
+    price: 2500,
+  },
+  {
+    field: 'Pengembangan Perangkat Lunak',
+    name: 'Pengembangan Aplikasi Mobile',
+    description:
+      'Pengembangan aplikasi mobile native atau lintas platform lengkap dengan desain UI/UX dan rilis ke app store.',
+    price: 5000,
+  },
+  {
+    field: 'Pengembangan Perangkat Lunak',
+    name: 'Integrasi API',
+    description:
+      'Integrasi API pihak ketiga, pengembangan middleware kustom, dan penyiapan sinkronisasi data.',
+    price: 1500,
+  },
+  // Desain & Kreatif
+  {
+    field: 'Desain & Kreatif',
+    name: 'Logo & Identitas Brand',
+    description:
+      'Desain logo profesional lengkap dengan panduan brand, palet warna, dan spesifikasi tipografi.',
+    price: 800,
+  },
+  {
+    field: 'Desain & Kreatif',
+    name: 'Desain UI/UX',
+    description:
+      'Desain antarmuka dan pengalaman pengguna termasuk wireframe, prototipe, dan design system.',
+    price: 2000,
+  },
+  {
+    field: 'Desain & Kreatif',
+    name: 'Grafis Media Sosial',
+    description:
+      'Template posting media sosial, banner, dan paket konten visual yang dibuat khusus.',
+    price: 500,
+  },
+  // Pemasaran
+  {
+    field: 'Pemasaran',
+    name: 'Optimasi SEO',
+    description:
+      'Audit SEO teknis dan konten, riset kata kunci, optimasi on-page, dan pelacakan performa.',
+    price: 1200,
+  },
+  {
+    field: 'Pemasaran',
+    name: 'Strategi Konten',
+    description:
+      'Pembuatan kalender konten, riset topik, panduan editorial, dan strategi distribusi.',
+    price: 1500,
+  },
+  {
+    field: 'Pemasaran',
+    name: 'Kampanye Email',
+    description:
+      'Desain kampanye email marketing, copywriting, setup automasi, dan pelacakan analitik.',
+    price: 800,
+  },
+  // Konsultasi
+  {
+    field: 'Konsultasi',
+    name: 'Sesi Strategi Bisnis',
+    description:
+      'Sesi konsultasi strategis satu-satu yang membahas analisis bisnis, peluang pertumbuhan, dan rencana aksi.',
+    price: 300,
+  },
+  {
+    field: 'Konsultasi',
+    name: 'Audit Teknis',
+    description:
+      'Tinjauan menyeluruh atas infrastruktur teknis, kualitas codebase, keamanan, dan rekomendasi perbaikan.',
+    price: 2000,
+  },
+  {
+    field: 'Konsultasi',
+    name: 'Workshop Pelatihan',
+    description:
+      'Workshop pelatihan kustom sesuai topik yang mencakup materi, latihan, dan sumber lanjutan.',
+    price: 1000,
+  },
+  // Pendidikan
+  {
+    field: 'Pendidikan',
+    name: 'Kuliah Tamu',
+    description:
+      'Sesi kuliah tamu dari ahli pada topik tertentu lengkap dengan materi presentasi dan tanya jawab.',
+    price: 500,
+  },
+  {
+    field: 'Pendidikan',
+    name: 'Modul Kursus Online',
+    description:
+      'Modul pembelajaran online mandiri berisi video, latihan, kuis, dan sertifikat.',
+    price: 3000,
+  },
+  {
+    field: 'Pendidikan',
+    name: 'Mentoring 1-on-1',
+    description:
+      'Sesi mentoring personal untuk arahan karier, pengembangan skill, dan umpan balik proyek.',
+    price: 150,
+  },
 ];
 
 function generateId(): string {

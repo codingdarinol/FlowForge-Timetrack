@@ -293,39 +293,39 @@ function CreateProductModal({ isOpen, onClose, onSaved, initialData, templateDat
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={initialData ? 'Edit Item' : 'New Item'}>
+    <Modal isOpen={isOpen} onClose={onClose} title={initialData ? 'Ubah Item' : 'Item Baru'}>
       <div className='space-y-4'>
         <Input
-          label='Name *'
+          label='Nama *'
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder='e.g. Web Hosting'
+          placeholder='Contoh: Web Hosting'
         />
         <Textarea
-          label='Description'
+          label='Deskripsi'
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder='Item details...'
+          placeholder='Detail item...'
           rows={3}
         />
         <div className='grid grid-cols-2 gap-4'>
           <Input
-            label='Price *'
+            label='Harga *'
             type='number'
             value={price || ''}
             onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
             min={0}
             step={0.01}
           />
-          <Input label='SKU (Optional)' value={sku} onChange={(e) => setSku(e.target.value)} />
+          <Input label='SKU (Opsional)' value={sku} onChange={(e) => setSku(e.target.value)} />
         </div>
 
         <ModalFooter>
           <Button variant='outline' onClick={onClose}>
-            Cancel
+            Batal
           </Button>
           <Button onClick={handleSubmit} loading={saving} disabled={!name}>
-            {initialData ? 'Save Changes' : 'Create Item'}
+            {initialData ? 'Simpan Perubahan' : 'Buat Item'}
           </Button>
         </ModalFooter>
       </div>
@@ -363,24 +363,24 @@ function TemplatesModal({ isOpen, onClose, onSelect, existingNames }: TemplatesM
   }, []);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Quick Add from Templates">
-      <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-        {fields.map(field => (
-          <div key={field} className="border border-border rounded-lg overflow-hidden">
+    <Modal isOpen={isOpen} onClose={onClose} title='Tambah Cepat dari Template'>
+      <div className='space-y-2 max-h-[60vh] overflow-y-auto'>
+        {fields.map((field) => (
+          <div key={field} className='border border-border rounded-lg overflow-hidden'>
             <button
               onClick={() => toggleField(field)}
-              className="w-full flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors"
+              className='w-full flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors'
             >
-              <span className="font-medium text-sm text-foreground">{field}</span>
+              <span className='font-medium text-sm text-foreground'>{field}</span>
               {expandedFields.has(field) ? (
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                <ChevronDown className='w-4 h-4 text-muted-foreground' />
               ) : (
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <ChevronRight className='w-4 h-4 text-muted-foreground' />
               )}
             </button>
             {expandedFields.has(field) && (
-              <div className="border-t border-border">
-                {PRODUCT_TEMPLATES.filter(t => t.field === field).map(template => {
+              <div className='border-t border-border'>
+                {PRODUCT_TEMPLATES.filter((t) => t.field === field).map((template) => {
                   const exists = existingNames.includes(template.name.toLowerCase());
                   return (
                     <button
@@ -393,15 +393,21 @@ function TemplatesModal({ isOpen, onClose, onSelect, existingNames }: TemplatesM
                           : 'hover:bg-primary/5 cursor-pointer'
                       }`}
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 mr-3">
-                          <div className="text-sm font-medium text-foreground">
+                      <div className='flex justify-between items-start'>
+                        <div className='flex-1 mr-3'>
+                          <div className='text-sm font-medium text-foreground'>
                             {template.name}
-                            {exists && <span className="ml-2 text-xs text-muted-foreground">(already exists)</span>}
+                            {exists && (
+                              <span className='ml-2 text-xs text-muted-foreground'>
+                                (sudah ada)
+                              </span>
+                            )}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{template.description}</p>
+                          <p className='text-xs text-muted-foreground mt-0.5 line-clamp-2'>
+                            {template.description}
+                          </p>
                         </div>
-                        <span className="text-sm font-mono text-muted-foreground whitespace-nowrap">
+                        <span className='text-sm font-mono text-muted-foreground whitespace-nowrap'>
                           ${template.price.toLocaleString()}
                         </span>
                       </div>
@@ -414,7 +420,7 @@ function TemplatesModal({ isOpen, onClose, onSelect, existingNames }: TemplatesM
         ))}
       </div>
       <ModalFooter>
-        <Button variant="outline" onClick={onClose}>Close</Button>
+        <Button variant='outline' onClick={onClose}>Tutup</Button>
       </ModalFooter>
     </Modal>
   );

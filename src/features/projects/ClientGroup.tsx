@@ -43,7 +43,7 @@ export function ClientGroup({
           </span>
           {clientName}
         </div>
-        <div className='text-muted-foreground text-sm'>{projects.length} Projects</div>
+        <div className='text-muted-foreground text-sm'>{projects.length} Proyek</div>
       </button>
 
       {isExpanded && (
@@ -96,7 +96,7 @@ export function ClientGroup({
                   <p className='text-sm font-medium text-foreground'>
                     {formatHours(project.totalHours)}
                   </p>
-                  <p className='text-xs text-muted-foreground'>tracked</p>
+                  <p className='text-xs text-muted-foreground'>tercatat</p>
                 </div>
 
                 <div className='flex items-center gap-1'>
@@ -104,7 +104,7 @@ export function ClientGroup({
                     variant='ghost'
                     size='sm'
                     onClick={() => onEdit(project)}
-                    aria-label='Edit project'
+                    aria-label='Ubah proyek'
                   >
                     <Pencil className='w-4 h-4' />
                   </Button>
@@ -112,7 +112,7 @@ export function ClientGroup({
                     variant='ghost'
                     size='sm'
                     onClick={() => onDelete(project)}
-                    aria-label='Delete project'
+                    aria-label='Hapus proyek'
                   >
                     <Trash2 className='w-4 h-4 text-destructive' />
                   </Button>

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Moon,
   Sun,
@@ -99,17 +99,17 @@ export function Settings() {
   };
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-    { id: 'general', label: 'General', icon: <Bell className='w-4 h-4' /> },
-    { id: 'appearance', label: 'Appearance', icon: <Palette className='w-4 h-4' /> },
-    { id: 'accessibility', label: 'Accessibility', icon: <LayoutGrid className='w-4 h-4' /> },
-    { id: 'business', label: 'Business', icon: <Building2 className='w-4 h-4' /> },
-    { id: 'guide', label: 'Guide', icon: <BookOpen className='w-4 h-4' /> },
+    { id: 'general', label: 'Umum', icon: <Bell className='w-4 h-4' /> },
+    { id: 'appearance', label: 'Tampilan', icon: <Palette className='w-4 h-4' /> },
+    { id: 'accessibility', label: 'Aksesibilitas', icon: <LayoutGrid className='w-4 h-4' /> },
+    { id: 'business', label: 'Bisnis', icon: <Building2 className='w-4 h-4' /> },
+    { id: 'guide', label: 'Panduan', icon: <BookOpen className='w-4 h-4' /> },
   ];
 
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-foreground'>Settings</h1>
+        <h1 className='text-2xl font-bold text-foreground'>Pengaturan</h1>
       </div>
 
       {/* Tabs */}
@@ -137,8 +137,8 @@ export function Settings() {
           <Card>
             <CardContent>
               <ToggleSetting
-                label='Show Floating Timer Widget'
-                description='Display an always-on-top mini timer window'
+                label='Tampilkan Widget Timer Mengambang'
+                description='Tampilkan jendela mini timer yang selalu di atas'
                 checked={localSettings.showFloatingWidget}
                 onChange={(v) => {
                   handleAutoSave('showFloatingWidget', v);
@@ -152,8 +152,8 @@ export function Settings() {
           <Card>
             <CardContent>
               <ToggleSetting
-                label='Sound Feedback'
-                description='Play sounds when starting/stopping timer'
+                label='Umpan Balik Suara'
+                description='Putar suara saat memulai atau menghentikan timer'
                 checked={localSettings.enableSoundFeedback}
                 onChange={(v) => handleAutoSave('enableSoundFeedback', v)}
                 icon={
@@ -170,8 +170,8 @@ export function Settings() {
           <Card>
             <CardContent className='space-y-4'>
               <ToggleSetting
-                label='Pomodoro Timer'
-                description='Get break reminders after working for a set duration'
+                label='Timer Pomodoro'
+                description='Tampilkan pengingat istirahat setelah bekerja dalam durasi tertentu'
                 checked={localSettings.pomodoroEnabled}
                 onChange={(v) => handleAutoSave('pomodoroEnabled', v)}
                 icon={<Clock className='w-5 h-5' />}
@@ -182,7 +182,7 @@ export function Settings() {
                   <div className='grid grid-cols-2 gap-4 pt-4 border-t border-border'>
                     <div>
                       <label className='block text-sm font-medium mb-2'>
-                        Work Duration (minutes)
+                        Durasi Kerja (menit)
                       </label>
                       <Input
                         type='number'
@@ -204,7 +204,7 @@ export function Settings() {
                     </div>
                     <div>
                       <label className='block text-sm font-medium mb-2'>
-                        Break Duration (minutes)
+                        Durasi Istirahat (menit)
                       </label>
                       <Input
                         type='number'
@@ -237,7 +237,7 @@ export function Settings() {
                       className='gap-2 text-muted-foreground hover:text-foreground'
                     >
                       <RotateCcw className='w-3.5 h-3.5' />
-                      Reset to Defaults
+                      Reset ke Default
                     </Button>
                   </div>
                 </>
@@ -248,8 +248,8 @@ export function Settings() {
           <Card>
             <CardContent className='space-y-4'>
               <ToggleSetting
-                label='Auto-Pause When Idle'
-                description='Automatically pause the timer when you step away from your computer'
+                label='Jeda Otomatis Saat Tidak Aktif'
+                description='Jeda timer secara otomatis saat Anda meninggalkan komputer'
                 checked={localSettings.enableIdleDetection}
                 onChange={(v) => handleAutoSave('enableIdleDetection', v)}
                 icon={<Clock className='w-5 h-5' />}
@@ -257,9 +257,9 @@ export function Settings() {
 
               {localSettings.enableIdleDetection && (
                 <div className='pt-4 border-t border-border'>
-                  <label className='block text-sm font-medium mb-2'>Idle Threshold</label>
+                  <label className='block text-sm font-medium mb-2'>Batas Tidak Aktif</label>
                   <p className='text-sm text-muted-foreground mb-3'>
-                    Minutes of inactivity before the timer pauses
+                    Jumlah menit tidak aktif sebelum timer dijeda
                   </p>
                   <div className='flex gap-2'>
                     {[2, 5, 10, 15, 30].map((minutes) => (
@@ -278,7 +278,7 @@ export function Settings() {
                     ))}
                   </div>
                   <p className='text-xs text-muted-foreground mt-3'>
-                    When you return, you'll be asked what to do with the idle time.
+                    Saat Anda kembali, Anda akan diminta memilih tindakan untuk waktu tidak aktif tersebut.
                   </p>
                 </div>
               )}
@@ -293,35 +293,35 @@ export function Settings() {
           <Card>
             <CardContent className='space-y-4'>
               <div>
-                <label className='block text-sm font-medium mb-2'>Theme</label>
+                <label className='block text-sm font-medium mb-2'>Tema</label>
                 <div className='flex gap-3 flex-wrap'>
                   <ThemeButton
                     theme='light'
                     current={localSettings.theme}
                     onClick={() => handleAutoSave('theme', 'light')}
                     icon={<Sun className='w-5 h-5' />}
-                    label='Light'
+                    label='Terang'
                   />
                   <ThemeButton
                     theme='dark'
                     current={localSettings.theme}
                     onClick={() => handleAutoSave('theme', 'dark')}
                     icon={<Moon className='w-5 h-5' />}
-                    label='Dark'
+                    label='Gelap'
                   />
                   <ThemeButton
                     theme='system'
                     current={localSettings.theme}
                     onClick={() => handleAutoSave('theme', 'system')}
                     icon={<Monitor className='w-5 h-5' />}
-                    label='System'
+                    label='Sistem'
                   />
                   <ThemeButton
                     theme='high-contrast'
                     current={localSettings.theme}
                     onClick={() => handleAutoSave('theme', 'high-contrast')}
                     icon={<Eye className='w-5 h-5' />}
-                    label='High Contrast'
+                    label='Kontras Tinggi'
                   />
                 </div>
               </div>
@@ -331,9 +331,9 @@ export function Settings() {
           <Card>
             <CardContent className='space-y-4'>
               <div>
-                <label className='block text-sm font-medium mb-2'>Font Size</label>
+                <label className='block text-sm font-medium mb-2'>Ukuran Font</label>
                 <p className='text-sm text-muted-foreground mb-3'>
-                  This scales ALL text throughout the entire app.
+                  Pengaturan ini mengubah ukuran SEMUA teks di seluruh aplikasi.
                 </p>
                 <div className='flex gap-2'>
                   {FONT_SIZE_OPTIONS.map((option) => (
@@ -358,9 +358,9 @@ export function Settings() {
           <Card>
             <CardContent className='space-y-4'>
               <div>
-                <label className='block text-sm font-medium mb-2'>Density</label>
+                <label className='block text-sm font-medium mb-2'>Kerapatan</label>
                 <p className='text-sm text-muted-foreground mb-3'>
-                  Adjusts spacing and padding throughout the app.
+                  Mengatur jarak dan padding di seluruh aplikasi.
                 </p>
                 <div className='flex gap-2'>
                   {DENSITY_OPTIONS.map((option) => (
@@ -390,8 +390,8 @@ export function Settings() {
           <Card>
             <CardContent className='space-y-4'>
               <ToggleSetting
-                label='Disable UI Animations'
-                description='Turn off all transitions, hover effects, and animations for reduced motion'
+                label='Nonaktifkan Animasi UI'
+                description='Matikan semua transisi, efek hover, dan animasi untuk mengurangi gerakan'
                 checked={localSettings.animationPreference === 'disabled'}
                 onChange={(v) => handleAutoSave('animationPreference', v ? 'disabled' : 'enabled')}
                 icon={<PauseCircle className='w-5 h-5' />}
@@ -402,17 +402,17 @@ export function Settings() {
           <Card className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'>
             <CardContent>
               <CardTitle className='text-blue-800 dark:text-blue-300 mb-2'>
-                Neurodivergent-Friendly Design
+                Desain Ramah Neurodivergen
               </CardTitle>
               <CardDescription className='text-blue-700 dark:text-blue-400'>
-                yuk-kerja was designed with neurodivergent users in mind. Features include:
+                yuk-kerja dirancang dengan mempertimbangkan pengguna neurodivergen. Fitur yang tersedia:
                 <ul className='list-disc list-inside mt-2 space-y-1'>
-                  <li>Large touch targets (minimum 44pt)</li>
-                  <li>Clear labels with icons</li>
-                  <li>Smooth, subtle transitions (can be disabled)</li>
-                  <li>High contrast theme option</li>
-                  <li>Always-visible timer widget</li>
-                  <li>Uncluttered, focused interfaces</li>
+                  <li>Area sentuh besar (minimal 44pt)</li>
+                  <li>Label jelas dengan ikon</li>
+                  <li>Transisi halus dan ringan (bisa dinonaktifkan)</li>
+                  <li>Opsi tema kontras tinggi</li>
+                  <li>Widget timer yang selalu terlihat</li>
+                  <li>Antarmuka rapi dan fokus</li>
                 </ul>
               </CardDescription>
             </CardContent>
@@ -424,21 +424,21 @@ export function Settings() {
       {activeTab === 'business' && (
         <div className='space-y-6'>
           <Card>
-            <CardTitle className='px-6 pt-6 text-base'>Invoice Information</CardTitle>
+            <CardTitle className='px-6 pt-6 text-base'>Informasi Invoice</CardTitle>
             <CardDescription className='px-6 pb-2'>
-              This information appears on your generated invoices.
+              Informasi ini akan tampil pada invoice yang Anda buat.
             </CardDescription>
             <CardContent className='space-y-4'>
               {/* Logo Upload */}
               <div>
                 <label className='block text-sm font-medium text-foreground mb-2'>
-                  Business Logo
+                  Logo Bisnis
                 </label>
                 {localSettings.businessLogo ? (
                   <div className='flex items-center gap-4'>
                     <img
                       src={localSettings.businessLogo}
-                      alt='Business Logo'
+                      alt='Logo Bisnis'
                       className='w-24 h-24 object-contain border border-border rounded-lg p-2 bg-background'
                     />
                     <Button
@@ -446,7 +446,7 @@ export function Settings() {
                       size='sm'
                       onClick={() => handleAutoSave('businessLogo', null)}
                     >
-                      Remove Logo
+                      Hapus Logo
                     </Button>
                   </div>
                 ) : (
@@ -454,10 +454,10 @@ export function Settings() {
                     <div className='flex flex-col items-center justify-center pt-5 pb-6'>
                       <Building2 className='w-8 h-8 text-muted-foreground mb-2' />
                       <p className='text-sm text-muted-foreground'>
-                        <span className='font-medium text-primary'>Click to upload</span> or drag
-                        and drop
+                        <span className='font-medium text-primary'>Klik untuk unggah</span> atau
+                        seret lalu lepas
                       </p>
-                      <p className='text-xs text-muted-foreground mt-1'>PNG, JPG up to 1MB</p>
+                      <p className='text-xs text-muted-foreground mt-1'>PNG, JPG hingga 1MB</p>
                     </div>
                     <input
                       type='file'
@@ -467,7 +467,7 @@ export function Settings() {
                         const file = e.target.files?.[0];
                         if (file) {
                           if (file.size > 1024 * 1024) {
-                            alert('File size must be less than 1MB');
+                            alert('Ukuran file harus kurang dari 1MB');
                             return;
                           }
                           const reader = new FileReader();
@@ -484,19 +484,19 @@ export function Settings() {
               </div>
 
               <Input
-                label='Business Name'
+                label='Nama Bisnis'
                 value={localSettings.businessName}
                 onChange={(e) => handleLocalChange('businessName', e.target.value)}
                 onBlur={() => handleAutoSave('businessName', localSettings.businessName)}
-                placeholder='Your Company Name'
+                placeholder='Nama perusahaan Anda'
               />
 
               <Textarea
-                label='Business Address'
+                label='Alamat Bisnis'
                 value={localSettings.businessAddress}
                 onChange={(e) => handleLocalChange('businessAddress', e.target.value)}
                 onBlur={() => handleAutoSave('businessAddress', localSettings.businessAddress)}
-                placeholder='123 Main St&#10;City, State 12345&#10;Country'
+                placeholder='Jl. Contoh No. 123&#10;Kota, Provinsi 12345&#10;Indonesia'
                 rows={3}
               />
 
@@ -510,7 +510,7 @@ export function Settings() {
                   placeholder='billing@company.com'
                 />
                 <Input
-                  label='Phone'
+                  label='Telepon'
                   type='tel'
                   value={localSettings.businessPhone}
                   onChange={(e) => handleLocalChange('businessPhone', e.target.value)}
@@ -520,15 +520,15 @@ export function Settings() {
               </div>
 
               <Input
-                label='VAT Number'
+                label='NPWP / Nomor Pajak'
                 value={localSettings.businessVatNumber}
                 onChange={(e) => handleLocalChange('businessVatNumber', e.target.value)}
                 onBlur={() => handleAutoSave('businessVatNumber', localSettings.businessVatNumber)}
-                placeholder='e.g., GB123456789'
+                placeholder='Contoh: 12.345.678.9-012.000'
               />
 
               <Input
-                label='Default Tax Rate (%)'
+                label='Tarif Pajak Default (%)'
                 type='number'
                 value={localSettings.defaultTaxRate * 100}
                 onChange={(e) =>
@@ -544,18 +544,18 @@ export function Settings() {
                 <div className='grid grid-cols-3 gap-4'>
                   <div>
                     <Input
-                      label='Payment Link 1 Title'
+                      label='Judul Tautan Pembayaran 1'
                       value={localSettings.paymentLinkTitle || ''}
                       onChange={(e) => handleLocalChange('paymentLinkTitle', e.target.value)}
                       onBlur={() =>
                         handleAutoSave('paymentLinkTitle', localSettings.paymentLinkTitle)
                       }
-                      placeholder='e.g. Pay via Stripe'
+                      placeholder='Contoh: Bayar via Stripe'
                     />
                   </div>
                   <div className='col-span-2'>
                     <Input
-                      label='Payment Link 1 URL'
+                      label='URL Tautan Pembayaran 1'
                       value={localSettings.paymentLink || ''}
                       onChange={(e) => handleLocalChange('paymentLink', e.target.value)}
                       onBlur={() => handleAutoSave('paymentLink', localSettings.paymentLink)}
@@ -567,18 +567,18 @@ export function Settings() {
                 <div className='grid grid-cols-3 gap-4'>
                   <div>
                     <Input
-                      label='Payment Link 2 Title'
+                      label='Judul Tautan Pembayaran 2'
                       value={localSettings.paymentLink2Title || ''}
                       onChange={(e) => handleLocalChange('paymentLink2Title', e.target.value)}
                       onBlur={() =>
                         handleAutoSave('paymentLink2Title', localSettings.paymentLink2Title)
                       }
-                      placeholder='e.g. Pay via Venmo'
+                      placeholder='Contoh: Bayar via Venmo'
                     />
                   </div>
                   <div className='col-span-2'>
                     <Input
-                      label='Payment Link 2 URL'
+                      label='URL Tautan Pembayaran 2'
                       value={localSettings.paymentLink2 || ''}
                       onChange={(e) => handleLocalChange('paymentLink2', e.target.value)}
                       onBlur={() => handleAutoSave('paymentLink2', localSettings.paymentLink2)}
@@ -589,24 +589,24 @@ export function Settings() {
               </div>
 
               <Textarea
-                label='Payment Terms'
+                label='Syarat Pembayaran'
                 value={localSettings.paymentTerms}
                 onChange={(e) => handleLocalChange('paymentTerms', e.target.value)}
                 onBlur={() => handleAutoSave('paymentTerms', localSettings.paymentTerms)}
-                placeholder='Payment is due within 30 days of invoice date.&#10;&#10;Bank Transfer Details:&#10;IBAN: ...&#10;BIC: ...'
+                placeholder='Pembayaran jatuh tempo dalam 30 hari sejak tanggal invoice.&#10;&#10;Detail Transfer Bank:&#10;IBAN: ...&#10;BIC: ...'
                 rows={6}
               />
 
               {/* QR Code Upload */}
               <div>
                 <label className='block text-sm font-medium text-foreground mb-2'>
-                  Payment QR Code
+                  Kode QR Pembayaran
                 </label>
                 {localSettings.paymentQrCode ? (
                   <div className='flex items-center gap-4'>
                     <img
                       src={localSettings.paymentQrCode}
-                      alt='Payment QR Code'
+                      alt='Kode QR Pembayaran'
                       className='w-24 h-24 object-contain border border-border rounded-lg p-2 bg-background'
                     />
                     <Button
@@ -614,7 +614,7 @@ export function Settings() {
                       size='sm'
                       onClick={() => handleAutoSave('paymentQrCode', null)}
                     >
-                      Remove QR Code
+                      Hapus Kode QR
                     </Button>
                   </div>
                 ) : (
@@ -622,10 +622,12 @@ export function Settings() {
                     <div className='flex flex-col items-center justify-center pt-5 pb-6'>
                       <QrCode className='w-8 h-8 text-muted-foreground mb-2' />
                       <p className='text-sm text-muted-foreground'>
-                        <span className='font-medium text-primary'>Click to upload</span> or drag
-                        and drop
+                        <span className='font-medium text-primary'>Klik untuk unggah</span> atau
+                        seret lalu lepas
                       </p>
-                      <p className='text-xs text-muted-foreground mt-1'>PNG, JPG up to 1MB. Used on all invoices.</p>
+                      <p className='text-xs text-muted-foreground mt-1'>
+                        PNG, JPG hingga 1MB. Dipakai di semua invoice.
+                      </p>
                     </div>
                     <input
                       type='file'
@@ -635,7 +637,7 @@ export function Settings() {
                         const file = e.target.files?.[0];
                         if (file) {
                           if (file.size > 1024 * 1024) {
-                            alert('File size must be less than 1MB');
+                            alert('Ukuran file harus kurang dari 1MB');
                             return;
                           }
                           const reader = new FileReader();
@@ -652,36 +654,36 @@ export function Settings() {
               </div>
 
               <Input
-                label='Website'
+                label='Situs Web'
                 value={localSettings.businessWebsite}
                 onChange={(e) => handleLocalChange('businessWebsite', e.target.value)}
                 onBlur={() => handleAutoSave('businessWebsite', localSettings.businessWebsite)}
-                placeholder='https://yourwebsite.com'
+                placeholder='https://situsanda.com'
               />
 
               <Input
-                label='Tagline'
+                label='Slogan'
                 value={localSettings.businessTagline}
                 onChange={(e) => handleLocalChange('businessTagline', e.target.value)}
                 onBlur={() => handleAutoSave('businessTagline', localSettings.businessTagline)}
-                placeholder='Your business tagline'
+                placeholder='Slogan bisnis Anda'
               />
 
               <Textarea
-                label='Bank Transfer Details'
+                label='Detail Transfer Bank'
                 value={localSettings.paymentBankDetails}
                 onChange={(e) => handleLocalChange('paymentBankDetails', e.target.value)}
                 onBlur={() => handleAutoSave('paymentBankDetails', localSettings.paymentBankDetails)}
-                placeholder={'IBAN: NL00 BANK 0000 0000 00\nBIC: BANKCODE\nBank Name'}
+                placeholder={'IBAN: NL00 BANK 0000 0000 00\nBIC: BANKCODE\nNama Bank'}
                 rows={4}
               />
             </CardContent>
           </Card>
 
           <Card>
-            <CardTitle className='px-6 pt-6 text-base'>Data Management</CardTitle>
+            <CardTitle className='px-6 pt-6 text-base'>Kelola Data</CardTitle>
             <CardDescription className='px-6 pb-2'>
-              Export or import your yuk-kerja database for backup purposes.
+              Ekspor atau impor database yuk-kerja untuk keperluan cadangan.
             </CardDescription>
             <CardContent className='space-y-4'>
               <div className='flex gap-4'>
@@ -692,25 +694,25 @@ export function Settings() {
                       const { backupService } = await import('../services/backupService');
                       const path = await backupService.exportBackup();
                       if (path) {
-                        alert(`Backup saved to: ${path}`);
+                        alert(`Cadangan disimpan di: ${path}`);
                       }
                     } catch (error) {
-                      alert('Backup failed: ' + (error as Error).message);
+                      alert('Ekspor cadangan gagal: ' + (error as Error).message);
                     }
                   }}
                 >
-                  Export Backup
+                  Ekspor Cadangan
                 </Button>
                 <Button
                   variant='outline'
                   onClick={() => setShowImportConfirm(true)}
                   disabled={importing}
                 >
-                  {importing ? 'Importing...' : 'Import Backup'}
+                  {importing ? 'Mengimpor...' : 'Impor Cadangan'}
                 </Button>
               </div>
               <p className='text-xs text-muted-foreground'>
-                Tip: Export your data regularly to prevent data loss. Import will restart the app.
+                Tips: Ekspor data secara berkala untuk mencegah kehilangan data. Impor akan memulai ulang aplikasi.
               </p>
             </CardContent>
           </Card>
@@ -729,7 +731,7 @@ export function Settings() {
                 if (success) {
                   try {
                     const { message } = await import('@tauri-apps/plugin-dialog');
-                    await message('Backup imported! The app will now restart.', {
+                    await message('Cadangan berhasil diimpor! Aplikasi akan dimulai ulang.', {
                       title: 'yuk-kerja',
                       kind: 'info',
                     });
@@ -743,14 +745,14 @@ export function Settings() {
                 }
               } catch (error) {
                 uiLogger.error('Import error in UI:', error);
-                alert('Import failed: ' + (error as Error).message);
+                alert('Impor cadangan gagal: ' + (error as Error).message);
               } finally {
                 setImporting(false);
               }
             }}
-            title='Import Backup'
-            message='Importing a backup will replace all current data and restart the app. Are you sure you want to continue?'
-            confirmLabel='Import & Restart'
+            title='Impor Cadangan'
+            message='Mengimpor cadangan akan menggantikan seluruh data saat ini dan memulai ulang aplikasi. Yakin ingin melanjutkan?'
+            confirmLabel='Impor & Mulai Ulang'
             variant='danger'
             loading={importing}
           />
@@ -764,646 +766,214 @@ export function Settings() {
             <CardContent className='py-6'>
               <div className='flex items-center gap-3 mb-2'>
                 <Zap className='w-6 h-6 text-primary' />
-                <CardTitle className='text-xl'>Welcome to yuk-kerja!</CardTitle>
+                <CardTitle className='text-xl'>Selamat datang di yuk-kerja!</CardTitle>
               </div>
               <CardDescription className='text-base'>
-                yuk-kerja is your all-in-one time tracking and invoicing companion. This guide
-                will walk you through every feature step by step.
+                yuk-kerja membantu Anda mencatat waktu, mengelola klien dan proyek, lalu membuat invoice dengan alur yang cepat dan sederhana.
               </CardDescription>
             </CardContent>
           </Card>
 
-          <GuideSection
-            icon={<Timer className='w-5 h-5' />}
-            title='Timer & Time Tracking'
-            defaultOpen={true}
-          >
+          <GuideSection icon={<Timer className='w-5 h-5' />} title='Timer & Pelacakan Waktu' defaultOpen={true}>
             <div className='space-y-4'>
+              <p className='text-sm text-muted-foreground'>
+                Mulai dari halaman Timer untuk memilih proyek dan mencatat sesi kerja secara real-time.
+              </p>
               <div>
-                <h4 className='font-medium mb-2'>Starting the Timer</h4>
+                <h4 className='font-medium mb-2'>Alur Dasar</h4>
                 <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    Go to the <strong>Timer</strong> page (home screen)
-                  </li>
-                  <li>Select a project from the dropdown menu</li>
-                  <li>
-                    Click the <strong>Play</strong> button to start tracking
-                  </li>
+                  <li>Buka halaman Timer lalu pilih proyek.</li>
+                  <li>Klik tombol mulai untuk memulai pencatatan waktu.</li>
+                  <li>Gunakan jeda, lanjutkan, atau hentikan sesuai kebutuhan.</li>
                 </ol>
               </div>
               <div>
-                <h4 className='font-medium mb-2'>Timer Controls</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Pause:</strong> Temporarily stop without finishing
-                  </li>
-                  <li>
-                    â€¢ <strong>Resume:</strong> Continue from where you paused
-                  </li>
-                  <li>
-                    â€¢ <strong>Stop:</strong> End the session and save it as a time entry
-                  </li>
+                <h4 className='font-medium mb-2'>Kontrol</h4>
+                <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                  <li>Jeda untuk berhenti sementara tanpa mengakhiri sesi.</li>
+                  <li>Lanjutkan untuk meneruskan sesi yang dijeda.</li>
+                  <li>Hentikan untuk menyimpan sesi sebagai catatan waktu.</li>
                 </ul>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>ðŸ’¡ Tip:</strong> When you stop the timer, a time entry is automatically
-                created and saved.
+                <strong>Tips:</strong> Saat timer dihentikan, catatan waktu akan dibuat otomatis.
               </div>
             </div>
           </GuideSection>
 
-          <GuideSection
-            icon={<div className='w-5 h-5 border-2 border-current rounded' />}
-            title='Floating Widget'
-          >
+          <GuideSection icon={<div className='w-5 h-5 border-2 border-current rounded' />} title='Widget Mengambang'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                The floating widget is a small, always-on-top window that shows your timer status
-                even when yuk-kerja is minimized.
+                Widget mengambang menampilkan status timer dalam jendela kecil yang selalu di atas, bahkan saat aplikasi diminimalkan.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Widget Features</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>â€¢ Shows current project name and elapsed time</li>
-                  <li>
-                    â€¢ <strong>Play/Pause button:</strong> Control your timer
-                  </li>
-                  <li>
-                    â€¢ <strong>Stop button:</strong> End the current session
-                  </li>
-                  <li>
-                    â€¢ <strong>Open App button:</strong> Bring yuk-kerja to focus
-                  </li>
-                  <li>
-                    â€¢ <strong>Drag handle:</strong> Move the widget anywhere on screen
-                  </li>
-                </ul>
-              </div>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Menampilkan proyek aktif dan waktu berjalan.</li>
+                <li>Menyediakan kontrol cepat untuk mulai, jeda, dan hentikan.</li>
+                <li>Dapat dipindahkan ke posisi yang paling nyaman di layar.</li>
+              </ul>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>ðŸ’¡ Tip:</strong> Enable or disable the widget in Settings â†’ General â†’ "Show
-                Floating Timer Widget"
+                <strong>Tips:</strong> Aktifkan atau nonaktifkan widget di Pengaturan - Umum.
               </div>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Coffee className='w-5 h-5' />} title='Pomodoro Timer'>
+          <GuideSection icon={<Coffee className='w-5 h-5' />} title='Timer Pomodoro'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                The Pomodoro technique helps you work in focused intervals with regular breaks,
-                improving productivity and reducing burnout.
+                Fitur Pomodoro membantu Anda bekerja fokus dalam blok waktu tertentu lalu beristirahat secara teratur.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>How It Works</h4>
-                <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>Work for a set duration (default: 25 minutes)</li>
-                  <li>When time's up, you'll see a break notification</li>
-                  <li>Click "Start Break" to pause work and rest</li>
-                  <li>After your break, click "Resume Work" to continue</li>
-                </ol>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Customizing</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>â€¢ Go to Settings â†’ General â†’ Pomodoro Timer</li>
-                  <li>â€¢ Set your preferred work duration (1-120 minutes)</li>
-                  <li>â€¢ Set your preferred break duration (1-60 minutes)</li>
-                  <li>â€¢ Default is 25 minutes work / 5 minutes break</li>
-                </ul>
-              </div>
+              <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Atur durasi kerja dan durasi istirahat sesuai kebiasaan Anda.</li>
+                <li>Setelah waktu kerja habis, aplikasi akan menampilkan pengingat istirahat.</li>
+                <li>Anda bisa memulai atau melewati sesi istirahat dari banner timer.</li>
+              </ol>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Users className='w-5 h-5' />} title='Managing Clients'>
+          <GuideSection icon={<Users className='w-5 h-5' />} title='Kelola Klien'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Clients are the people or companies you work for. Store their details to use when
-                creating invoices.
+                Simpan data klien agar lebih mudah dipakai di proyek, catatan waktu, dan invoice.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Adding a Client</h4>
-                <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    Go to the <strong>Clients</strong> page
-                  </li>
-                  <li>
-                    Click <strong>New Client</strong>
-                  </li>
-                  <li>Fill in their details (only Name is required)</li>
-                  <li>
-                    Click <strong>Create Client</strong>
-                  </li>
-                </ol>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Client Details</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Name:</strong> Client or company name (required)
-                  </li>
-                  <li>
-                    â€¢ <strong>Currency:</strong> Pilih IDR (Rp) atau USD ($) untuk invoice klien
-                    ini
-                  </li>
-                  <li>
-                    â€¢ <strong>Hourly Rate:</strong> Default rate for this client
-                  </li>
-                  <li>
-                    â€¢ <strong>Email & Address:</strong> For invoice delivery
-                  </li>
-                  <li>
-                    â€¢ <strong>VAT Number:</strong> For tax purposes
-                  </li>
-                  <li>
-                    â€¢ <strong>Notes:</strong> Private notes (click the note icon to view)
-                  </li>
-                </ul>
-              </div>
+              <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Buka halaman Klien dan buat klien baru.</li>
+                <li>Isi nama, kontak, alamat, tarif, mata uang, dan catatan bila perlu.</li>
+                <li>Mata uang klien akan dipakai sebagai acuan saat membuat invoice.</li>
+              </ol>
+            </div>
+          </GuideSection>
+
+          <GuideSection icon={<Briefcase className='w-5 h-5' />} title='Kelola Proyek'>
+            <div className='space-y-4'>
+              <p className='text-sm text-muted-foreground'>
+                Proyek membantu Anda memisahkan pekerjaan per klien atau per jenis pekerjaan.
+              </p>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Pilih klien untuk mengaitkan proyek dengan pihak yang tepat.</li>
+                <li>Gunakan warna proyek agar mudah dikenali di timer dan daftar.</li>
+                <li>Status aktif, dijeda, dan selesai membantu mengatur visibilitas proyek.</li>
+              </ul>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>ðŸ’¡ Tip:</strong> The selected currency will automatically apply to all
-                invoices created for this client.
+                <strong>Tips:</strong> Hanya proyek aktif yang muncul di pilihan timer.
               </div>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Briefcase className='w-5 h-5' />} title='Managing Projects'>
+          <GuideSection icon={<Clock className='w-5 h-5' />} title='Catatan Waktu'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Projects help you organize your work. Each project can be linked to a client and has
-                its own color for easy identification.
+                Catatan waktu adalah hasil akhir dari sesi kerja Anda dan bisa dikelola sebelum masuk ke invoice.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Creating a Project</h4>
-                <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    Go to the <strong>Projects</strong> page
-                  </li>
-                  <li>
-                    Click <strong>New Project</strong>
-                  </li>
-                  <li>Enter a name and optional description</li>
-                  <li>Select a client (optional)</li>
-                  <li>Choose a color for visual identification</li>
-                  <li>
-                    Click <strong>Create Project</strong>
-                  </li>
-                </ol>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Project Statuses</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Active:</strong> Currently working on this project
-                  </li>
-                  <li>
-                    â€¢ <strong>Paused:</strong> Temporarily on hold
-                  </li>
-                  <li>
-                    â€¢ <strong>Completed:</strong> Finished project (hidden from timer)
-                  </li>
-                </ul>
-              </div>
-              <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>ðŸ’¡ Tip:</strong> Only Active projects appear in the timer dropdown. Change
-                status to control visibility.
-              </div>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Catatan dikelompokkan per klien dan proyek.</li>
+                <li>Gunakan filter untuk menyaring proyek, klien, atau status penagihan.</li>
+                <li>Anda bisa mengubah waktu mulai, selesai, catatan, dan status dapat ditagih.</li>
+              </ul>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Clock className='w-5 h-5' />} title='Time Entries'>
+          <GuideSection icon={<FileText className='w-5 h-5' />} title='Membuat Invoice'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Time entries are individual work sessions. They're created automatically when you
-                stop the timer.
+                Invoice dapat dibuat dari catatan waktu yang belum ditagih maupun dari item manual.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Viewing Entries</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>â€¢ Entries are grouped by Client â†’ Project</li>
-                  <li>â€¢ Each entry shows date, time, and duration</li>
-                  <li>â€¢ Use filters to find specific entries</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Billed vs Unbilled</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Unbilled (gray):</strong> Not yet added to an invoice
-                  </li>
-                  <li>
-                    â€¢ <strong>Billed (green):</strong> Already included in an invoice
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Bulk Actions</h4>
-                <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>Select entries using checkboxes</li>
-                  <li>Use the action buttons that appear:</li>
-                </ol>
-                <ul className='space-y-1 text-sm text-muted-foreground ml-6 mt-1'>
-                  <li>
-                    â€¢ <strong>Mark as Billed:</strong> Manually mark entries as invoiced
-                  </li>
-                  <li>
-                    â€¢ <strong>Mark as Unbilled:</strong> Revert billed entries
-                  </li>
-                  <li>
-                    â€¢ <strong>Delete:</strong> Remove selected entries
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Editing Entries</h4>
-                <p className='text-sm text-muted-foreground mb-2'>
-                  Need to fix a mistake? Click the <strong>pencil icon</strong> on any time entry
-                  card to:
-                </p>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>â€¢ Adjust Start/End times</li>
-                  <li>â€¢ Edit the Duration directly</li>
-                  <li>â€¢ Toggle Billable status</li>
-                  <li>â€¢ Update notes</li>
-                </ul>
-              </div>
+              <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Pilih klien saat membuat invoice baru.</li>
+                <li>Tinjau item baris, pajak, tanggal, dan catatan invoice.</li>
+                <li>Ekspor PDF atau ubah status invoice setelah disimpan.</li>
+              </ol>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<FileText className='w-5 h-5' />} title='Creating Invoices'>
+          <GuideSection icon={<Package className='w-5 h-5' />} title='Produk & Layanan'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                yuk-kerja makes invoicing easy by automatically importing your unbilled time
-                entries.
+                Simpan item yang sering dipakai agar lebih cepat saat menambahkan baris ke invoice.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Step-by-Step Invoice Creation</h4>
-                <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    Go to the <strong>Invoices</strong> page
-                  </li>
-                  <li>
-                    Click <strong>New Invoice</strong>
-                  </li>
-                  <li>Select a client from the dropdown</li>
-                  <li>
-                    Click <strong>Next</strong> â€“ your unbilled hours are loaded automatically!
-                  </li>
-                  <li>Review and edit line items as needed</li>
-                  <li>
-                    <strong>Payment Terms:</strong> You can customize payment instructions
-                    specifically for this invoice
-                  </li>
-                  <li>Set issue date, due date, and notes</li>
-                  <li>
-                    Click <strong>Create Invoice</strong>
-                  </li>
-                </ol>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Adding Extra Items</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Add stored item:</strong> Select from your saved Products
-                  </li>
-                  <li>
-                    â€¢ <strong>+ Add Line:</strong> Create a custom line item manually
-                  </li>
-                  <li>â€¢ You can edit descriptions, quantities, and prices freely</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Invoice Actions</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Preview:</strong> View the full invoice with your business details
-                  </li>
-                  <li>
-                    â€¢ <strong>Export PDF:</strong> Download a professional PDF
-                  </li>
-                  <li>
-                    â€¢ <strong>Edit:</strong> Modify invoice details
-                  </li>
-                  <li>
-                    â€¢ <strong>Change Status:</strong> Use the dropdown on each invoice card (Draft,
-                    Sent, Paid, Overdue, Cancelled)
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>PDF Design</h4>
-                <p className='text-sm text-muted-foreground'>
-                  Exported PDFs feature a professional teal-accented header with your business logo,
-                  a clear FROM/BILL TO layout, itemized line items with tax calculations, and a
-                  payment details box including your QR code for quick mobile payments.
-                </p>
-              </div>
-              <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>ðŸ’¡ Tip:</strong> Only the time entries included in the final saved invoice
-                are marked as "billed". If you remove an entry before saving, it stays unbilled.
-              </div>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Buat item dengan nama, deskripsi, harga, dan SKU opsional.</li>
+                <li>Gunakan fitur Tambah Cepat untuk membuat item dari template.</li>
+                <li>Item tersimpan bisa dipilih kembali saat menyusun invoice.</li>
+              </ul>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Package className='w-5 h-5' />} title='Products & Services'>
+          <GuideSection icon={<Building2 className='w-5 h-5' />} title='Pengaturan Bisnis'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Save frequently used items with preset prices to add to invoices quickly.
+                Lengkapi informasi bisnis agar invoice terlihat profesional dan siap dikirim.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Creating a Product</h4>
-                <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    Go to the <strong>Products</strong> page
-                  </li>
-                  <li>
-                    Click <strong>New Item</strong>
-                  </li>
-                  <li>Enter a name, description, and price</li>
-                  <li>Optionally add an SKU for reference</li>
-                  <li>
-                    Click <strong>Create Item</strong>
-                  </li>
-                </ol>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Using Products in Invoices</h4>
-                <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>Create or edit an invoice</li>
-                  <li>In the Line Items step, find the "Add stored item..." dropdown</li>
-                  <li>Select a product â€“ it's added with preset name and price!</li>
-                  <li>Adjust quantity as needed</li>
-                </ol>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Quick Add Templates</h4>
-                <p className='text-sm text-muted-foreground'>
-                  Use the "Quick Add" button to instantly create products from pre-filled templates.
-                  Templates provide suggested names, descriptions, and prices for common service types
-                  that you can customize before saving.
-                </p>
-              </div>
-              <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>ðŸ’¡ Tip:</strong> Click the eye icon on any product card to view its full
-                description.
-              </div>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Unggah logo, isi nama bisnis, alamat, kontak, dan NPWP bila ada.</li>
+                <li>Tambahkan tautan pembayaran, detail transfer bank, dan kode QR pembayaran.</li>
+                <li>Atur tarif pajak default untuk mempermudah pembuatan invoice baru.</li>
+              </ul>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Building2 className='w-5 h-5' />} title='Business Settings'>
+          <GuideSection icon={<Palette className='w-5 h-5' />} title='Pengaturan Tampilan'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Set up your business information to appear on invoices.
+                Sesuaikan tema, ukuran font, kerapatan, dan animasi agar aplikasi terasa nyaman dipakai.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Available Fields</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Logo:</strong> Upload your business logo (PNG/JPG, max 1MB)
-                  </li>
-                  <li>
-                    â€¢ <strong>Name:</strong> Your business or freelancer name
-                  </li>
-                  <li>
-                    â€¢ <strong>Address:</strong> Full business address
-                  </li>
-                  <li>
-                    â€¢ <strong>Email & Phone:</strong> Contact information
-                  </li>
-                  <li>
-                    â€¢ <strong>VAT Number:</strong> For tax compliance
-                  </li>
-                  <li>
-                    â€¢ <strong>Default Tax Rate:</strong> Auto-applied to new invoices
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Payment Options</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Payment Links (x2):</strong> Add links to PayPal, Stripe, Venmo, etc.
-                  </li>
-                  <li>
-                    â€¢ <strong>Custom Titles:</strong> Name each payment link (e.g., "Pay via
-                    PayPal")
-                  </li>
-                  <li>
-                    â€¢ <strong>Payment Terms:</strong> Bank details, IBAN, instructions, etc.
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Additional Business Info</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Website:</strong> Your business website URL, displayed on invoices.
-                  </li>
-                  <li>
-                    â€¢ <strong>Tagline:</strong> A short description or slogan for your business.
-                  </li>
-                  <li>
-                    â€¢ <strong>Payment QR Code:</strong> Upload a QR code image for quick mobile
-                    payments (appears on PDF invoices).
-                  </li>
-                  <li>
-                    â€¢ <strong>Bank Transfer Details:</strong> Add IBAN, bank name, and reference info
-                    for direct transfers.
-                  </li>
-                </ul>
-              </div>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Pilih tema terang, gelap, sistem, atau kontras tinggi.</li>
+                <li>Ukuran font dan kerapatan memengaruhi seluruh tampilan aplikasi.</li>
+                <li>Animasi dapat dimatikan dari tab aksesibilitas.</li>
+              </ul>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Palette className='w-5 h-5' />} title='Appearance Settings'>
-            <div className='space-y-4'>
-              <div>
-                <h4 className='font-medium mb-2'>Theme</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Light:</strong> Bright, clean interface
-                  </li>
-                  <li>
-                    â€¢ <strong>Dark:</strong> Easy on the eyes, great for night work
-                  </li>
-                  <li>
-                    â€¢ <strong>High Contrast:</strong> optimized for accessibility with distinct
-                    borders and pure black backgrounds
-                  </li>
-                  <li>
-                    â€¢ <strong>System:</strong> Follows your OS settings automatically
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Accessibility</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Disable Animations:</strong> Toggle this in the Accessibility tab to
-                    remove all motion effects
-                  </li>
-                  <li>
-                    â€¢ <strong>Font Size:</strong> Scale text up to Extra Large
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Font Size</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>â€¢ Choose from Small, Medium, Large, or Extra Large</li>
-                  <li>â€¢ Affects all text throughout the app</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Density</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Compact:</strong> More content, less spacing
-                  </li>
-                  <li>
-                    â€¢ <strong>Comfortable:</strong> Balanced (default)
-                  </li>
-                  <li>
-                    â€¢ <strong>Spacious:</strong> More breathing room
-                  </li>
-                </ul>
-              </div>
-              <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>ðŸ’¡ Tip:</strong> All appearance changes save automatically â€“ no need to
-                click Save!
-              </div>
-            </div>
-          </GuideSection>
-
-          <GuideSection icon={<Keyboard className='w-5 h-5' />} title='Global Shortcuts'>
+          <GuideSection icon={<Keyboard className='w-5 h-5' />} title='Pintasan Global'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Control yuk-kerja from anywhere, even when the app is in the background.
+                Pintasan global memungkinkan Anda mengontrol timer tanpa harus membuka jendela utama.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Available Shortcuts</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Cmd/Ctrl + Shift + S:</strong> Start or Resume timer
-                  </li>
-                  <li>
-                    â€¢ <strong>Cmd/Ctrl + Shift + P:</strong> Pause timer
-                  </li>
-                  <li>
-                    â€¢ <strong>Cmd/Ctrl + Shift + X:</strong> Stop timer and save entry
-                  </li>
-                  <li>
-                    â€¢ <strong>Cmd/Ctrl + Shift + W:</strong> Toggle floating widget
-                  </li>
-                  <li>
-                    â€¢ <strong>Cmd/Ctrl + Shift + M:</strong> Toggle sound feedback
-                  </li>
-                </ul>
-              </div>
-              <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>ðŸ’¡ Tip:</strong> These work globally! You don't need to have the FlowForge
-                window focused.
-              </div>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li><strong>Cmd/Ctrl + Shift + S</strong> untuk mulai atau lanjutkan timer.</li>
+                <li><strong>Cmd/Ctrl + Shift + P</strong> untuk jeda timer.</li>
+                <li><strong>Cmd/Ctrl + Shift + X</strong> untuk hentikan timer dan simpan catatan.</li>
+                <li><strong>Cmd/Ctrl + Shift + W</strong> untuk tampilkan atau sembunyikan widget.</li>
+              </ul>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<BarChart3 className='w-5 h-5' />} title='Dashboard Analytics'>
+          <GuideSection icon={<BarChart3 className='w-5 h-5' />} title='Analitik Dashboard'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Get visual insights into your productivity on the main dashboard.
+                Dashboard memberi ringkasan visual supaya Anda cepat memahami progres kerja dan potensi penagihan.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>Features</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Today's Summary:</strong> See exactly how your day is broken down by
-                    project.
-                  </li>
-                  <li>
-                    â€¢ <strong>Weekly Progress:</strong> Visual bar chart of your hours for the last
-                    7 days.
-                  </li>
-                  <li>
-                    â€¢ <strong>Quick Stats:</strong> At-a-glance view of unbilled revenue and total
-                    weekly hours.
-                  </li>
-                  <li>
-                    â€¢ <strong>Client Breakdown:</strong> See hours and billing split for each client
-                    with visual progress bars.
-                  </li>
-                  <li>
-                    â€¢ <strong>Monthly Hours:</strong> Navigate between months with prev/next arrows.
-                    Shows total hours, days worked, and average per day with percentage change vs
-                    previous month.
-                  </li>
-                  <li>
-                    â€¢ <strong>Project Breakdown:</strong> All-time hours per project with color-coded
-                    progress bars showing each project's share of total time.
-                  </li>
-                </ul>
-              </div>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Ringkasan hari ini dan progres mingguan.</li>
+                <li>Statistik cepat untuk jam kerja dan nilai belum ditagih.</li>
+                <li>Rincian klien, proyek, dan jam bulanan.</li>
+              </ul>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<PauseCircle className='w-5 h-5' />} title='Automatic Idle Detection'>
+          <GuideSection icon={<PauseCircle className='w-5 h-5' />} title='Deteksi Tidak Aktif Otomatis'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Never worry about forgetting to pause your timer when you walk away.
+                Deteksi tidak aktif membantu mencegah timer terus berjalan saat Anda meninggalkan komputer.
               </p>
-              <div>
-                <h4 className='font-medium mb-2'>How It Works</h4>
-                <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    If you stop moving your mouse/keyboard for a set time (default 5 mins), the
-                    timer pauses automatically.
-                  </li>
-                  <li>When you return, you'll be asked what to do with the time you were away.</li>
-                  <li>
-                    Options: <strong>Discard</strong> (remove idle time), <strong>Keep</strong> (add
-                    it to work), or <strong>Adjust</strong> manually.
-                  </li>
-                </ol>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>Configuration</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ Go to <strong>Settings â†’ General</strong> to enable/disable.
-                  </li>
-                  <li>
-                    â€¢ Adjust the "Idle Threshold" to choose how long to wait before pausing (2-30
-                    minutes).
-                  </li>
-                </ul>
-              </div>
+              <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Atur batas tidak aktif di tab Umum.</li>
+                <li>Jika tidak ada aktivitas, timer akan dijeda otomatis.</li>
+                <li>Saat kembali, Anda bisa memilih membuang atau mempertahankan waktu idle.</li>
+              </ol>
             </div>
           </GuideSection>
 
-          <GuideSection icon={<Package className='w-5 h-5' />} title='Backup & Updates'>
+          <GuideSection icon={<Package className='w-5 h-5' />} title='Cadangan & Pembaruan'>
             <div className='space-y-4'>
-              <div>
-                <h4 className='font-medium mb-2'>Data Backup</h4>
-                <p className='text-sm text-muted-foreground mb-2'>
-                  Protect your data by exporting regular backups from the{' '}
-                  <strong>Settings â†’ Business</strong> tab.
-                </p>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
-                  <li>
-                    â€¢ <strong>Export:</strong> Saves your entire database as a file to your
-                    computer.
-                  </li>
-                  <li>
-                    â€¢ <strong>Import:</strong> Restores your data from a backup file. (Note: This
-                    replaces current data and restarts the app).
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-medium mb-2'>App Updates</h4>
-                <p className='text-sm text-muted-foreground'>
-                  yuk-kerja automatically checks for updates on startup. If a new version is
-                  available, a <strong>banner</strong> will appear at the top of the screen with a
-                  link to download the latest release.
-                </p>
-              </div>
+              <p className='text-sm text-muted-foreground'>
+                Gunakan fitur cadangan untuk melindungi data lokal dan pantau pembaruan aplikasi saat tersedia.
+              </p>
+              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
+                <li>Ekspor cadangan secara berkala agar data aman.</li>
+                <li>Impor cadangan akan mengganti data saat ini dan memulai ulang aplikasi.</li>
+                <li>Aplikasi akan memeriksa pembaruan dan menampilkan banner jika ada versi baru.</li>
+              </ul>
             </div>
           </GuideSection>
 
@@ -1419,13 +989,12 @@ export function Settings() {
                 >
                   team pahampajak
                 </a>{' '}
-                â€” a freelance-first time tracking and invoicing app designed for simplicity and speed.
+                sebagai aplikasi pelacakan waktu dan invoice yang berfokus pada kesederhanaan dan kecepatan.
               </p>
               <div>
-                <h4 className='font-medium mb-2'>Links</h4>
-                <ul className='space-y-1 text-sm text-muted-foreground'>
+                <h4 className='font-medium mb-2'>Tautan</h4>
+                <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
                   <li>
-                    â€¢{' '}
                     <a
                       href='https://pahampajak.id'
                       target='_blank'
@@ -1434,10 +1003,9 @@ export function Settings() {
                     >
                       pahampajak.id
                     </a>{' '}
-                    â€” Website produk
+                    - Website produk
                   </li>
                   <li>
-                    â€¢{' '}
                     <a
                       href='https://pahampajak.id'
                       target='_blank'
@@ -1446,12 +1014,12 @@ export function Settings() {
                     >
                       team pahampajak
                     </a>{' '}
-                    â€” Developer portfolio
+                    - Portofolio developer
                   </li>
                 </ul>
               </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
-                <strong>Version:</strong> 0.2.0
+                <strong>Versi:</strong> 0.2.0
               </div>
             </div>
           </GuideSection>
@@ -1459,11 +1027,10 @@ export function Settings() {
           <Card className='bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'>
             <CardContent className='py-6'>
               <CardTitle className='text-green-800 dark:text-green-300 mb-2'>
-                ðŸŽ‰ You're All Set!
+                Semua Siap!
               </CardTitle>
               <CardDescription className='text-green-700 dark:text-green-400'>
-                You now know everything yuk-kerja can do. Start tracking your time and
-                creating invoices with ease!
+                Sekarang Anda sudah tahu fitur utama yuk-kerja. Lanjutkan mencatat waktu dan membuat invoice dengan lebih cepat.
               </CardDescription>
             </CardContent>
           </Card>
@@ -1472,7 +1039,6 @@ export function Settings() {
     </div>
   );
 }
-
 // Toggle Setting Component
 interface ToggleSettingProps {
   label: string;

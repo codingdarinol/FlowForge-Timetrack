@@ -42,11 +42,11 @@ export type UpdateInvoiceInput = Partial<Omit<CreateInvoiceInput, 'clientId'>>;
 export type CreateLineItemInput = Omit<InvoiceLineItem, 'id'>;
 
 export const INVOICE_STATUS_OPTIONS: { value: InvoiceStatus; label: string; color: string }[] = [
-  { value: 'draft', label: 'Draft', color: '#8E8E93' },
-  { value: 'sent', label: 'Sent', color: '#007AFF' },
-  { value: 'paid', label: 'Paid', color: '#34C759' },
-  { value: 'overdue', label: 'Overdue', color: '#FF3B30' },
-  { value: 'cancelled', label: 'Cancelled', color: '#8E8E93' },
+  { value: 'draft', label: 'Draf', color: '#8E8E93' },
+  { value: 'sent', label: 'Terkirim', color: '#007AFF' },
+  { value: 'paid', label: 'Lunas', color: '#34C759' },
+  { value: 'overdue', label: 'Terlambat', color: '#FF3B30' },
+  { value: 'cancelled', label: 'Dibatalkan', color: '#8E8E93' },
 ];
 
 // Generate next invoice number

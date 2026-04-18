@@ -72,7 +72,7 @@ export function ProjectForm({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = 'Nama wajib diisi';
     }
 
     setErrors(newErrors);
@@ -89,16 +89,14 @@ export function ProjectForm({
       // Don't call onClose here - parent handles closing on success
     } catch (err) {
       console.error('Failed to save project:', err);
-      setSubmitError(
-        err instanceof Error ? err.message : 'Failed to save project. Please try again.',
-      );
+      setSubmitError(err instanceof Error ? err.message : 'Gagal menyimpan proyek. Coba lagi.');
     }
   };
 
   const isEditing = !!initialData;
 
   const clientOptions = [
-    { value: '', label: 'No client' },
+    { value: '', label: 'Tanpa klien' },
     ...clients.map((c) => ({ value: c.id, label: c.name })),
   ];
 
@@ -111,7 +109,7 @@ export function ProjectForm({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Edit Project' : 'New Project'}
+      title={isEditing ? 'Ubah Proyek' : 'Proyek Baru'}
       size='lg'
     >
       <form onSubmit={handleSubmit} className='space-y-4'>
@@ -122,25 +120,25 @@ export function ProjectForm({
         )}
 
         <Input
-          label='Name *'
+          label='Nama *'
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
           error={errors.name}
-          placeholder='Project name'
+          placeholder='Nama proyek'
           autoFocus
         />
 
         <Textarea
-          label='Description'
+          label='Deskripsi'
           value={formData.description}
           onChange={(e) => handleChange('description', e.target.value)}
-          placeholder='Brief description of the project'
+          placeholder='Deskripsi singkat proyek'
           rows={2}
         />
 
         <div className='grid grid-cols-2 gap-4'>
           <Select
-            label='Client'
+            label='Klien'
             value={formData.clientId || ''}
             onChange={(e) => handleChange('clientId', e.target.value || null)}
             options={clientOptions}
@@ -155,7 +153,7 @@ export function ProjectForm({
         </div>
 
         <div>
-          <label className='block text-sm font-medium text-foreground mb-2'>Color</label>
+          <label className='block text-sm font-medium text-foreground mb-2'>Warna</label>
           <ColorPicker
             value={formData.color}
             onChange={(color) => handleChange('color', color)}
@@ -165,10 +163,10 @@ export function ProjectForm({
 
         <ModalFooter>
           <Button type='button' variant='outline' onClick={onClose} disabled={loading}>
-            Cancel
+            Batal
           </Button>
           <Button type='submit' loading={loading}>
-            {isEditing ? 'Save Changes' : 'Create Project'}
+            {isEditing ? 'Simpan Perubahan' : 'Buat Proyek'}
           </Button>
         </ModalFooter>
       </form>

@@ -70,11 +70,11 @@ export const DEFAULT_SETTINGS: AppSettings = {
   businessVatNumber: '',
   businessLogo: null,
   defaultTaxRate: 0,
-  paymentTerms: 'Payment is due within 30 days of invoice date.',
+  paymentTerms: 'Pembayaran jatuh tempo dalam 30 hari sejak tanggal invoice.',
   paymentLink: '',
-  paymentLinkTitle: 'Payment Link 1',
+  paymentLinkTitle: 'Tautan Pembayaran 1',
   paymentLink2: '',
-  paymentLink2Title: 'Payment Link 2',
+  paymentLink2Title: 'Tautan Pembayaran 2',
   paymentQrCode: null,
   businessWebsite: 'https://pahampajak.id',
   businessTagline: '',
@@ -90,14 +90,14 @@ export const FONT_SIZE_SCALE: Record<FontSize, number> = {
 };
 
 export const FONT_SIZE_OPTIONS: { value: FontSize; label: string }[] = [
-  { value: 'small', label: 'Small' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'large', label: 'Large' },
-  { value: 'extraLarge', label: 'Extra Large' },
+  { value: 'small', label: 'Kecil' },
+  { value: 'medium', label: 'Sedang' },
+  { value: 'large', label: 'Besar' },
+  { value: 'extraLarge', label: 'Sangat Besar' },
 ];
 
 export const DENSITY_OPTIONS: { value: Density; label: string }[] = [
-  { value: 'compact', label: 'Compact' },
-  { value: 'comfortable', label: 'Comfortable' },
-  { value: 'spacious', label: 'Spacious' },
+  { value: 'compact', label: 'Rapat' },
+  { value: 'comfortable', label: 'Nyaman' },
+  { value: 'spacious', label: 'Lapang' },
 ];

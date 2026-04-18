@@ -231,8 +231,8 @@ export function ClientsList() {
                           ? 'bg-muted text-primary'
                           : 'text-muted-foreground'
                       }
-                      aria-label='View payments'
-                      title='Down payments'
+                      aria-label='Lihat pembayaran'
+                      title='Pembayaran muka'
                     >
                       <Banknote className='w-4 h-4' />
                     </Button>
@@ -246,8 +246,8 @@ export function ClientsList() {
                             ? 'bg-muted text-primary'
                             : 'text-muted-foreground'
                         }
-                        aria-label='View notes'
-                        title='View notes'
+                        aria-label='Lihat catatan'
+                        title='Lihat catatan'
                       >
                         <StickyNote className='w-4 h-4' />
                       </Button>
@@ -256,7 +256,7 @@ export function ClientsList() {
                       variant='ghost'
                       size='sm'
                       onClick={() => setEditingClient(client)}
-                      aria-label='Edit client'
+                      aria-label='Ubah klien'
                     >
                       <Pencil className='w-4 h-4' />
                     </Button>
@@ -264,7 +264,7 @@ export function ClientsList() {
                       variant='ghost'
                       size='sm'
                       onClick={() => setDeletingClient(client)}
-                      aria-label='Delete client'
+                      aria-label='Hapus klien'
                     >
                       <Trash2 className='w-4 h-4 text-destructive' />
                     </Button>
@@ -317,9 +317,9 @@ export function ClientsList() {
         isOpen={!!deletingClient}
         onClose={() => setDeletingClient(null)}
         onConfirm={handleDelete}
-        title='Delete Client'
-        message={`Are you sure you want to delete "${deletingClient?.name}"? This will also delete all associated projects and time entries.`}
-        confirmLabel='Delete'
+        title='Hapus Klien'
+        message={`Yakin ingin menghapus "${deletingClient?.name}"? Semua proyek dan catatan waktu yang terkait juga akan ikut terhapus.`}
+        confirmLabel='Hapus'
         variant='danger'
         loading={submitting}
       />

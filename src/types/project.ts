@@ -23,9 +23,9 @@ export type CreateProjectInput = Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
 export type UpdateProjectInput = Partial<CreateProjectInput>;
 
 export const PROJECT_STATUS_OPTIONS: { value: ProjectStatus; label: string }[] = [
-  { value: 'active', label: 'Active' },
-  { value: 'paused', label: 'Paused' },
-  { value: 'completed', label: 'Completed' },
+  { value: 'active', label: 'Aktif' },
+  { value: 'paused', label: 'Dijeda' },
+  { value: 'completed', label: 'Selesai' },
 ];
 
 export const DEFAULT_PROJECT_COLORS = [
