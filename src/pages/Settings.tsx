@@ -181,9 +181,7 @@ export function Settings() {
                 <>
                   <div className='grid grid-cols-2 gap-4 pt-4 border-t border-border'>
                     <div>
-                      <label className='block text-sm font-medium mb-2'>
-                        Durasi Kerja (menit)
-                      </label>
+                      <label className='block text-sm font-medium mb-2'>Durasi Kerja (menit)</label>
                       <Input
                         type='number'
                         value={localSettings.pomodoroWorkMinutes || ''}
@@ -278,7 +276,8 @@ export function Settings() {
                     ))}
                   </div>
                   <p className='text-xs text-muted-foreground mt-3'>
-                    Saat Anda kembali, Anda akan diminta memilih tindakan untuk waktu tidak aktif tersebut.
+                    Saat Anda kembali, Anda akan diminta memilih tindakan untuk waktu tidak aktif
+                    tersebut.
                   </p>
                 </div>
               )}
@@ -405,7 +404,8 @@ export function Settings() {
                 Desain Ramah Neurodivergen
               </CardTitle>
               <CardDescription className='text-blue-700 dark:text-blue-400'>
-                yuk-kerja dirancang dengan mempertimbangkan pengguna neurodivergen. Fitur yang tersedia:
+                yuk-kerja dirancang dengan mempertimbangkan pengguna neurodivergen. Fitur yang
+                tersedia:
                 <ul className='list-disc list-inside mt-2 space-y-1'>
                   <li>Area sentuh besar (minimal 44pt)</li>
                   <li>Label jelas dengan ikon</li>
@@ -507,7 +507,7 @@ export function Settings() {
                   value={localSettings.businessEmail}
                   onChange={(e) => handleLocalChange('businessEmail', e.target.value)}
                   onBlur={() => handleAutoSave('businessEmail', localSettings.businessEmail)}
-                  placeholder='billing@company.com'
+                  placeholder='billing@perusahaan.co.id'
                 />
                 <Input
                   label='Telepon'
@@ -515,7 +515,7 @@ export function Settings() {
                   value={localSettings.businessPhone}
                   onChange={(e) => handleLocalChange('businessPhone', e.target.value)}
                   onBlur={() => handleAutoSave('businessPhone', localSettings.businessPhone)}
-                  placeholder='+1 (555) 000-0000'
+                  placeholder='+62 812-3456-7890'
                 />
               </div>
 
@@ -550,7 +550,7 @@ export function Settings() {
                       onBlur={() =>
                         handleAutoSave('paymentLinkTitle', localSettings.paymentLinkTitle)
                       }
-                      placeholder='Contoh: Bayar via Stripe'
+                      placeholder='Contoh: Bayar via Midtrans'
                     />
                   </div>
                   <div className='col-span-2'>
@@ -559,7 +559,7 @@ export function Settings() {
                       value={localSettings.paymentLink || ''}
                       onChange={(e) => handleLocalChange('paymentLink', e.target.value)}
                       onBlur={() => handleAutoSave('paymentLink', localSettings.paymentLink)}
-                      placeholder='https://paypal.me/yourbusiness'
+                      placeholder='https://payment.example.com/bisnis-anda'
                     />
                   </div>
                 </div>
@@ -573,7 +573,7 @@ export function Settings() {
                       onBlur={() =>
                         handleAutoSave('paymentLink2Title', localSettings.paymentLink2Title)
                       }
-                      placeholder='Contoh: Bayar via Venmo'
+                      placeholder='Contoh: Bayar via Xendit'
                     />
                   </div>
                   <div className='col-span-2'>
@@ -582,7 +582,7 @@ export function Settings() {
                       value={localSettings.paymentLink2 || ''}
                       onChange={(e) => handleLocalChange('paymentLink2', e.target.value)}
                       onBlur={() => handleAutoSave('paymentLink2', localSettings.paymentLink2)}
-                      placeholder='https://venmo.com/yourbusiness'
+                      placeholder='https://checkout.example.com/bisnis-anda'
                     />
                   </div>
                 </div>
@@ -593,7 +593,7 @@ export function Settings() {
                 value={localSettings.paymentTerms}
                 onChange={(e) => handleLocalChange('paymentTerms', e.target.value)}
                 onBlur={() => handleAutoSave('paymentTerms', localSettings.paymentTerms)}
-                placeholder='Pembayaran jatuh tempo dalam 30 hari sejak tanggal invoice.&#10;&#10;Detail Transfer Bank:&#10;IBAN: ...&#10;BIC: ...'
+                placeholder='Pembayaran jatuh tempo dalam 30 hari sejak tanggal invoice.&#10;&#10;Detail Transfer Bank:&#10;Bank: ...&#10;No. Rekening: ...&#10;Atas Nama: ...'
                 rows={6}
               />
 
@@ -673,8 +673,10 @@ export function Settings() {
                 label='Detail Transfer Bank'
                 value={localSettings.paymentBankDetails}
                 onChange={(e) => handleLocalChange('paymentBankDetails', e.target.value)}
-                onBlur={() => handleAutoSave('paymentBankDetails', localSettings.paymentBankDetails)}
-                placeholder={'IBAN: NL00 BANK 0000 0000 00\nBIC: BANKCODE\nNama Bank'}
+                onBlur={() =>
+                  handleAutoSave('paymentBankDetails', localSettings.paymentBankDetails)
+                }
+                placeholder={'Bank: BCA\nNo. Rekening: 1234567890\nAtas Nama: Nama Bisnis'}
                 rows={4}
               />
             </CardContent>
@@ -712,7 +714,8 @@ export function Settings() {
                 </Button>
               </div>
               <p className='text-xs text-muted-foreground'>
-                Tips: Ekspor data secara berkala untuk mencegah kehilangan data. Impor akan memulai ulang aplikasi.
+                Tips: Ekspor data secara berkala untuk mencegah kehilangan data. Impor akan memulai
+                ulang aplikasi.
               </p>
             </CardContent>
           </Card>
@@ -769,15 +772,21 @@ export function Settings() {
                 <CardTitle className='text-xl'>Selamat datang di yuk-kerja!</CardTitle>
               </div>
               <CardDescription className='text-base'>
-                yuk-kerja membantu Anda mencatat waktu, mengelola klien dan proyek, lalu membuat invoice dengan alur yang cepat dan sederhana.
+                yuk-kerja membantu Anda mencatat waktu, mengelola klien dan proyek, lalu membuat
+                invoice dengan alur yang cepat dan sederhana.
               </CardDescription>
             </CardContent>
           </Card>
 
-          <GuideSection icon={<Timer className='w-5 h-5' />} title='Timer & Pelacakan Waktu' defaultOpen={true}>
+          <GuideSection
+            icon={<Timer className='w-5 h-5' />}
+            title='Timer & Pelacakan Waktu'
+            defaultOpen={true}
+          >
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Mulai dari halaman Timer untuk memilih proyek dan mencatat sesi kerja secara real-time.
+                Mulai dari halaman Timer untuk memilih proyek dan mencatat sesi kerja secara
+                real-time.
               </p>
               <div>
                 <h4 className='font-medium mb-2'>Alur Dasar</h4>
@@ -801,10 +810,14 @@ export function Settings() {
             </div>
           </GuideSection>
 
-          <GuideSection icon={<div className='w-5 h-5 border-2 border-current rounded' />} title='Widget Mengambang'>
+          <GuideSection
+            icon={<div className='w-5 h-5 border-2 border-current rounded' />}
+            title='Widget Mengambang'
+          >
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Widget mengambang menampilkan status timer dalam jendela kecil yang selalu di atas, bahkan saat aplikasi diminimalkan.
+                Widget mengambang menampilkan status timer dalam jendela kecil yang selalu di atas,
+                bahkan saat aplikasi diminimalkan.
               </p>
               <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
                 <li>Menampilkan proyek aktif dan waktu berjalan.</li>
@@ -820,7 +833,8 @@ export function Settings() {
           <GuideSection icon={<Coffee className='w-5 h-5' />} title='Timer Pomodoro'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Fitur Pomodoro membantu Anda bekerja fokus dalam blok waktu tertentu lalu beristirahat secara teratur.
+                Fitur Pomodoro membantu Anda bekerja fokus dalam blok waktu tertentu lalu
+                beristirahat secara teratur.
               </p>
               <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
                 <li>Atur durasi kerja dan durasi istirahat sesuai kebiasaan Anda.</li>
@@ -862,7 +876,8 @@ export function Settings() {
           <GuideSection icon={<Clock className='w-5 h-5' />} title='Catatan Waktu'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Catatan waktu adalah hasil akhir dari sesi kerja Anda dan bisa dikelola sebelum masuk ke invoice.
+                Catatan waktu adalah hasil akhir dari sesi kerja Anda dan bisa dikelola sebelum
+                masuk ke invoice.
               </p>
               <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
                 <li>Catatan dikelompokkan per klien dan proyek.</li>
@@ -914,7 +929,8 @@ export function Settings() {
           <GuideSection icon={<Palette className='w-5 h-5' />} title='Pengaturan Tampilan'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Sesuaikan tema, ukuran font, kerapatan, dan animasi agar aplikasi terasa nyaman dipakai.
+                Sesuaikan tema, ukuran font, kerapatan, dan animasi agar aplikasi terasa nyaman
+                dipakai.
               </p>
               <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
                 <li>Pilih tema terang, gelap, sistem, atau kontras tinggi.</li>
@@ -927,13 +943,22 @@ export function Settings() {
           <GuideSection icon={<Keyboard className='w-5 h-5' />} title='Pintasan Global'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Pintasan global memungkinkan Anda mengontrol timer tanpa harus membuka jendela utama.
+                Pintasan global memungkinkan Anda mengontrol timer tanpa harus membuka jendela
+                utama.
               </p>
               <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
-                <li><strong>Cmd/Ctrl + Shift + S</strong> untuk mulai atau lanjutkan timer.</li>
-                <li><strong>Cmd/Ctrl + Shift + P</strong> untuk jeda timer.</li>
-                <li><strong>Cmd/Ctrl + Shift + X</strong> untuk hentikan timer dan simpan catatan.</li>
-                <li><strong>Cmd/Ctrl + Shift + W</strong> untuk tampilkan atau sembunyikan widget.</li>
+                <li>
+                  <strong>Cmd/Ctrl + Shift + S</strong> untuk mulai atau lanjutkan timer.
+                </li>
+                <li>
+                  <strong>Cmd/Ctrl + Shift + P</strong> untuk jeda timer.
+                </li>
+                <li>
+                  <strong>Cmd/Ctrl + Shift + X</strong> untuk hentikan timer dan simpan catatan.
+                </li>
+                <li>
+                  <strong>Cmd/Ctrl + Shift + W</strong> untuk tampilkan atau sembunyikan widget.
+                </li>
               </ul>
             </div>
           </GuideSection>
@@ -941,7 +966,8 @@ export function Settings() {
           <GuideSection icon={<BarChart3 className='w-5 h-5' />} title='Analitik Dashboard'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Dashboard memberi ringkasan visual supaya Anda cepat memahami progres kerja dan potensi penagihan.
+                Dashboard memberi ringkasan visual supaya Anda cepat memahami progres kerja dan
+                potensi penagihan.
               </p>
               <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
                 <li>Ringkasan hari ini dan progres mingguan.</li>
@@ -951,10 +977,14 @@ export function Settings() {
             </div>
           </GuideSection>
 
-          <GuideSection icon={<PauseCircle className='w-5 h-5' />} title='Deteksi Tidak Aktif Otomatis'>
+          <GuideSection
+            icon={<PauseCircle className='w-5 h-5' />}
+            title='Deteksi Tidak Aktif Otomatis'
+          >
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Deteksi tidak aktif membantu mencegah timer terus berjalan saat Anda meninggalkan komputer.
+                Deteksi tidak aktif membantu mencegah timer terus berjalan saat Anda meninggalkan
+                komputer.
               </p>
               <ol className='list-decimal list-inside space-y-1 text-sm text-muted-foreground'>
                 <li>Atur batas tidak aktif di tab Umum.</li>
@@ -967,12 +997,15 @@ export function Settings() {
           <GuideSection icon={<Package className='w-5 h-5' />} title='Cadangan & Pembaruan'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Gunakan fitur cadangan untuk melindungi data lokal dan pantau pembaruan aplikasi saat tersedia.
+                Gunakan fitur cadangan untuk melindungi data lokal dan pantau pembaruan aplikasi
+                saat tersedia.
               </p>
               <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
                 <li>Ekspor cadangan secara berkala agar data aman.</li>
                 <li>Impor cadangan akan mengganti data saat ini dan memulai ulang aplikasi.</li>
-                <li>Aplikasi akan memeriksa pembaruan dan menampilkan banner jika ada versi baru.</li>
+                <li>
+                  Aplikasi akan memeriksa pembaruan dan menampilkan banner jika ada versi baru.
+                </li>
               </ul>
             </div>
           </GuideSection>
@@ -989,7 +1022,8 @@ export function Settings() {
                 >
                   team pahampajak
                 </a>{' '}
-                sebagai aplikasi pelacakan waktu dan invoice yang berfokus pada kesederhanaan dan kecepatan.
+                sebagai aplikasi pelacakan waktu dan invoice yang berfokus pada kesederhanaan dan
+                kecepatan.
               </p>
               <div>
                 <h4 className='font-medium mb-2'>Tautan</h4>
@@ -1026,11 +1060,10 @@ export function Settings() {
 
           <Card className='bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'>
             <CardContent className='py-6'>
-              <CardTitle className='text-green-800 dark:text-green-300 mb-2'>
-                Semua Siap!
-              </CardTitle>
+              <CardTitle className='text-green-800 dark:text-green-300 mb-2'>Semua Siap!</CardTitle>
               <CardDescription className='text-green-700 dark:text-green-400'>
-                Sekarang Anda sudah tahu fitur utama yuk-kerja. Lanjutkan mencatat waktu dan membuat invoice dengan lebih cepat.
+                Sekarang Anda sudah tahu fitur utama yuk-kerja. Lanjutkan mencatat waktu dan membuat
+                invoice dengan lebih cepat.
               </CardDescription>
             </CardContent>
           </Card>
@@ -1137,4 +1170,3 @@ function GuideSection({ icon, title, children, defaultOpen = false }: GuideSecti
     </Card>
   );
 }
-

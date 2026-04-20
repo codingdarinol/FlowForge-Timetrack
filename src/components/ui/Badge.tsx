@@ -53,9 +53,21 @@ const statusVariants: Record<string, BadgeProps['variant']> = {
   cancelled: 'default',
 };
 
+const statusLabels: Record<string, string> = {
+  active: 'Aktif',
+  paused: 'Dijeda',
+  completed: 'Selesai',
+  draft: 'Draf',
+  sent: 'Terkirim',
+  paid: 'Lunas',
+  overdue: 'Terlambat',
+  cancelled: 'Dibatalkan',
+};
+
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const variant = statusVariants[status.toLowerCase()] || 'default';
-  const label = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  const normalized = status.toLowerCase();
+  const variant = statusVariants[normalized] || 'default';
+  const label = statusLabels[normalized] || status;
 
   return (
     <Badge variant={variant} className={className}>

@@ -3,7 +3,9 @@ import { useToastStore } from '../stores/toastStore';
 
 export function useUndoableAction() {
   const addToast = useToastStore((state) => state.addToast);
-  const pendingRef = useRef<{ timeoutId: ReturnType<typeof setTimeout>; toastId: string } | null>(null);
+  const pendingRef = useRef<{ timeoutId: ReturnType<typeof setTimeout>; toastId: string } | null>(
+    null,
+  );
 
   const execute = useCallback(
     (options: {
@@ -23,7 +25,7 @@ export function useUndoableAction() {
         message,
         action: onUndo
           ? {
-              label: 'Undo',
+              label: 'Urungkan',
               onClick: () => {
                 if (pendingRef.current) {
                   clearTimeout(pendingRef.current.timeoutId);

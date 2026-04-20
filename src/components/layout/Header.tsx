@@ -10,6 +10,13 @@ const TYPE_ICONS: Record<string, typeof Users> = {
   'time-entry': FileText,
 };
 
+const TYPE_LABELS: Record<string, string> = {
+  client: 'Klien',
+  project: 'Proyek',
+  invoice: 'Invoice',
+  'time-entry': 'Catatan Waktu',
+};
+
 export function Header() {
   const navigate = useNavigate();
   const { query, setQuery, isOpen, open, close, results } = useGlobalSearch();
@@ -61,7 +68,7 @@ export function Header() {
           <Search className='w-4 h-4' />
           <span>Cari...</span>
           <kbd className='ml-2 px-1.5 py-0.5 text-xs font-mono bg-background border border-border rounded'>
-            {/Mac/.test(navigator.userAgent) ? 'âŒ˜' : 'Ctrl'}+K
+            {/Mac/.test(navigator.userAgent) ? 'Cmd' : 'Ctrl'}+K
           </kbd>
         </button>
 
@@ -81,7 +88,10 @@ export function Header() {
                     className='flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground'
                   />
                   {query && (
-                    <button onClick={() => setQuery('')} className='text-muted-foreground hover:text-foreground'>
+                    <button
+                      onClick={() => setQuery('')}
+                      className='text-muted-foreground hover:text-foreground'
+                    >
                       <X className='w-4 h-4' />
                     </button>
                   )}
@@ -108,11 +118,13 @@ export function Header() {
                             <div className='flex-1 min-w-0'>
                               <p className='text-sm font-medium truncate'>{result.title}</p>
                               {result.subtitle && (
-                                <p className='text-xs text-muted-foreground truncate'>{result.subtitle}</p>
+                                <p className='text-xs text-muted-foreground truncate'>
+                                  {result.subtitle}
+                                </p>
                               )}
                             </div>
                             <span className='text-xs text-muted-foreground capitalize shrink-0'>
-                              {result.type.replace('-', ' ')}
+                              {TYPE_LABELS[result.type] || result.type}
                             </span>
                           </button>
                         );
@@ -122,9 +134,15 @@ export function Header() {
                 )}
 
                 <div className='px-4 py-2 border-t border-border flex items-center gap-4 text-xs text-muted-foreground'>
-                  <span><kbd className='px-1 bg-secondary rounded'>â†‘â†“</kbd> Navigasi</span>
-                  <span><kbd className='px-1 bg-secondary rounded'>â†µ</kbd> Pilih</span>
-                  <span><kbd className='px-1 bg-secondary rounded'>Esc</kbd> Tutup</span>
+                  <span>
+                    <kbd className='px-1 bg-secondary rounded'>Atas/Bawah</kbd> Navigasi
+                  </span>
+                  <span>
+                    <kbd className='px-1 bg-secondary rounded'>Enter</kbd> Pilih
+                  </span>
+                  <span>
+                    <kbd className='px-1 bg-secondary rounded'>Esc</kbd> Tutup
+                  </span>
                 </div>
               </div>
             </div>
@@ -134,5 +152,3 @@ export function Header() {
     </header>
   );
 }
-
-

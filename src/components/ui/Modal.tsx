@@ -134,14 +134,18 @@ export function Modal({
         {/* Header */}
         {(title || showCloseButton) && (
           <div className='flex items-center justify-between px-6 py-4 border-b border-border shrink-0'>
-            {title && <h2 id={modalTitleId} className='text-lg font-semibold text-foreground'>{title}</h2>}
+            {title && (
+              <h2 id={modalTitleId} className='text-lg font-semibold text-foreground'>
+                {title}
+              </h2>
+            )}
             {showCloseButton && (
               <Button
                 variant='ghost'
                 size='sm'
                 onClick={onClose}
                 className='ml-auto -mr-2'
-                aria-label='Close'
+                aria-label='Tutup'
               >
                 <X className='w-5 h-5' />
               </Button>

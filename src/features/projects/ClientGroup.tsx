@@ -3,6 +3,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { Button, Card } from '../../components/ui';
 import type { ProjectWithStats, ProjectStatus } from '../../types';
 import { PROJECT_STATUS_OPTIONS } from '../../types';
+import { formatNumber } from '../../lib/formatters';
 
 interface ClientGroupProps {
   clientName: string;
@@ -26,9 +27,9 @@ export function ClientGroup({
   }
 
   const formatHours = (hours: number) => {
-    if (typeof hours !== 'number') return '0h';
+    if (typeof hours !== 'number') return '0j';
     if (hours < 1) return `${Math.round(hours * 60)}m`;
-    return `${hours.toFixed(1)}h`;
+    return `${formatNumber(hours, 1)}j`;
   };
 
   return (

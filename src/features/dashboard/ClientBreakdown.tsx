@@ -1,9 +1,9 @@
 import type { ClientSummary } from '../../services/dashboardService';
-import { formatCurrency } from '../../lib/formatters';
+import { formatCurrency, formatNumber } from '../../lib/formatters';
 
 function formatHours(seconds: number): string {
   const hours = seconds / 3600;
-  return hours < 1 ? `${Math.round(hours * 60)}m` : `${hours.toFixed(1)}h`;
+  return hours < 1 ? `${Math.round(hours * 60)}m` : `${formatNumber(hours, 1)}j`;
 }
 
 function normalizeDashboardCurrency(currency: string) {

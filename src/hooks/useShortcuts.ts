@@ -36,7 +36,7 @@ export function useShortcuts() {
         case 'start':
           if (currentTimerState === 'paused') {
             timerResume();
-            await showNotification('Timer Resumed', 'Your timer has been resumed');
+            await showNotification('Timer Dilanjutkan', 'Timer Anda sudah dilanjutkan');
           }
           // Note: Starting a new timer requires project selection, so we just resume
           break;
@@ -44,7 +44,7 @@ export function useShortcuts() {
         case 'pause':
           if (currentTimerState === 'running') {
             timerPause();
-            await showNotification('Timer Paused', 'Your timer has been paused');
+            await showNotification('Timer Dijeda', 'Timer Anda sudah dijeda');
           }
           break;
 
@@ -63,10 +63,10 @@ export function useShortcuts() {
                   isBilled: false,
                 });
                 await emit('time-entry-saved');
-                await showNotification('Timer Stopped', 'Time entry has been saved');
+                await showNotification('Timer Dihentikan', 'Catatan waktu sudah disimpan');
               } catch (err) {
                 console.error('Failed to save time entry via shortcut:', err);
-                await showNotification('Error', 'Failed to save time entry');
+                await showNotification('Error', 'Gagal menyimpan catatan waktu');
               }
             }
           }
@@ -77,10 +77,10 @@ export function useShortcuts() {
           await toggleWidget(newWidgetState);
           await updateSetting('showFloatingWidget', newWidgetState);
           await showNotification(
-            newWidgetState ? 'Widget Shown' : 'Widget Hidden',
+            newWidgetState ? 'Widget Ditampilkan' : 'Widget Disembunyikan',
             newWidgetState
-              ? 'Floating timer widget is now visible'
-              : 'Floating timer widget is now hidden',
+              ? 'Widget timer mengambang sekarang terlihat'
+              : 'Widget timer mengambang sekarang disembunyikan',
           );
           break;
         }
@@ -89,8 +89,8 @@ export function useShortcuts() {
           const newSoundState = !currentSettings.enableSoundFeedback;
           await updateSetting('enableSoundFeedback', newSoundState);
           await showNotification(
-            newSoundState ? 'Sounds Enabled' : 'Sounds Disabled',
-            newSoundState ? 'Sound feedback is now on' : 'Sound feedback is now off',
+            newSoundState ? 'Suara Diaktifkan' : 'Suara Dinonaktifkan',
+            newSoundState ? 'Umpan balik suara aktif' : 'Umpan balik suara nonaktif',
           );
           break;
         }

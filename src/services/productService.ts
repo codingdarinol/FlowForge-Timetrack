@@ -17,21 +17,21 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
     name: 'Pengembangan Website',
     description:
       'Desain dan pengembangan website kustom termasuk tata letak responsif, integrasi CMS, dan deployment.',
-    price: 2500,
+    price: 2500000,
   },
   {
     field: 'Pengembangan Perangkat Lunak',
     name: 'Pengembangan Aplikasi Mobile',
     description:
       'Pengembangan aplikasi mobile native atau lintas platform lengkap dengan desain UI/UX dan rilis ke app store.',
-    price: 5000,
+    price: 5000000,
   },
   {
     field: 'Pengembangan Perangkat Lunak',
     name: 'Integrasi API',
     description:
       'Integrasi API pihak ketiga, pengembangan middleware kustom, dan penyiapan sinkronisasi data.',
-    price: 1500,
+    price: 1500000,
   },
   // Desain & Kreatif
   {
@@ -39,21 +39,21 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
     name: 'Logo & Identitas Brand',
     description:
       'Desain logo profesional lengkap dengan panduan brand, palet warna, dan spesifikasi tipografi.',
-    price: 800,
+    price: 800000,
   },
   {
     field: 'Desain & Kreatif',
     name: 'Desain UI/UX',
     description:
       'Desain antarmuka dan pengalaman pengguna termasuk wireframe, prototipe, dan design system.',
-    price: 2000,
+    price: 2000000,
   },
   {
     field: 'Desain & Kreatif',
     name: 'Grafis Media Sosial',
     description:
       'Template posting media sosial, banner, dan paket konten visual yang dibuat khusus.',
-    price: 500,
+    price: 500000,
   },
   // Pemasaran
   {
@@ -61,21 +61,21 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
     name: 'Optimasi SEO',
     description:
       'Audit SEO teknis dan konten, riset kata kunci, optimasi on-page, dan pelacakan performa.',
-    price: 1200,
+    price: 1200000,
   },
   {
     field: 'Pemasaran',
     name: 'Strategi Konten',
     description:
       'Pembuatan kalender konten, riset topik, panduan editorial, dan strategi distribusi.',
-    price: 1500,
+    price: 1500000,
   },
   {
     field: 'Pemasaran',
     name: 'Kampanye Email',
     description:
       'Desain kampanye email marketing, copywriting, setup automasi, dan pelacakan analitik.',
-    price: 800,
+    price: 800000,
   },
   // Konsultasi
   {
@@ -83,21 +83,21 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
     name: 'Sesi Strategi Bisnis',
     description:
       'Sesi konsultasi strategis satu-satu yang membahas analisis bisnis, peluang pertumbuhan, dan rencana aksi.',
-    price: 300,
+    price: 300000,
   },
   {
     field: 'Konsultasi',
     name: 'Audit Teknis',
     description:
       'Tinjauan menyeluruh atas infrastruktur teknis, kualitas codebase, keamanan, dan rekomendasi perbaikan.',
-    price: 2000,
+    price: 2000000,
   },
   {
     field: 'Konsultasi',
     name: 'Workshop Pelatihan',
     description:
       'Workshop pelatihan kustom sesuai topik yang mencakup materi, latihan, dan sumber lanjutan.',
-    price: 1000,
+    price: 1000000,
   },
   // Pendidikan
   {
@@ -105,21 +105,20 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
     name: 'Kuliah Tamu',
     description:
       'Sesi kuliah tamu dari ahli pada topik tertentu lengkap dengan materi presentasi dan tanya jawab.',
-    price: 500,
+    price: 500000,
   },
   {
     field: 'Pendidikan',
     name: 'Modul Kursus Online',
-    description:
-      'Modul pembelajaran online mandiri berisi video, latihan, kuis, dan sertifikat.',
-    price: 3000,
+    description: 'Modul pembelajaran online mandiri berisi video, latihan, kuis, dan sertifikat.',
+    price: 3000000,
   },
   {
     field: 'Pendidikan',
     name: 'Mentoring 1-on-1',
     description:
       'Sesi mentoring personal untuk arahan karier, pengembangan skill, dan umpan balik proyek.',
-    price: 150,
+    price: 150000,
   },
 ];
 

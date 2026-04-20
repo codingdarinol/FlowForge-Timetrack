@@ -30,12 +30,12 @@ export function WeeklyChart({
         <div className='flex items-center gap-2'>
           <BarChart3 className='w-4 h-4 text-muted-foreground' />
           <h3 className='font-semibold text-sm uppercase tracking-wide text-muted-foreground'>
-            {range === 'week' ? 'This Week' : 'Last 30 Days'}
+            {range === 'week' ? 'Minggu Ini' : '30 Hari Terakhir'}
           </h3>
         </div>
         <div className='flex items-center gap-3'>
           <span className='text-sm text-muted-foreground'>
-            {formatDuration(totalSeconds)} total
+            Total {formatDuration(totalSeconds)}
           </span>
           {onRangeChange && (
             <Button
@@ -43,7 +43,7 @@ export function WeeklyChart({
               size='sm'
               onClick={() => onRangeChange(range === 'week' ? 'month' : 'week')}
               className='h-6 w-6 p-0 hover:bg-muted'
-              title={range === 'week' ? 'Show last 30 days' : 'Show this week'}
+              title={range === 'week' ? 'Tampilkan 30 hari terakhir' : 'Tampilkan minggu ini'}
             >
               {range === 'week' ? (
                 <Maximize2 className='w-4 h-4 text-muted-foreground' />
@@ -73,7 +73,7 @@ export function WeeklyChart({
           return (
             <div
               key={day.date}
-              className="flex-1 flex flex-col items-center gap-1"
+              className='flex-1 flex flex-col items-center gap-1'
               style={{ minWidth: range === 'month' ? '8px' : 'auto' }}
               title={`${day.date}: ${formatDuration(day.totalSeconds)}`}
             >
@@ -98,8 +98,8 @@ export function WeeklyChart({
                 className={`text-[10px] ${isToday ? 'font-bold text-primary' : 'text-muted-foreground'} h-3 overflow-hidden whitespace-nowrap`}
               >
                 {showLabel
-                  ? range === 'month' && day.dayOfWeek === 'Mon'
-                    ? 'M'
+                  ? range === 'month' && day.dayOfWeek === 'Sen'
+                    ? 'S'
                     : day.dayOfWeek.slice(0, 3)
                   : ''}
               </span>

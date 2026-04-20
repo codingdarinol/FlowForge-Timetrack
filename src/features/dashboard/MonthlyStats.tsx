@@ -2,10 +2,21 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { dashboardService, type MonthSummary } from '../../services/dashboardService';
 import { formatDuration } from '../../types';
+import { formatNumber } from '../../lib/formatters';
 
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
 ];
 
 interface MonthlyStatsProps {
@@ -57,28 +68,28 @@ export function MonthlyStats({ initialData }: MonthlyStatsProps) {
       : null;
 
   return (
-    <div className="bg-background border border-border rounded-xl p-4">
+    <div className='bg-background border border-border rounded-xl p-4'>
       {/* Header with month navigation */}
-      <div className="flex items-center justify-between mb-3">
-        <button onClick={goPrev} className="p-1 hover:bg-muted rounded">
-          <ChevronLeft className="w-4 h-4" />
+      <div className='flex items-center justify-between mb-3'>
+        <button onClick={goPrev} className='p-1 hover:bg-muted rounded'>
+          <ChevronLeft className='w-4 h-4' />
         </button>
-        <h3 className="text-sm font-semibold">{monthLabel}</h3>
+        <h3 className='text-sm font-semibold'>{monthLabel}</h3>
         <button
           onClick={goNext}
           disabled={isCurrentMonth}
-          className="p-1 hover:bg-muted rounded disabled:opacity-30"
+          className='p-1 hover:bg-muted rounded disabled:opacity-30'
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className='w-4 h-4' />
         </button>
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className='grid grid-cols-3 gap-3'>
         {/* Total Hours */}
-        <div className="bg-muted/50 rounded-lg p-2.5 text-center">
-          <div className="text-xs text-muted-foreground mb-1">Total Hours</div>
-          <div className="text-sm font-semibold text-foreground">
+        <div className='bg-muted/50 rounded-lg p-2.5 text-center'>
+          <div className='text-xs text-muted-foreground mb-1'>Total Jam</div>
+          <div className='text-sm font-semibold text-foreground'>
             {formatDuration(data.totalSeconds)}
           </div>
           {percentChange !== null && (
@@ -88,30 +99,30 @@ export function MonthlyStats({ initialData }: MonthlyStatsProps) {
               }`}
             >
               {percentChange >= 0 ? (
-                <TrendingUp className="w-3 h-3" />
+                <TrendingUp className='w-3 h-3' />
               ) : (
-                <TrendingDown className="w-3 h-3" />
+                <TrendingDown className='w-3 h-3' />
               )}
-              {Math.abs(percentChange).toFixed(0)}%
+              {formatNumber(Math.abs(percentChange), 0)}%
             </div>
           )}
           {percentChange === null && data.totalSeconds > 0 && (
-            <div className="flex items-center justify-center mt-1 text-xs text-muted-foreground">
-              No prev data
+            <div className='flex items-center justify-center mt-1 text-xs text-muted-foreground'>
+              Tidak ada data sebelumnya
             </div>
           )}
         </div>
 
         {/* Days Worked */}
-        <div className="bg-muted/50 rounded-lg p-2.5 text-center">
-          <div className="text-xs text-muted-foreground mb-1">Days Worked</div>
-          <div className="text-sm font-semibold text-foreground">{data.daysWorked}</div>
+        <div className='bg-muted/50 rounded-lg p-2.5 text-center'>
+          <div className='text-xs text-muted-foreground mb-1'>Hari Kerja</div>
+          <div className='text-sm font-semibold text-foreground'>{data.daysWorked}</div>
         </div>
 
         {/* Avg per Day */}
-        <div className="bg-muted/50 rounded-lg p-2.5 text-center">
-          <div className="text-xs text-muted-foreground mb-1">Avg per Day</div>
-          <div className="text-sm font-semibold text-foreground">
+        <div className='bg-muted/50 rounded-lg p-2.5 text-center'>
+          <div className='text-xs text-muted-foreground mb-1'>Rata-rata per Hari</div>
+          <div className='text-sm font-semibold text-foreground'>
             {formatDuration(data.avgSecondsPerDay)}
           </div>
         </div>

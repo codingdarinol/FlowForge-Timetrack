@@ -1,5 +1,6 @@
 import { ChangeEvent } from 'react';
 import { Product } from '../../types';
+import { formatCurrency } from '../../lib/formatters';
 
 interface QuerySelectProps {
   products: Product[];
@@ -26,11 +27,11 @@ export function QuerySelect({ products, onSelect }: QuerySelectProps) {
       defaultValue=''
     >
       <option value='' disabled>
-        Add stored item...
+        Tambah item tersimpan...
       </option>
       {products.map((p) => (
         <option key={p.id} value={p.id}>
-          {p.name} (${p.price.toFixed(2)})
+          {p.name} ({formatCurrency(p.price)})
         </option>
       ))}
     </select>

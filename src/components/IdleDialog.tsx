@@ -57,7 +57,9 @@ export function IdleDialog({ idleDuration, onClose }: IdleDialogProps) {
         accumulatedPauseDuration: targetAccumulated,
       });
     }
-    emit('timer-idle-toggle', { active: false }).catch((err) => uiLogger.error('Failed to emit idle toggle:', err));
+    emit('timer-idle-toggle', { active: false }).catch((err) =>
+      uiLogger.error('Failed to emit idle toggle:', err),
+    );
     onClose();
   };
 
@@ -92,34 +94,36 @@ export function IdleDialog({ idleDuration, onClose }: IdleDialogProps) {
         accumulatedPauseDuration: targetAccumulated,
       });
     }
-    emit('timer-idle-toggle', { active: false }).catch((err) => uiLogger.error('Failed to emit idle toggle:', err));
+    emit('timer-idle-toggle', { active: false }).catch((err) =>
+      uiLogger.error('Failed to emit idle toggle:', err),
+    );
     onClose();
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose} title='Welcome Back!' size='sm'>
+    <Modal isOpen={true} onClose={onClose} title='Selamat Datang Kembali' size='sm'>
       <div className='space-y-4'>
         <div className='flex items-center gap-3'>
           <div className='p-3 bg-amber-500/10 rounded-full'>
             <Clock className='w-6 h-6 text-amber-600 dark:text-amber-400' />
           </div>
           <p className='text-sm text-muted-foreground'>
-            You were away for {formatDuration(idleDuration)}
+            Anda tidak aktif selama {formatDuration(idleDuration)}
           </p>
         </div>
 
         <p className='text-sm'>
-          Your timer was paused while you were away. What would you like to do with this time?
+          Timer dijeda saat Anda tidak aktif. Apa yang ingin dilakukan dengan waktu ini?
         </p>
 
         <div className='space-y-2'>
           <Button onClick={handleDiscard} variant='outline' className='w-full justify-start gap-3'>
             <Trash2 className='w-4 h-4' />
-            Discard idle time
+            Abaikan waktu tidak aktif
           </Button>
           <Button onClick={handleKeepAll} variant='outline' className='w-full justify-start gap-3'>
             <Check className='w-4 h-4' />
-            Keep all time
+            Tetap hitung semua waktu
           </Button>
         </div>
       </div>

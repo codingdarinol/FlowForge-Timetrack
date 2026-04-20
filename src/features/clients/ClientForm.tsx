@@ -89,9 +89,7 @@ export function ClientForm({
       // Don't call onClose here - parent handles closing on success
     } catch (err) {
       console.error('Failed to save client:', err);
-      setSubmitError(
-        err instanceof Error ? err.message : 'Gagal menyimpan klien. Coba lagi.',
-      );
+      setSubmitError(err instanceof Error ? err.message : 'Gagal menyimpan klien. Coba lagi.');
     }
   };
 
@@ -135,7 +133,7 @@ export function ClientForm({
             type='tel'
             value={formData.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
-            placeholder='+1 (555) 000-0000'
+            placeholder='+62 812-3456-7890'
           />
         </div>
 
@@ -161,7 +159,7 @@ export function ClientForm({
             type='number'
             min={0}
             max={1000000}
-            step={0.01}
+            step={formData.currency === 'IDR' ? 1000 : 0.01}
             value={formData.hourlyRate === 0 ? '' : formData.hourlyRate}
             onChange={(e) =>
               handleChange('hourlyRate', e.target.value === '' ? 0 : parseFloat(e.target.value))

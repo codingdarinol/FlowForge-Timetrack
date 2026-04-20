@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { clientService, projectService, invoiceService } from '../services';
-import type { Client, Project } from '../types';
+import { INVOICE_STATUS_OPTIONS, type Client, type Project } from '../types';
 
 export interface SearchResult {
   id: string;
@@ -15,25 +15,27 @@ export function useGlobalSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [invoices, setInvoices] = useState<{ id: string; invoiceNumber: string; clientName: string; status: string }[]>([]);
+  const [invoices, setInvoices] = useState<
+    { id: string; invoiceNumber: string; clientName: string; status: string }[]
+  >([]);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    Promise.all([
-      clientService.getAll(),
-      projectService.getAll(),
-      invoiceService.getAll(),
-    ]).then(([c, p, i]) => {
-      setClients(c);
-      setProjects(p);
-      setInvoices(i.map((inv) => ({
-        id: inv.id,
-        invoiceNumber: inv.invoiceNumber,
-        clientName: inv.clientName,
-        status: inv.status,
-      })));
-    });
+    Promise.all([clientService.getAll(), projectService.getAll(), invoiceService.getAll()]).then(
+      ([c, p, i]) => {
+        setClients(c);
+        setProjects(p);
+        setInvoices(
+          i.map((inv) => ({
+            id: inv.id,
+            invoiceNumber: inv.invoiceNumber,
+            clientName: inv.clientName,
+            status: inv.status,
+          })),
+        );
+      },
+    );
   }, [isOpen]);
 
   const results = useMemo((): SearchResult[] => {
@@ -68,11 +70,13 @@ export function useGlobalSearch() {
 
     invoices.forEach((i) => {
       if (i.invoiceNumber.toLowerCase().includes(q) || i.clientName.toLowerCase().includes(q)) {
+        const statusLabel =
+          INVOICE_STATUS_OPTIONS.find((s) => s.value === i.status)?.label || i.status;
         matches.push({
           id: i.id,
           type: 'invoice',
           title: i.invoiceNumber,
-          subtitle: `${i.clientName} — ${i.status}`,
+          subtitle: `${i.clientName} - ${statusLabel}`,
           route: '/invoices',
         });
       }

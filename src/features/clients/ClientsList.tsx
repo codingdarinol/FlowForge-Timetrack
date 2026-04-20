@@ -5,7 +5,7 @@ import { clientService } from '../../services';
 import { Button, Card, EmptyState, ConfirmDialog, ListSkeleton } from '../../components/ui';
 import { ClientForm } from './ClientForm';
 import { ClientPayments } from './ClientPayments';
-import { formatCurrency } from '../../lib/formatters';
+import { formatCurrency, formatNumber } from '../../lib/formatters';
 import { clientLogger } from '../../lib/logger';
 import { useUndoableAction } from '../../hooks/useUndoableAction';
 
@@ -108,7 +108,7 @@ export function ClientsList() {
 
   const formatHours = (hours: number) => {
     if (hours < 1) return `${Math.round(hours * 60)}m`;
-    return `${hours.toFixed(1)}h`;
+    return `${formatNumber(hours, 1)}j`;
   };
 
   const toggleNotes = (clientId: string) => {

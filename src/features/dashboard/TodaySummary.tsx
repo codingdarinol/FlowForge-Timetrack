@@ -22,14 +22,14 @@ export function TodaySummary({ totalSeconds, projects }: TodaySummaryProps) {
       <div className='flex items-center gap-2 mb-3'>
         <Clock className='w-4 h-4 text-muted-foreground' />
         <h3 className='font-semibold text-sm uppercase tracking-wide text-muted-foreground'>
-          Today's Summary
+          Ringkasan Hari Ini
         </h3>
       </div>
 
-      <div className='text-2xl font-bold mb-4'>⏱️ {formatDuration(totalSeconds)} tracked</div>
+      <div className='text-2xl font-bold mb-4'>{formatDuration(totalSeconds)} tercatat</div>
 
       {projects.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>No time tracked today</p>
+        <p className='text-muted-foreground text-sm'>Belum ada waktu tercatat hari ini</p>
       ) : (
         <div className='space-y-2'>
           {projects.map((project) => (

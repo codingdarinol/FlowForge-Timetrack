@@ -24,11 +24,11 @@ export const backupService = {
 
       // Open save dialog
       const savePath = await save({
-        title: 'Export FlowForge Backup',
+        title: 'Ekspor Cadangan FlowForge',
         defaultPath: `flowforge-backup-${new Date().toISOString().split('T')[0]}.db`,
         filters: [
           {
-            name: 'SQLite Database',
+            name: 'Database SQLite',
             extensions: ['db'],
           },
         ],
@@ -73,11 +73,11 @@ export const backupService = {
       backupLogger.debug('Opening file dialog...');
       // Open file dialog
       const selectedPath = await open({
-        title: 'Import FlowForge Backup',
+        title: 'Impor Cadangan FlowForge',
         multiple: false,
         filters: [
           {
-            name: 'SQLite Database',
+            name: 'Database SQLite',
             extensions: ['db'],
           },
         ],

@@ -6,30 +6,30 @@ interface ShortcutGroup {
 }
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent);
-const mod = isMac ? '⌘' : 'Ctrl';
+const mod = isMac ? 'Cmd' : 'Ctrl';
 
 const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
     title: 'Timer',
     shortcuts: [
-      { keys: [mod, 'Shift', 'S'], description: 'Start / Resume timer' },
-      { keys: [mod, 'Shift', 'P'], description: 'Pause timer' },
-      { keys: [mod, 'Shift', 'X'], description: 'Stop timer and save' },
+      { keys: [mod, 'Shift', 'S'], description: 'Mulai / lanjutkan timer' },
+      { keys: [mod, 'Shift', 'P'], description: 'Jeda timer' },
+      { keys: [mod, 'Shift', 'X'], description: 'Hentikan timer dan simpan' },
     ],
   },
   {
-    title: 'App',
+    title: 'Aplikasi',
     shortcuts: [
-      { keys: [mod, 'Shift', 'W'], description: 'Toggle floating widget' },
-      { keys: [mod, 'Shift', 'M'], description: 'Toggle sound notifications' },
-      { keys: [mod, 'K'], description: 'Open global search' },
+      { keys: [mod, 'Shift', 'W'], description: 'Tampilkan/sembunyikan widget mengambang' },
+      { keys: [mod, 'Shift', 'M'], description: 'Aktifkan/nonaktifkan suara' },
+      { keys: [mod, 'K'], description: 'Buka pencarian global' },
     ],
   },
   {
-    title: 'Dialogs',
+    title: 'Dialog',
     shortcuts: [
-      { keys: ['Esc'], description: 'Close modal / dialog' },
-      { keys: ['?'], description: 'Show this help' },
+      { keys: ['Esc'], description: 'Tutup modal / dialog' },
+      { keys: ['?'], description: 'Tampilkan bantuan ini' },
     ],
   },
 ];
@@ -41,7 +41,7 @@ interface KeyboardShortcutsDialogProps {
 
 export function KeyboardShortcutsDialog({ isOpen, onClose }: KeyboardShortcutsDialogProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title='Keyboard Shortcuts' size='md'>
+    <Modal isOpen={isOpen} onClose={onClose} title='Pintasan Keyboard' size='md'>
       <div className='space-y-6'>
         {SHORTCUT_GROUPS.map((group) => (
           <div key={group.title}>
@@ -56,7 +56,9 @@ export function KeyboardShortcutsDialog({ isOpen, onClose }: KeyboardShortcutsDi
                         <kbd className='px-2 py-1 text-xs font-mono bg-secondary border border-border rounded-md'>
                           {key}
                         </kbd>
-                        {i < shortcut.keys.length - 1 && <span className='mx-0.5 text-muted-foreground'>+</span>}
+                        {i < shortcut.keys.length - 1 && (
+                          <span className='mx-0.5 text-muted-foreground'>+</span>
+                        )}
                       </span>
                     ))}
                   </div>

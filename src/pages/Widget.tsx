@@ -119,7 +119,7 @@ export function Widget() {
       onMouseDown={handleDrag}
     >
       {/* Drag Handle */}
-      <div className='widget-drag-handle' title='Drag to move'>
+      <div className='widget-drag-handle' title='Seret untuk memindahkan'>
         <GripVertical className='w-4 h-4 text-muted-foreground/40' />
       </div>
 
@@ -130,11 +130,11 @@ export function Widget() {
         </span>
         <span className='widget-project'>
           {isIdle
-            ? 'Ready'
+            ? 'Siap'
             : isIdlePaused
-              ? 'IDLE'
+              ? 'Tidak Aktif'
               : isBreakActive
-                ? 'Take a Break!'
+                ? 'Istirahat'
                 : timerState.projectName}
         </span>
       </div>
@@ -148,7 +148,7 @@ export function Widget() {
             handlePauseResume(e);
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          title={timerState.status === 'running' ? 'Pause' : 'Resume'}
+          title={timerState.status === 'running' ? 'Jeda' : 'Lanjutkan'}
         >
           {timerState.status === 'running' ? (
             <Pause className='w-3.5 h-3.5' />
@@ -168,7 +168,7 @@ export function Widget() {
             await mainWindow.setFocus();
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          title='Open App'
+          title='Buka Aplikasi'
         >
           <Layout className='w-3.5 h-3.5' />
         </button>
@@ -179,7 +179,7 @@ export function Widget() {
             handleStop(e);
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          title='Stop'
+          title='Hentikan'
         >
           <Square className='w-3.5 h-3.5' />
         </button>

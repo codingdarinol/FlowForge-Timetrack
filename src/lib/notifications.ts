@@ -54,16 +54,16 @@ export async function showNotification(title: string, body: string): Promise<voi
 
 // Convenience functions for timer events
 export function notifyTimerStarted(projectName: string): Promise<void> {
-  return showNotification('Timer Started', `Now tracking time for ${projectName}`);
+  return showNotification('Timer Dimulai', `Sekarang mencatat waktu untuk ${projectName}`);
 }
 
 export function notifyTimerStopped(projectName: string, duration: string): Promise<void> {
-  return showNotification('Timer Stopped', `${projectName}: ${duration} recorded`);
+  return showNotification('Timer Dihentikan', `${projectName}: ${duration} tercatat`);
 }
 
 export function notifyBreakTime(breakMinutes: number): Promise<void> {
   return showNotification(
-    'Time for a Break! ☕',
-    `You've reached your work goal. Take a ${breakMinutes} minute break.`,
+    'Waktunya Istirahat',
+    `Target kerja tercapai. Ambil istirahat ${breakMinutes} menit.`,
   );
 }

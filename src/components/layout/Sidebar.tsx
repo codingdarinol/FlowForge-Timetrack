@@ -84,13 +84,21 @@ export function Sidebar() {
           <span>Pengaturan</span>
         </NavLink>
         <div className='px-4 pt-3 pb-1'>
-          <a href='https://pahampajak.id' target='_blank' rel='noopener noreferrer'
-             className='block text-xs text-muted-foreground hover:text-foreground transition-colors'>
+          <a
+            href='https://pahampajak.id'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='block text-xs text-muted-foreground hover:text-foreground transition-colors'
+          >
             pahampajak.id
           </a>
-          <a href='https://pahampajak.id' target='_blank' rel='noopener noreferrer'
-             className='block text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors mt-0.5'>
-            by team pahampajak
+          <a
+            href='https://pahampajak.id'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='block text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors mt-0.5'
+          >
+            oleh tim pahampajak
           </a>
         </div>
       </div>

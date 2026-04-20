@@ -41,7 +41,7 @@ export function formatDurationShort(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    return `${hours}j ${minutes}m`;
   }
   if (minutes > 0) {
     return `${minutes}m`;

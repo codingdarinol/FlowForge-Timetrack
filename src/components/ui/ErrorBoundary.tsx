@@ -26,7 +26,7 @@ export class ErrorBoundary extends Component<
       return (
         <div className='p-4 m-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg'>
           <h2 className='text-lg font-bold mb-2'>
-            Something went wrong in {this.props.name || 'component'}
+            Terjadi kesalahan di {this.props.name || 'komponen'}
           </h2>
           <p className='font-mono text-xs whitespace-pre-wrap break-all'>
             {this.state.error?.toString()}
@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<
             onClick={() => this.setState({ hasError: false, error: null })}
             className='mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity'
           >
-            Try Again
+            Coba Lagi
           </button>
         </div>
       );

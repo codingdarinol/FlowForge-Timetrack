@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Package, Pencil, Trash2, Eye, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  Package,
+  Pencil,
+  Trash2,
+  Eye,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 import type { Product } from '../../types';
 import { productService } from '../../services';
 import { PRODUCT_TEMPLATES } from '../../services/productService';
@@ -180,7 +189,9 @@ export function ProductsList() {
           <div className='space-y-4'>
             <div className='flex justify-between items-start'>
               <h3 className='text-xl font-bold text-foreground'>{viewingProduct.name}</h3>
-              <span className='font-mono text-lg font-medium'>{formatCurrency(viewingProduct.price)}</span>
+              <span className='font-mono text-lg font-medium'>
+                {formatCurrency(viewingProduct.price)}
+              </span>
             </div>
 
             {viewingProduct.sku && (
@@ -238,7 +249,13 @@ interface CreateProductModalProps {
   templateData?: ProductTemplate | null;
 }
 
-function CreateProductModal({ isOpen, onClose, onSaved, initialData, templateData }: CreateProductModalProps) {
+function CreateProductModal({
+  isOpen,
+  onClose,
+  onSaved,
+  initialData,
+  templateData,
+}: CreateProductModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState<number>(0);
@@ -315,7 +332,7 @@ function CreateProductModal({ isOpen, onClose, onSaved, initialData, templateDat
             value={price || ''}
             onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
             min={0}
-            step={0.01}
+            step={1000}
           />
           <Input label='SKU (Opsional)' value={sku} onChange={(e) => setSku(e.target.value)} />
         </div>
@@ -343,10 +360,10 @@ interface TemplatesModalProps {
 function TemplatesModal({ isOpen, onClose, onSelect, existingNames }: TemplatesModalProps) {
   const [expandedFields, setExpandedFields] = useState<Set<string>>(new Set());
 
-  const fields = [...new Set(PRODUCT_TEMPLATES.map(t => t.field))];
+  const fields = [...new Set(PRODUCT_TEMPLATES.map((t) => t.field))];
 
   const toggleField = (field: string) => {
-    setExpandedFields(prev => {
+    setExpandedFields((prev) => {
       const next = new Set(prev);
       if (next.has(field)) {
         next.delete(field);
@@ -408,7 +425,7 @@ function TemplatesModal({ isOpen, onClose, onSelect, existingNames }: TemplatesM
                           </p>
                         </div>
                         <span className='text-sm font-mono text-muted-foreground whitespace-nowrap'>
-                          ${template.price.toLocaleString()}
+                          {formatCurrency(template.price)}
                         </span>
                       </div>
                     </button>
@@ -420,7 +437,9 @@ function TemplatesModal({ isOpen, onClose, onSelect, existingNames }: TemplatesM
         ))}
       </div>
       <ModalFooter>
-        <Button variant='outline' onClick={onClose}>Tutup</Button>
+        <Button variant='outline' onClick={onClose}>
+          Tutup
+        </Button>
       </ModalFooter>
     </Modal>
   );

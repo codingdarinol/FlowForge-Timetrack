@@ -20,7 +20,11 @@ import {
 } from '../../services';
 import { invoiceLogger } from '../../lib/logger';
 import { generateCSV, downloadCSV } from '../../lib/exportUtils';
-import { formatCurrency as formatMoney, formatDate as formatAppDate } from '../../lib/formatters';
+import {
+  formatCurrency as formatMoney,
+  formatDate as formatAppDate,
+  formatNumber,
+} from '../../lib/formatters';
 import { ListSkeleton } from '../../components/ui';
 import { useUndoableAction } from '../../hooks/useUndoableAction';
 import {
@@ -37,14 +41,12 @@ import {
 } from '../../components/ui';
 import { QuerySelect } from './QuerySelect';
 
-// Currency formatting helpers
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  IDR: 'Rp',
-  USD: '$',
-};
-
 function formatCurrency(amount: number, currency: Currency = 'IDR'): string {
   return formatMoney(amount, currency);
+}
+
+function getInvoiceStatusLabel(status: InvoiceStatus | string): string {
+  return INVOICE_STATUS_OPTIONS.find((option) => option.value === status)?.label || status;
 }
 
 export function InvoicesList() {
@@ -94,7 +96,7 @@ export function InvoicesList() {
     setInvoices((prev) => prev.filter((i) => i.id !== invoiceToDelete.id));
 
     executeUndoable({
-      message: `Deleted invoice "${invoiceToDelete.invoiceNumber}"`,
+      message: `Invoice "${invoiceToDelete.invoiceNumber}" dihapus`,
       action: async () => {
         await invoiceService.delete(invoiceToDelete.id);
       },
@@ -106,7 +108,18 @@ export function InvoicesList() {
 
   const handleExportCSV = async () => {
     try {
-      const headers = ['Invoice #', 'Client', 'Issue Date', 'Due Date', 'Status', 'Currency', 'Subtotal', 'Tax', 'Down Payment', 'Total'];
+      const headers = [
+        'No. Invoice',
+        'Klien',
+        'Tanggal Invoice',
+        'Jatuh Tempo',
+        'Status',
+        'Mata Uang',
+        'Subtotal',
+        'Pajak',
+        'Uang Muka',
+        'Total',
+      ];
       const rows = invoices.map((inv) => {
         const currency = clients.find((c) => c.id === inv.clientId)?.currency || 'IDR';
         return [
@@ -114,16 +127,16 @@ export function InvoicesList() {
           inv.clientName,
           formatAppDate(inv.issueDate),
           formatAppDate(inv.dueDate),
-          inv.status,
+          getInvoiceStatusLabel(inv.status),
           currency,
-          inv.subtotal.toFixed(2),
-          inv.taxAmount.toFixed(2),
-          (inv.downPayment || 0).toFixed(2),
-          inv.total.toFixed(2),
+          formatNumber(inv.subtotal, currency === 'IDR' ? 0 : 2),
+          formatNumber(inv.taxAmount, currency === 'IDR' ? 0 : 2),
+          formatNumber(inv.downPayment || 0, currency === 'IDR' ? 0 : 2),
+          formatNumber(inv.total, currency === 'IDR' ? 0 : 2),
         ];
       });
       const csv = generateCSV(headers, rows);
-      await downloadCSV(`invoices-${new Date().toISOString().split('T')[0]}.csv`, csv);
+      await downloadCSV(`invoice-${new Date().toISOString().split('T')[0]}.csv`, csv);
     } catch (error) {
       invoiceLogger.error('Failed to export CSV', error);
     }
@@ -143,7 +156,7 @@ export function InvoicesList() {
   };
 
   const statusOptions = [
-    { value: '', label: 'All Statuses' },
+    { value: '', label: 'Semua Status' },
     ...INVOICE_STATUS_OPTIONS.map((s) => ({ value: s.value, label: s.label })),
   ];
 
@@ -155,15 +168,20 @@ export function InvoicesList() {
     <div className='space-y-6'>
       {/* Header */}
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-foreground'>Invoices</h1>
+        <h1 className='text-2xl font-bold text-foreground'>Invoice</h1>
         <div className='flex items-center gap-2'>
-          <Button variant='outline' size='sm' onClick={handleExportCSV} disabled={invoices.length === 0}>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleExportCSV}
+            disabled={invoices.length === 0}
+          >
             <Download className='w-4 h-4' />
-            Export CSV
+            Ekspor CSV
           </Button>
           <Button onClick={() => setShowCreate(true)} disabled={clients.length === 0}>
             <Plus className='w-4 h-4' />
-            New Invoice
+            Invoice Baru
           </Button>
         </div>
       </div>
@@ -183,17 +201,17 @@ export function InvoicesList() {
       {invoices.length === 0 && allInvoicesCount === 0 ? (
         <EmptyState
           icon={<FileText className='w-8 h-8' />}
-          title='No invoices yet'
+          title='Belum ada invoice'
           description={
             clients.length === 0
-              ? 'Create a client first to generate invoices.'
-              : 'Create your first invoice to get started.'
+              ? 'Buat klien terlebih dahulu untuk membuat invoice.'
+              : 'Buat invoice pertama untuk mulai menagih.'
           }
           action={
             clients.length > 0 ? (
               <Button onClick={() => setShowCreate(true)}>
                 <Plus className='w-4 h-4' />
-                Create Invoice
+                Buat Invoice
               </Button>
             ) : undefined
           }
@@ -201,11 +219,11 @@ export function InvoicesList() {
       ) : invoices.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
-          title='No matching invoices'
-          description='Try selecting a different status filter.'
+          title='Tidak ada invoice yang cocok'
+          description='Coba pilih filter status lain.'
           action={
             <Button variant='outline' onClick={() => setStatusFilter('')}>
-              Clear Filter
+              Hapus Filter
             </Button>
           }
         />
@@ -243,8 +261,15 @@ export function InvoicesList() {
               </div>
 
               <div className='text-right'>
-                <p className='font-medium text-foreground'>{formatCurrency(invoice.total, clients.find((c) => c.id === invoice.clientId)?.currency)}</p>
-                <p className='text-xs text-muted-foreground'>Due {formatDate(invoice.dueDate)}</p>
+                <p className='font-medium text-foreground'>
+                  {formatCurrency(
+                    invoice.total,
+                    clients.find((c) => c.id === invoice.clientId)?.currency,
+                  )}
+                </p>
+                <p className='text-xs text-muted-foreground'>
+                  Jatuh tempo {formatDate(invoice.dueDate)}
+                </p>
               </div>
 
               <div className='flex items-center gap-1'>
@@ -252,7 +277,7 @@ export function InvoicesList() {
                   variant='ghost'
                   size='sm'
                   onClick={() => setEditingInvoice(invoice)}
-                  aria-label='Edit invoice'
+                  aria-label='Ubah invoice'
                 >
                   <Pencil className='w-4 h-4' />
                 </Button>
@@ -260,7 +285,7 @@ export function InvoicesList() {
                   variant='ghost'
                   size='sm'
                   onClick={() => setViewingInvoice(invoice)}
-                  aria-label='View invoice'
+                  aria-label='Lihat invoice'
                 >
                   <Eye className='w-4 h-4' />
                 </Button>
@@ -268,7 +293,7 @@ export function InvoicesList() {
                   variant='ghost'
                   size='sm'
                   onClick={() => setDeletingInvoice(invoice)}
-                  aria-label='Delete invoice'
+                  aria-label='Hapus invoice'
                 >
                   <Trash2 className='w-4 h-4 text-destructive' />
                 </Button>
@@ -311,9 +336,9 @@ export function InvoicesList() {
         isOpen={!!deletingInvoice}
         onClose={() => setDeletingInvoice(null)}
         onConfirm={handleDelete}
-        title='Delete Invoice'
-        message={`Are you sure you want to delete invoice ${deletingInvoice?.invoiceNumber}?`}
-        confirmLabel='Delete'
+        title='Hapus Invoice'
+        message={`Yakin ingin menghapus invoice ${deletingInvoice?.invoiceNumber}?`}
+        confirmLabel='Hapus'
         variant='danger'
       />
     </div>
@@ -412,7 +437,10 @@ function CreateInvoiceModal({
   // Load products
   useEffect(() => {
     if (isOpen) {
-      productService.getAll().then(setProducts).catch((err) => invoiceLogger.error('Failed to load products:', err));
+      productService
+        .getAll()
+        .then(setProducts)
+        .catch((err) => invoiceLogger.error('Failed to load products:', err));
     }
   }, [isOpen]);
 
@@ -446,8 +474,9 @@ function CreateInvoiceModal({
       const hours = totalSeconds / 3600;
 
       if (hours > 0) {
+        const formattedHours = formatNumber(hours, 2);
         items.push({
-          description: `${project.name} - ${hours.toFixed(2)} hours`,
+          description: `${project.name} - ${formattedHours} jam`,
           quantity: parseFloat(hours.toFixed(2)),
           unitPrice: hourlyRate,
           timeEntryIds: entryIds,
@@ -578,23 +607,23 @@ function CreateInvoiceModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialData ? 'Edit Invoice' : 'Create Invoice'}
+      title={initialData ? 'Ubah Invoice' : 'Buat Invoice'}
       size='xl'
     >
       {step === 1 && (
         <div className='space-y-4'>
           <Select
-            label='Client *'
+            label='Klien *'
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
             options={clientOptions}
-            placeholder='Select a client...'
+            placeholder='Pilih klien...'
             disabled={!!initialData} // Lock client on edit
           />
 
           <ModalFooter>
             <Button variant='outline' onClick={onClose}>
-              Cancel
+              Batal
             </Button>
             <Button
               onClick={async () => {
@@ -612,7 +641,7 @@ function CreateInvoiceModal({
               }}
               disabled={!clientId}
             >
-              Next: Line Items
+              Berikutnya: Item Tagihan
             </Button>
           </ModalFooter>
         </div>
@@ -621,18 +650,18 @@ function CreateInvoiceModal({
       {step === 2 && (
         <div className='space-y-4'>
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Line Items</label>
+            <label className='text-sm font-medium'>Item Tagihan</label>
             {lineItems.map((item, index) => (
               <div key={index} className='flex gap-2 items-start'>
                 <Input
-                  placeholder='Description'
+                  placeholder='Deskripsi'
                   value={item.description}
                   onChange={(e) => handleLineItemChange(index, 'description', e.target.value)}
                   className='flex-1'
                 />
                 <Input
                   type='number'
-                  placeholder='Qty'
+                  placeholder='Jumlah'
                   value={item.quantity || ''}
                   onChange={(e) =>
                     handleLineItemChange(
@@ -647,7 +676,7 @@ function CreateInvoiceModal({
                 />
                 <Input
                   type='number'
-                  placeholder='Price'
+                  placeholder='Harga'
                   value={item.unitPrice || ''}
                   onChange={(e) =>
                     handleLineItemChange(
@@ -671,14 +700,14 @@ function CreateInvoiceModal({
               </div>
             ))}
             <Button variant='outline' size='sm' onClick={handleAddLineItem}>
-              + Add Line
+              + Tambah Baris
             </Button>
             <div className='inline-block relative ml-2'>
               <QuerySelect products={products} onSelect={handleAddProductLine} />
             </div>
             {!initialData && (
               <Button variant='ghost' size='sm' onClick={handleLoadHours} className='ml-2'>
-                Reload Hours
+                Muat Ulang Jam
               </Button>
             )}
           </div>
@@ -686,22 +715,24 @@ function CreateInvoiceModal({
           {/* Down Payment */}
           <div className='pt-4 border-t border-border'>
             <Input
-              label='Down Payment'
+              label='Uang Muka'
               type='number'
               value={downPayment || ''}
-              onChange={(e) => setDownPayment(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+              onChange={(e) =>
+                setDownPayment(e.target.value === '' ? 0 : parseFloat(e.target.value))
+              }
               min={0}
               step={0.01}
-              helperText='Amount already paid upfront (subtracted from total)'
+              helperText='Nominal yang sudah dibayar di awal dan akan mengurangi total tagihan'
             />
           </div>
 
           <ModalFooter>
             <Button variant='outline' onClick={() => setStep(1)}>
-              Back
+              Kembali
             </Button>
             <Button onClick={() => setStep(3)} disabled={lineItems.length === 0}>
-              Next: Details
+              Berikutnya: Detail
             </Button>
           </ModalFooter>
         </div>
@@ -711,13 +742,13 @@ function CreateInvoiceModal({
         <div className='space-y-4'>
           <div className='grid grid-cols-2 gap-4'>
             <Input
-              label='Issue Date'
+              label='Tanggal Invoice'
               type='date'
               value={issueDate}
               onChange={(e) => setIssueDate(e.target.value)}
             />
             <Input
-              label='Due Date'
+              label='Jatuh Tempo'
               type='date'
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
@@ -725,7 +756,7 @@ function CreateInvoiceModal({
           </div>
 
           <Input
-            label='Tax Rate (%)'
+            label='Pajak (%)'
             type='number'
             value={taxRate || ''}
             onChange={(e) => setTaxRate(e.target.value === '' ? 0 : parseFloat(e.target.value))}
@@ -735,20 +766,20 @@ function CreateInvoiceModal({
           />
 
           <Textarea
-            label='Notes'
+            label='Catatan'
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder='Additional notes for the invoice...'
+            placeholder='Catatan tambahan untuk invoice...'
             rows={2}
           />
 
           <Textarea
-            label='Payment Terms'
+            label='Syarat Pembayaran'
             value={paymentTerms}
             onChange={(e) => setPaymentTerms(e.target.value)}
-            placeholder='Enter payment terms (pre-filled from settings)...'
+            placeholder='Masukkan syarat pembayaran (terisi dari pengaturan)...'
             rows={2}
-            helperText='Override the default payment terms for this invoice'
+            helperText='Ubah syarat pembayaran khusus untuk invoice ini'
           />
 
           <div className='p-4 bg-secondary rounded-lg'>
@@ -759,21 +790,21 @@ function CreateInvoiceModal({
               </span>
             </div>
             <div className='flex justify-between text-sm'>
-              <span>Tax ({taxRate}%):</span>
+              <span>Pajak ({taxRate}%):</span>
               <span>
                 {formatCurrency(totals.taxAmount, clients.find((c) => c.id === clientId)?.currency)}
               </span>
             </div>
             {downPayment > 0 && (
               <div className='flex justify-between text-sm text-green-600 dark:text-green-400'>
-                <span>Down Payment:</span>
+                <span>Uang Muka:</span>
                 <span>
                   -{formatCurrency(downPayment, clients.find((c) => c.id === clientId)?.currency)}
                 </span>
               </div>
             )}
             <div className='flex justify-between font-medium mt-2 pt-2 border-t border-border'>
-              <span>{downPayment > 0 ? 'Amount Due:' : 'Total:'}</span>
+              <span>{downPayment > 0 ? 'Sisa Tagihan:' : 'Total:'}</span>
               <span>
                 {formatCurrency(totals.total, clients.find((c) => c.id === clientId)?.currency)}
               </span>
@@ -782,10 +813,10 @@ function CreateInvoiceModal({
 
           <ModalFooter>
             <Button variant='outline' onClick={() => setStep(2)}>
-              Back
+              Kembali
             </Button>
             <Button onClick={handleSubmit} loading={saving}>
-              {initialData ? 'Save Changes' : 'Create Invoice'}
+              {initialData ? 'Simpan Perubahan' : 'Buat Invoice'}
             </Button>
           </ModalFooter>
         </div>
@@ -806,14 +837,17 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
-    settingsService.load().then(setSettings).catch((err) => invoiceLogger.error('Failed to load settings for preview:', err));
+    settingsService
+      .load()
+      .then(setSettings)
+      .catch((err) => invoiceLogger.error('Failed to load settings for preview:', err));
   }, []);
 
   const formatDate = (isoString: string) => {
     try {
       return formatAppDate(isoString);
     } catch {
-      return 'Invalid Date';
+      return '';
     }
   };
 
@@ -840,7 +874,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       const WHITE: [number, number, number] = [255, 255, 255];
 
       const invoiceCurrency = clients.find((c) => c.id === invoice.clientId)?.currency || 'IDR';
-      const currencySymbol = CURRENCY_SYMBOLS[invoiceCurrency] || 'Rp';
+      const formatInvoiceMoney = (amount: number) => formatCurrency(amount, invoiceCurrency);
 
       const checkPageBreak = (currentY: number, requiredSpace: number): number => {
         if (currentY + requiredSpace > pageHeight - MARGIN_BOTTOM) {
@@ -850,7 +884,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         return currentY;
       };
 
-      // === HEADER: Logo (left) + INVOICE title (right) ===
+      // === HEADER: Logo (left) + title (right) ===
       let headerRightY = y;
       if (settings?.businessLogo) {
         try {
@@ -859,7 +893,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
           invoiceLogger.warn('Failed to add logo to PDF', { error: e });
         }
       }
-      // INVOICE title (right-aligned, teal)
+      // Invoice title (right-aligned, teal)
       doc.setFontSize(28);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...TEAL);
@@ -868,7 +902,9 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...GRAY_TEXT);
-      doc.text(`#${invoice.invoiceNumber}`, pageWidth - MARGIN, headerRightY + 16, { align: 'right' });
+      doc.text(`#${invoice.invoiceNumber}`, pageWidth - MARGIN, headerRightY + 16, {
+        align: 'right',
+      });
 
       y = Math.max(y + 25, headerRightY + 22);
 
@@ -887,10 +923,10 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...TEAL);
-      doc.text('FROM', fromX, y);
+      doc.text('DARI', fromX, y);
 
       // BILL TO label
-      doc.text('BILL TO', billToX, y);
+      doc.text('TAGIH KE', billToX, y);
       y += 5;
 
       // FROM details
@@ -930,7 +966,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         });
       }
       if (settings?.businessVatNumber) {
-        doc.text(`VAT: ${settings.businessVatNumber}`, fromX, fromY);
+        doc.text(`NPWP: ${settings.businessVatNumber}`, fromX, fromY);
         fromY += 4;
       }
 
@@ -959,7 +995,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         billY += 4;
       }
       if (invoice.clientVatNumber) {
-        doc.text(`VAT: ${invoice.clientVatNumber}`, billToX, billY);
+        doc.text(`NPWP: ${invoice.clientVatNumber}`, billToX, billY);
         billY += 4;
       }
 
@@ -972,7 +1008,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
 
       // Calculate due date
       let displayDueDate = formatDate(invoice.dueDate);
-      if (displayDueDate === 'Invalid Date' && invoice.issueDate) {
+      if (!displayDueDate && invoice.issueDate) {
         const issueDate = new Date(invoice.issueDate);
         const dueDate = new Date(issueDate);
         dueDate.setDate(issueDate.getDate() + 30);
@@ -983,9 +1019,9 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...GRAY_TEXT);
       const thirdWidth = CONTENT_WIDTH / 3;
-      doc.text(`Invoice Date: ${formatDate(invoice.issueDate)}`, MARGIN + 4, y + 2);
-      doc.text(`Service Date: ${formatDate(invoice.issueDate)}`, MARGIN + thirdWidth + 4, y + 2);
-      doc.text(`Payment Due: ${displayDueDate}`, MARGIN + thirdWidth * 2 + 4, y + 2);
+      doc.text(`Tanggal Invoice: ${formatDate(invoice.issueDate)}`, MARGIN + 4, y + 2);
+      doc.text(`Tanggal Layanan: ${formatDate(invoice.issueDate)}`, MARGIN + thirdWidth + 4, y + 2);
+      doc.text(`Jatuh Tempo: ${displayDueDate}`, MARGIN + thirdWidth * 2 + 4, y + 2);
       y += 14;
 
       // === LINE ITEMS TABLE ===
@@ -1003,10 +1039,10 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...WHITE);
-        doc.text('DESCRIPTION', colDesc + 4, atY);
-        doc.text('RATE', colRate, atY, { align: 'right' });
-        doc.text('QTY (HRS)', colQty + 8, atY, { align: 'right' });
-        doc.text('AMOUNT', colAmount, atY, { align: 'right' });
+        doc.text('DESKRIPSI', colDesc + 4, atY);
+        doc.text('HARGA', colRate, atY, { align: 'right' });
+        doc.text('JML', colQty + 8, atY, { align: 'right' });
+        doc.text('JUMLAH', colAmount, atY, { align: 'right' });
         return atY + 8;
       };
 
@@ -1032,9 +1068,11 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         doc.setTextColor(...BLACK);
         const descText = doc.splitTextToSize(item.description, colRate - colDesc - 20);
         doc.text(descText[0] || item.description.substring(0, 50), colDesc + 4, y);
-        doc.text(`${currencySymbol}${item.unitPrice.toFixed(2)}`, colRate, y, { align: 'right' });
-        doc.text(item.quantity.toString(), colQty + 8, y, { align: 'right' });
-        doc.text(`${currencySymbol}${(item.quantity * item.unitPrice).toFixed(2)}`, colAmount, y, { align: 'right' });
+        doc.text(formatInvoiceMoney(item.unitPrice), colRate, y, { align: 'right' });
+        doc.text(formatNumber(item.quantity, 2), colQty + 8, y, { align: 'right' });
+        doc.text(formatInvoiceMoney(item.quantity * item.unitPrice), colAmount, y, {
+          align: 'right',
+        });
         y += 7;
       });
 
@@ -1054,14 +1092,14 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       doc.setTextColor(...GRAY_TEXT);
       doc.text('Subtotal', totalsX, y);
       doc.setTextColor(...BLACK);
-      doc.text(`${currencySymbol}${invoice.subtotal.toFixed(2)}`, totalsValX, y, { align: 'right' });
+      doc.text(formatInvoiceMoney(invoice.subtotal), totalsValX, y, { align: 'right' });
       y += 6;
 
       if (invoice.taxRate > 0) {
         doc.setTextColor(...GRAY_TEXT);
-        doc.text(`VAT (${(invoice.taxRate * 100).toFixed(1)}%)`, totalsX, y);
+        doc.text(`Pajak (${formatNumber(invoice.taxRate * 100, 1)}%)`, totalsX, y);
         doc.setTextColor(...BLACK);
-        doc.text(`${currencySymbol}${invoice.taxAmount.toFixed(2)}`, totalsValX, y, { align: 'right' });
+        doc.text(formatInvoiceMoney(invoice.taxAmount), totalsValX, y, { align: 'right' });
         y += 8;
       }
 
@@ -1069,19 +1107,19 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...GRAY_TEXT);
-        doc.text('Down Payment', totalsX, y);
+        doc.text('Uang Muka', totalsX, y);
         doc.setTextColor(22, 163, 74); // green-600
-        doc.text(`-${currencySymbol}${invoice.downPayment.toFixed(2)}`, totalsValX, y, { align: 'right' });
+        doc.text(`-${formatInvoiceMoney(invoice.downPayment)}`, totalsValX, y, { align: 'right' });
         doc.setTextColor(...BLACK);
         y += 8;
       }
 
-      // Total Due (teal, bold, larger)
+      // Total due (teal, bold, larger)
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...TEAL);
-      doc.text(invoice.downPayment > 0 ? 'Amount Due' : 'Total Due', totalsX, y);
-      doc.text(`${currencySymbol}${invoice.total.toFixed(2)}`, totalsValX, y, { align: 'right' });
+      doc.text(invoice.downPayment > 0 ? 'Sisa Tagihan' : 'Total Tagihan', totalsX, y);
+      doc.text(formatInvoiceMoney(invoice.total), totalsValX, y, { align: 'right' });
       doc.setTextColor(...BLACK);
       y += 15;
 
@@ -1091,7 +1129,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...TEAL);
-        doc.text('NOTES', MARGIN, y);
+        doc.text('CATATAN', MARGIN, y);
         y += 5;
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
@@ -1109,17 +1147,26 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       // Calculate box height dynamically
       let paymentContentHeight = 10; // header
       if (settings?.paymentTerms) {
-        const termLines = doc.splitTextToSize(settings.paymentTerms, settings?.paymentQrCode ? CONTENT_WIDTH - 55 : CONTENT_WIDTH - boxPadding * 2);
+        const termLines = doc.splitTextToSize(
+          settings.paymentTerms,
+          settings?.paymentQrCode ? CONTENT_WIDTH - 55 : CONTENT_WIDTH - boxPadding * 2,
+        );
         paymentContentHeight += termLines.length * 4 + 4;
       }
       if (settings?.paymentBankDetails) {
-        const bankLines = doc.splitTextToSize(settings.paymentBankDetails, settings?.paymentQrCode ? CONTENT_WIDTH - 55 : CONTENT_WIDTH - boxPadding * 2);
+        const bankLines = doc.splitTextToSize(
+          settings.paymentBankDetails,
+          settings?.paymentQrCode ? CONTENT_WIDTH - 55 : CONTENT_WIDTH - boxPadding * 2,
+        );
         paymentContentHeight += bankLines.length * 4 + 8;
       }
       if (settings?.paymentLink || settings?.paymentLink2) paymentContentHeight += 12;
       paymentContentHeight += 8; // Invoice ref line
       const qrHeight = settings?.paymentQrCode ? 45 : 0;
-      const boxHeight = Math.max(paymentContentHeight + boxPadding * 2, qrHeight + boxPadding * 2 + 10);
+      const boxHeight = Math.max(
+        paymentContentHeight + boxPadding * 2,
+        qrHeight + boxPadding * 2 + 10,
+      );
 
       // Box border (rounded corners via rect)
       doc.setDrawColor(...TEAL);
@@ -1130,7 +1177,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...TEAL);
-      doc.text('PAYMENT DETAILS', MARGIN + boxPadding, boxY + boxPadding + 3);
+      doc.text('DETAIL PEMBAYARAN', MARGIN + boxPadding, boxY + boxPadding + 3);
       let payY = boxY + boxPadding + 10;
 
       // QR Code (left side if present)
@@ -1148,7 +1195,9 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(...BLACK);
-      const textWidth = settings?.paymentQrCode ? CONTENT_WIDTH - 55 - boxPadding : CONTENT_WIDTH - boxPadding * 2;
+      const textWidth = settings?.paymentQrCode
+        ? CONTENT_WIDTH - 55 - boxPadding
+        : CONTENT_WIDTH - boxPadding * 2;
 
       if (settings?.paymentTerms) {
         const termLines = doc.splitTextToSize(settings.paymentTerms, textWidth);
@@ -1159,7 +1208,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       if (settings?.paymentBankDetails) {
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
-        doc.text('Bank Transfer:', textStartX, payY);
+        doc.text('Transfer Bank:', textStartX, payY);
         payY += 4;
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
@@ -1172,20 +1221,31 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       if (settings?.paymentLink) {
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
-        doc.text(settings.paymentLinkTitle || 'Payment Link:', textStartX, payY);
+        doc.text(settings.paymentLinkTitle || 'Tautan Pembayaran:', textStartX, payY);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(0, 0, 238);
-        doc.textWithLink(settings.paymentLink, textStartX + doc.getTextWidth((settings.paymentLinkTitle || 'Payment Link:') + ' '), payY, { url: settings.paymentLink });
+        doc.textWithLink(
+          settings.paymentLink,
+          textStartX + doc.getTextWidth((settings.paymentLinkTitle || 'Tautan Pembayaran:') + ' '),
+          payY,
+          { url: settings.paymentLink },
+        );
         doc.setTextColor(...BLACK);
         payY += 5;
       }
       if (settings?.paymentLink2) {
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
-        doc.text(settings.paymentLink2Title || 'Payment Link 2:', textStartX, payY);
+        doc.text(settings.paymentLink2Title || 'Tautan Pembayaran 2:', textStartX, payY);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(0, 0, 238);
-        doc.textWithLink(settings.paymentLink2, textStartX + doc.getTextWidth((settings.paymentLink2Title || 'Payment Link 2:') + ' '), payY, { url: settings.paymentLink2 });
+        doc.textWithLink(
+          settings.paymentLink2,
+          textStartX +
+            doc.getTextWidth((settings.paymentLink2Title || 'Tautan Pembayaran 2:') + ' '),
+          payY,
+          { url: settings.paymentLink2 },
+        );
         doc.setTextColor(...BLACK);
         payY += 5;
       }
@@ -1193,7 +1253,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       // Invoice reference
       doc.setFontSize(8);
       doc.setTextColor(...GRAY_TEXT);
-      doc.text(`Reference: ${invoice.invoiceNumber}`, textStartX, payY + 2);
+      doc.text(`Referensi: ${invoice.invoiceNumber}`, textStartX, payY + 2);
 
       y = boxY + boxHeight + 10;
 
@@ -1241,7 +1301,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         invoiceLogger.debug('Opening save dialog...');
         const filePath = await save({
           defaultPath: `${invoice.invoiceNumber}.pdf`,
-          filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
+          filters: [{ name: 'File PDF', extensions: ['pdf'] }],
         });
 
         invoiceLogger.debug('Save dialog returned', { filePath });
@@ -1251,7 +1311,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
           try {
             await writeFile(filePath, new Uint8Array(pdfOutput));
             invoiceLogger.info('PDF saved successfully', { path: filePath });
-            alert(`Invoice saved to:\n${filePath}`);
+            alert(`Invoice disimpan di:\n${filePath}`);
           } catch (writeError) {
             invoiceLogger.error('writeFile failed', writeError);
             throw writeError;
@@ -1275,7 +1335,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
       invoiceLogger.info('PDF export completed successfully');
     } catch (error) {
       invoiceLogger.error('Failed to export PDF:', error);
-      alert(`Failed to export PDF: ${(error as Error).message}`);
+      alert(`Gagal mengekspor PDF: ${(error as Error).message}`);
     } finally {
       setExporting(false);
     }
@@ -1291,7 +1351,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
               {settings.businessLogo && (
                 <img
                   src={settings.businessLogo}
-                  alt='Business Logo'
+                  alt='Logo bisnis'
                   className='w-16 h-16 object-contain'
                 />
               )}
@@ -1311,7 +1371,9 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
                   <p className='text-muted-foreground text-xs'>{settings.businessPhone}</p>
                 )}
                 {settings.businessVatNumber && (
-                  <p className='text-muted-foreground text-xs'>VAT: {settings.businessVatNumber}</p>
+                  <p className='text-muted-foreground text-xs'>
+                    NPWP: {settings.businessVatNumber}
+                  </p>
                 )}
               </div>
             </div>
@@ -1321,19 +1383,19 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         {/* Invoice Info Row */}
         <div className='flex justify-between'>
           <div>
-            <p className='font-medium text-foreground'>Bill To:</p>
+            <p className='font-medium text-foreground'>Tagih ke:</p>
             <p className='text-muted-foreground'>{invoice.clientName}</p>
             {invoice.clientAddress && (
               <p className='text-muted-foreground whitespace-pre-line'>{invoice.clientAddress}</p>
             )}
             {invoice.clientVatNumber && (
-              <p className='text-muted-foreground'>VAT: {invoice.clientVatNumber}</p>
+              <p className='text-muted-foreground'>NPWP: {invoice.clientVatNumber}</p>
             )}
           </div>
           <div className='text-right'>
             <StatusBadge status={invoice.status} />
-            <p className='mt-2 text-muted-foreground'>Issue: {formatDate(invoice.issueDate)}</p>
-            <p className='text-muted-foreground'>Due: {formatDate(invoice.dueDate)}</p>
+            <p className='mt-2 text-muted-foreground'>Tanggal: {formatDate(invoice.issueDate)}</p>
+            <p className='text-muted-foreground'>Jatuh Tempo: {formatDate(invoice.dueDate)}</p>
           </div>
         </div>
 
@@ -1341,10 +1403,10 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         <table className='w-full'>
           <thead>
             <tr className='border-b border-border text-left'>
-              <th className='py-2'>Description</th>
-              <th className='py-2 text-right'>Qty</th>
-              <th className='py-2 text-right'>Price</th>
-              <th className='py-2 text-right'>Amount</th>
+              <th className='py-2'>Deskripsi</th>
+              <th className='py-2 text-right'>Jumlah</th>
+              <th className='py-2 text-right'>Harga</th>
+              <th className='py-2 text-right'>Total</th>
             </tr>
           </thead>
           <tbody>
@@ -1382,7 +1444,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
               </span>
             </div>
             <div className='flex justify-between py-1'>
-              <span>Tax ({(invoice.taxRate * 100).toFixed(1)}%):</span>
+              <span>Pajak ({formatNumber(invoice.taxRate * 100, 1)}%):</span>
               <span>
                 {formatCurrency(
                   invoice.taxAmount,
@@ -1392,9 +1454,10 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
             </div>
             {invoice.downPayment > 0 && (
               <div className='flex justify-between py-1 text-green-600 dark:text-green-400'>
-                <span>Down Payment:</span>
+                <span>Uang Muka:</span>
                 <span>
-                  -{formatCurrency(
+                  -
+                  {formatCurrency(
                     invoice.downPayment,
                     clients.find((c) => c.id === invoice.clientId)?.currency,
                   )}
@@ -1402,7 +1465,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
               </div>
             )}
             <div className='flex justify-between py-2 border-t border-border font-medium'>
-              <span>{invoice.downPayment > 0 ? 'Amount Due:' : 'Total:'}</span>
+              <span>{invoice.downPayment > 0 ? 'Sisa Tagihan:' : 'Total:'}</span>
               <span>
                 {formatCurrency(
                   invoice.total,
@@ -1415,21 +1478,21 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
 
         {invoice.notes && (
           <div className='pt-4 border-t border-border'>
-            <p className='font-medium'>Notes:</p>
+            <p className='font-medium'>Catatan:</p>
             <p className='text-muted-foreground whitespace-pre-line'>{invoice.notes}</p>
           </div>
         )}
 
         {settings?.paymentTerms && (
           <div className='pt-4 border-t border-border'>
-            <p className='font-medium'>Payment Terms:</p>
+            <p className='font-medium'>Syarat Pembayaran:</p>
             <p className='text-muted-foreground whitespace-pre-line'>{settings.paymentTerms}</p>
           </div>
         )}
 
         {settings?.paymentLink && (
           <div className='pt-4 border-t border-border'>
-            <p className='font-medium'>Payment Link 1:</p>
+            <p className='font-medium'>Tautan Pembayaran 1:</p>
             <a
               href={settings.paymentLink}
               target='_blank'
@@ -1443,7 +1506,7 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
 
         {settings?.paymentLink2 && (
           <div className='pt-2'>
-            <p className='font-medium'>Payment Link 2:</p>
+            <p className='font-medium'>Tautan Pembayaran 2:</p>
             <a
               href={settings.paymentLink2}
               target='_blank'
@@ -1458,11 +1521,11 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
 
       <ModalFooter>
         <Button variant='outline' onClick={onClose}>
-          Close
+          Tutup
         </Button>
         <Button onClick={handleExportPDF} loading={exporting}>
           <Download className='w-4 h-4' />
-          Export PDF
+          Ekspor PDF
         </Button>
       </ModalFooter>
     </Modal>

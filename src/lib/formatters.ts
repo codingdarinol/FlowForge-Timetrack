@@ -13,12 +13,13 @@ export function normalizeCurrency(currency?: string | null): Currency {
 
 export function formatCurrency(amount: number, currency: Currency = DEFAULT_CURRENCY): string {
   const normalized = normalizeCurrency(currency);
+  const fractionDigits = normalized === 'IDR' ? 0 : 2;
   const value = new Intl.NumberFormat(APP_LOCALE, {
     style: 'currency',
     currency: normalized,
     currencyDisplay: 'narrowSymbol',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   }).format(amount);
 
   return normalizeCurrencySpacing(value);

@@ -38,7 +38,7 @@ export function ColorPicker({
             value === color ? 'border-foreground scale-110' : 'border-transparent',
           )}
           style={{ backgroundColor: color }}
-          aria-label={`Select color ${color}`}
+          aria-label={`Pilih warna ${color}`}
         />
       ))}
     </div>

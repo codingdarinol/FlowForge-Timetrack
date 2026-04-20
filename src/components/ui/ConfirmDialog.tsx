@@ -20,8 +20,8 @@ export function ConfirmDialog({
   onConfirm,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel = 'Konfirmasi',
+  cancelLabel = 'Batal',
   variant = 'default',
   loading = false,
 }: ConfirmDialogProps) {
