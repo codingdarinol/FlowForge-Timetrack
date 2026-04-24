@@ -201,11 +201,17 @@ export function InvoicesList() {
       {invoices.length === 0 && allInvoicesCount === 0 ? (
         <EmptyState
           icon={<FileText className='w-8 h-8' />}
+          variant='guided'
           title='Belum ada invoice'
           description={
             clients.length === 0
               ? 'Buat klien terlebih dahulu untuk membuat invoice.'
               : 'Buat invoice pertama untuk mulai menagih.'
+          }
+          secondaryText={
+            clients.length > 0
+              ? 'Invoice membantu Anda menagih klien dari waktu yang sudah dicatat.'
+              : undefined
           }
           action={
             clients.length > 0 ? (
@@ -219,6 +225,7 @@ export function InvoicesList() {
       ) : invoices.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
+          variant='minimal'
           title='Tidak ada invoice yang cocok'
           description='Coba pilih filter status lain.'
           action={

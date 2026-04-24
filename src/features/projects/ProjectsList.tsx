@@ -218,6 +218,7 @@ function ProjectsListContent() {
       {projects.length === 0 ? (
         <EmptyState
           icon={<Briefcase className='w-8 h-8' />}
+          variant='guided'
           title='Belum ada proyek'
           description='Buat proyek pertama untuk mulai mencatat waktu.'
           action={
@@ -230,6 +231,7 @@ function ProjectsListContent() {
       ) : filteredProjects.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
+          variant='minimal'
           title='Tidak ada hasil'
           description='Coba ubah pencarian atau filter.'
         />

@@ -372,12 +372,14 @@ export function TimeEntriesList() {
       {entries.length === 0 ? (
         <EmptyState
           icon={<Clock className='w-8 h-8' />}
+          variant='guided'
           title='Belum ada catatan waktu'
           description='Mulai timer pada proyek untuk melihat catatan di sini.'
         />
       ) : filteredEntries.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
+          variant='minimal'
           title='Tidak ada catatan yang cocok'
           description='Coba ubah filter.'
         />

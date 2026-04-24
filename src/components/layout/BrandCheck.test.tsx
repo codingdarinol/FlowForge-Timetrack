@@ -28,12 +28,12 @@ describe('Brand Verification', () => {
     expect(screen.getByText('yuk-kerja')).toBeInTheDocument();
   });
 
-  it('Header displays yuk-kerja', () => {
+  it('Header displays route-aware title', () => {
     render(
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
     );
-    expect(screen.getByText('yuk-kerja')).toBeInTheDocument();
+    expect(screen.getByText('Timer')).toBeInTheDocument();
   });
 });

@@ -118,6 +118,7 @@ export function ProductsList() {
       {products.length === 0 ? (
         <EmptyState
           icon={<Package className='w-8 h-8' />}
+          variant='guided'
           title='Belum ada item'
           description='Buat produk atau layanan pertama agar mudah ditambahkan ke invoice.'
           action={
@@ -130,6 +131,7 @@ export function ProductsList() {
       ) : filteredProducts.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
+          variant='minimal'
           title='Tidak ada item yang cocok'
           description='Coba kata kunci lain.'
         />

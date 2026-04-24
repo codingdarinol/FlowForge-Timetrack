@@ -773,7 +773,8 @@ export function Settings() {
               </div>
               <CardDescription className='text-base'>
                 yuk-kerja membantu Anda mencatat waktu, mengelola klien dan proyek, lalu membuat
-                invoice dengan alur yang cepat dan sederhana.
+                invoice dengan alur yang cepat dan sederhana. Panduan ini akan membantu Anda
+                memahami fitur-fitur utamanya langkah demi langkah.
               </CardDescription>
             </CardContent>
           </Card>
@@ -819,11 +820,24 @@ export function Settings() {
                 Widget mengambang menampilkan status timer dalam jendela kecil yang selalu di atas,
                 bahkan saat aplikasi diminimalkan.
               </p>
-              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
-                <li>Menampilkan proyek aktif dan waktu berjalan.</li>
-                <li>Menyediakan kontrol cepat untuk mulai, jeda, dan hentikan.</li>
-                <li>Dapat dipindahkan ke posisi yang paling nyaman di layar.</li>
-              </ul>
+              <div>
+                <h4 className='font-medium mb-2'>Fitur Widget</h4>
+                <ul className='space-y-1 text-sm text-muted-foreground'>
+                  <li>Menampilkan nama proyek aktif dan waktu berjalan.</li>
+                  <li>
+                    <strong>Tombol Mulai/Jeda:</strong> Mengontrol timer dengan cepat.
+                  </li>
+                  <li>
+                    <strong>Tombol Hentikan:</strong> Mengakhiri sesi saat ini.
+                  </li>
+                  <li>
+                    <strong>Tombol Buka Aplikasi:</strong> Membawa yuk-kerja ke depan.
+                  </li>
+                  <li>
+                    <strong>Handle seret:</strong> Memindahkan widget ke posisi yang nyaman.
+                  </li>
+                </ul>
+              </div>
               <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
                 <strong>Tips:</strong> Aktifkan atau nonaktifkan widget di Pengaturan - Umum.
               </div>
@@ -903,7 +917,8 @@ export function Settings() {
           <GuideSection icon={<Package className='w-5 h-5' />} title='Produk & Layanan'>
             <div className='space-y-4'>
               <p className='text-sm text-muted-foreground'>
-                Simpan item yang sering dipakai agar lebih cepat saat menambahkan baris ke invoice.
+                Simpan item yang sering dipakai agar lebih cepat saat menambahkan baris ke invoice,
+                dan gunakan juga catatan waktu yang belum ditagih sebagai dasar penagihan.
               </p>
               <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
                 <li>Buat item dengan nama, deskripsi, harga, dan SKU opsional.</li>
@@ -946,20 +961,30 @@ export function Settings() {
                 Pintasan global memungkinkan Anda mengontrol timer tanpa harus membuka jendela
                 utama.
               </p>
-              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
-                <li>
-                  <strong>Cmd/Ctrl + Shift + S</strong> untuk mulai atau lanjutkan timer.
-                </li>
-                <li>
-                  <strong>Cmd/Ctrl + Shift + P</strong> untuk jeda timer.
-                </li>
-                <li>
-                  <strong>Cmd/Ctrl + Shift + X</strong> untuk hentikan timer dan simpan catatan.
-                </li>
-                <li>
-                  <strong>Cmd/Ctrl + Shift + W</strong> untuk tampilkan atau sembunyikan widget.
-                </li>
-              </ul>
+              <div>
+                <h4 className='font-medium mb-2'>Pintasan Tersedia</h4>
+                <ul className='space-y-1 text-sm text-muted-foreground'>
+                  <li>
+                    <strong>Cmd/Ctrl + Shift + S:</strong> Mulai atau lanjutkan timer.
+                  </li>
+                  <li>
+                    <strong>Cmd/Ctrl + Shift + P:</strong> Jeda timer.
+                  </li>
+                  <li>
+                    <strong>Cmd/Ctrl + Shift + X:</strong> Hentikan timer dan simpan catatan.
+                  </li>
+                  <li>
+                    <strong>Cmd/Ctrl + Shift + W:</strong> Tampilkan atau sembunyikan widget.
+                  </li>
+                  <li>
+                    <strong>Cmd/Ctrl + Shift + M:</strong> Aktifkan atau nonaktifkan suara.
+                  </li>
+                </ul>
+              </div>
+              <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm'>
+                <strong>Tips:</strong> Pintasan ini bekerja secara global, jadi Anda tidak perlu
+                memfokuskan jendela yuk-kerja terlebih dahulu.
+              </div>
             </div>
           </GuideSection>
 
@@ -996,17 +1021,29 @@ export function Settings() {
 
           <GuideSection icon={<Package className='w-5 h-5' />} title='Cadangan & Pembaruan'>
             <div className='space-y-4'>
-              <p className='text-sm text-muted-foreground'>
-                Gunakan fitur cadangan untuk melindungi data lokal dan pantau pembaruan aplikasi
-                saat tersedia.
-              </p>
-              <ul className='list-disc list-inside space-y-1 text-sm text-muted-foreground'>
-                <li>Ekspor cadangan secara berkala agar data aman.</li>
-                <li>Impor cadangan akan mengganti data saat ini dan memulai ulang aplikasi.</li>
-                <li>
-                  Aplikasi akan memeriksa pembaruan dan menampilkan banner jika ada versi baru.
-                </li>
-              </ul>
+              <div>
+                <h4 className='font-medium mb-2'>Cadangan Data</h4>
+                <p className='text-sm text-muted-foreground mb-2'>
+                  Lindungi data dengan mengekspor cadangan berkala dari tab{' '}
+                  <strong>Pengaturan - Bisnis</strong>.
+                </p>
+                <ul className='space-y-1 text-sm text-muted-foreground'>
+                  <li>
+                    <strong>Ekspor:</strong> Menyimpan seluruh database ke file di komputer Anda.
+                  </li>
+                  <li>
+                    <strong>Impor:</strong> Memulihkan data dari file cadangan. Proses ini
+                    mengganti data saat ini dan memulai ulang aplikasi.
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className='font-medium mb-2'>Pembaruan Aplikasi</h4>
+                <p className='text-sm text-muted-foreground'>
+                  yuk-kerja memeriksa pembaruan saat aplikasi dibuka. Jika ada versi baru, banner
+                  akan muncul di bagian atas layar untuk mengunduh rilis terbaru.
+                </p>
+              </div>
             </div>
           </GuideSection>
 

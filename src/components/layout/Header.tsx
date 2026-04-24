@@ -1,5 +1,5 @@
-﻿import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Users, FolderKanban, FileText, X } from 'lucide-react';
 import { useGlobalSearch, type SearchResult } from '../../hooks/useGlobalSearch';
 
@@ -17,10 +17,23 @@ const TYPE_LABELS: Record<string, string> = {
   'time-entry': 'Catatan Waktu',
 };
 
+const ROUTE_TITLES: Record<string, { title: string; subtitle?: string }> = {
+  '/': { title: 'Timer', subtitle: 'Lacak waktu Anda' },
+  '/clients': { title: 'Klien', subtitle: 'Kelola klien Anda' },
+  '/projects': { title: 'Proyek', subtitle: 'Atur pekerjaan Anda' },
+  '/time-entries': { title: 'Catatan Waktu', subtitle: 'Lihat waktu yang tercatat' },
+  '/invoices': { title: 'Invoice', subtitle: 'Buat dan kelola invoice' },
+  '/products': { title: 'Produk', subtitle: 'Katalog layanan' },
+  '/settings': { title: 'Pengaturan', subtitle: 'Atur preferensi Anda' },
+};
+
 export function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { query, setQuery, isOpen, open, close, results } = useGlobalSearch();
-  const [selectedIndex, setPilihedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const pageInfo = ROUTE_TITLES[location.pathname] || { title: 'yuk-kerja' };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -29,15 +42,16 @@ export function Header() {
         open();
       }
     };
+
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open]);
 
   useEffect(() => {
-    setPilihedIndex(0);
+    setSelectedIndex(0);
   }, [results]);
 
-  const handlePilih = (result: SearchResult) => {
+  const handleSelect = (result: SearchResult) => {
     navigate(result.route);
     close();
   };
@@ -45,12 +59,12 @@ export function Header() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setPilihedIndex((i) => Math.min(i + 1, results.length - 1));
+      setSelectedIndex((index) => Math.min(index + 1, results.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setPilihedIndex((i) => Math.max(i - 1, 0));
+      setSelectedIndex((index) => Math.max(index - 1, 0));
     } else if (e.key === 'Enter' && results[selectedIndex]) {
-      handlePilih(results[selectedIndex]);
+      handleSelect(results[selectedIndex]);
     } else if (e.key === 'Escape') {
       close();
     }
@@ -58,7 +72,10 @@ export function Header() {
 
   return (
     <header className='h-16 border-b border-border flex items-center px-8 bg-background shrink-0'>
-      <h1 className='text-xl font-semibold'>yuk-kerja</h1>
+      <div>
+        <h1 className='text-xl font-semibold'>{pageInfo.title}</h1>
+        {pageInfo.subtitle && <p className='text-sm text-muted-foreground'>{pageInfo.subtitle}</p>}
+      </div>
 
       <div className='ml-auto relative'>
         <button
@@ -74,9 +91,9 @@ export function Header() {
 
         {isOpen && (
           <>
-            <div className='fixed inset-0 bg-black/50 z-40' onClick={close} />
-            <div className='fixed top-[20vh] left-1/2 -translate-x-1/2 w-full max-w-lg z-50'>
-              <div className='bg-background border border-border rounded-xl shadow-xl overflow-hidden'>
+            <div className='fixed inset-0 bg-background/60 backdrop-blur-sm z-40' onClick={close} />
+            <div className='fixed top-[20vh] left-1/2 -translate-x-1/2 w-full max-w-lg z-50 px-4 sm:px-0'>
+              <div className='bg-background border border-border/60 rounded-xl shadow-lg overflow-hidden animate-in fade-in zoom-in-95'>
                 <div className='flex items-center gap-3 px-4 py-3 border-b border-border'>
                   <Search className='w-5 h-5 text-muted-foreground shrink-0' />
                   <input
@@ -85,12 +102,16 @@ export function Header() {
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder='Cari klien, proyek, invoice...'
+                    aria-label='Cari'
+                    aria-autocomplete='list'
+                    aria-controls='cmd-search-results'
                     className='flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground'
                   />
                   {query && (
                     <button
                       onClick={() => setQuery('')}
-                      className='text-muted-foreground hover:text-foreground'
+                      aria-label='Hapus pencarian'
+                      className='text-muted-foreground hover:text-foreground rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
                     >
                       <X className='w-4 h-4' />
                     </button>
@@ -98,7 +119,12 @@ export function Header() {
                 </div>
 
                 {query.trim() && (
-                  <div className='max-h-64 overflow-y-auto'>
+                  <div
+                    id='cmd-search-results'
+                    role='listbox'
+                    aria-label='Hasil pencarian'
+                    className='max-h-64 overflow-y-auto'
+                  >
                     {results.length === 0 ? (
                       <div className='px-4 py-8 text-center text-sm text-muted-foreground'>
                         Tidak ada hasil
@@ -106,12 +132,18 @@ export function Header() {
                     ) : (
                       results.map((result, index) => {
                         const Icon = TYPE_ICONS[result.type] || FileText;
+                        const isSelected = index === selectedIndex;
+
                         return (
                           <button
                             key={result.id}
-                            onClick={() => handlePilih(result)}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-secondary transition-colors ${
-                              index === selectedIndex ? 'bg-secondary' : ''
+                            role='option'
+                            aria-selected={isSelected}
+                            onClick={() => handleSelect(result)}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-l-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${
+                              isSelected
+                                ? 'bg-secondary border-l-primary'
+                                : 'border-l-transparent hover:bg-secondary/60'
                             }`}
                           >
                             <Icon className='w-4 h-4 text-muted-foreground shrink-0' />

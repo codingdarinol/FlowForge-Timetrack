@@ -174,6 +174,7 @@ export function ClientsList() {
       {clients.length === 0 ? (
         <EmptyState
           icon={<Users className='w-8 h-8' />}
+          variant='guided'
           title='Belum ada klien'
           description='Tambahkan klien pertama untuk mulai mencatat waktu dan membuat invoice.'
           action={
@@ -186,6 +187,7 @@ export function ClientsList() {
       ) : filteredClients.length === 0 ? (
         <EmptyState
           icon={<Search className='w-8 h-8' />}
+          variant='minimal'
           title='Tidak ada hasil'
           description={`Tidak ada klien yang cocok dengan "${searchQuery}"`}
         />
