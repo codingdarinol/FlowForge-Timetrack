@@ -75,7 +75,8 @@ export async function runMigrations(): Promise<void> {
       invoice_id TEXT NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
       description TEXT NOT NULL,
       quantity REAL NOT NULL,
-      unit_price REAL NOT NULL
+      unit_price REAL NOT NULL,
+      discount REAL DEFAULT 0
     )
   `);
 
@@ -134,6 +135,13 @@ export async function runMigrations(): Promise<void> {
   // Migration: Add down_payment column to invoices if it doesn't exist
   try {
     await db.execute(`ALTER TABLE invoices ADD COLUMN down_payment REAL DEFAULT 0`);
+  } catch {
+    // Column already exists, ignore error
+  }
+
+  // Migration: Add discount column to invoice line items if it doesn't exist
+  try {
+    await db.execute(`ALTER TABLE invoice_line_items ADD COLUMN discount REAL DEFAULT 0`);
   } catch {
     // Column already exists, ignore error
   }

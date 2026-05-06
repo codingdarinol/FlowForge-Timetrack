@@ -123,7 +123,8 @@ export const invoiceService = {
         invoice_id as invoiceId,
         description,
         quantity,
-        unit_price as unitPrice
+        unit_price as unitPrice,
+        COALESCE(discount, 0) as discount
       FROM invoice_line_items
       WHERE invoice_id = $1
       ORDER BY rowid ASC
@@ -248,10 +249,10 @@ export const invoiceService = {
 
     await db.execute(
       `
-      INSERT INTO invoice_line_items (id, invoice_id, description, quantity, unit_price)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO invoice_line_items (id, invoice_id, description, quantity, unit_price, discount)
+      VALUES ($1, $2, $3, $4, $5, $6)
     `,
-      [id, input.invoiceId, input.description, input.quantity, input.unitPrice],
+      [id, input.invoiceId, input.description, input.quantity, input.unitPrice, input.discount || 0],
     );
 
     return {
@@ -260,6 +261,7 @@ export const invoiceService = {
       description: input.description,
       quantity: input.quantity,
       unitPrice: input.unitPrice,
+      discount: input.discount || 0,
     };
   },
 

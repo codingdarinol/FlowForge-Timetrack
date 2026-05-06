@@ -154,6 +154,12 @@ pub fn run() {
             CREATE INDEX IF NOT EXISTS idx_down_payments_payment_date ON down_payments(payment_date);",
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 8,
+            description: "add_discount_to_invoice_line_items",
+            sql: "ALTER TABLE invoice_line_items ADD COLUMN discount REAL DEFAULT 0;",
+            kind: MigrationKind::Up,
+        },
     ];
 
     let mut builder = tauri::Builder::default()

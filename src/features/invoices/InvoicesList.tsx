@@ -40,6 +40,7 @@ import {
   Textarea,
 } from '../../components/ui';
 import { QuerySelect } from './QuerySelect';
+import { exportInvoicePdf } from './exportInvoicePdf';
 
 function formatCurrency(amount: number, currency: Currency = 'IDR'): string {
   return formatMoney(amount, currency);
@@ -116,7 +117,7 @@ export function InvoicesList() {
         'Status',
         'Mata Uang',
         'Subtotal',
-        'Pajak',
+        'PPN',
         'Uang Muka',
         'Total',
       ];
@@ -361,6 +362,14 @@ interface CreateInvoiceModalProps {
   initialData?: InvoiceWithDetails | null;
 }
 
+type DraftInvoiceLineItem = {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  discount: number;
+  timeEntryIds?: string[];
+};
+
 function CreateInvoiceModal({
   isOpen,
   onClose,
@@ -370,9 +379,7 @@ function CreateInvoiceModal({
 }: CreateInvoiceModalProps) {
   const [step, setStep] = useState(1);
   const [clientId, setClientId] = useState('');
-  const [lineItems, setLineItems] = useState<
-    { description: string; quantity: number; unitPrice: number; timeEntryIds?: string[] }[]
-  >([]);
+  const [lineItems, setLineItems] = useState<DraftInvoiceLineItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [issueDate, setIssueDate] = useState(new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState('');
@@ -395,6 +402,7 @@ function CreateInvoiceModal({
             description: item.description,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
+            discount: item.discount || 0,
           })),
         );
         setIssueDate(initialData.issueDate);
@@ -486,6 +494,7 @@ function CreateInvoiceModal({
           description: `${project.name} - ${formattedHours} jam`,
           quantity: parseFloat(hours.toFixed(2)),
           unitPrice: hourlyRate,
+          discount: 0,
           timeEntryIds: entryIds,
         });
       }
@@ -499,12 +508,12 @@ function CreateInvoiceModal({
         setLineItems(items);
       }
     } else if (lineItems.length === 0) {
-      setLineItems([{ description: '', quantity: 1, unitPrice: 0 }]);
+      setLineItems([{ description: '', quantity: 1, unitPrice: 0, discount: 0 }]);
     }
   };
 
   const handleAddLineItem = () => {
-    setLineItems([...lineItems, { description: '', quantity: 1, unitPrice: 0 }]);
+    setLineItems([...lineItems, { description: '', quantity: 1, unitPrice: 0, discount: 0 }]);
   };
 
   const handleAddProductLine = (product: Product) => {
@@ -514,6 +523,7 @@ function CreateInvoiceModal({
         description: product.name + (product.description ? ` - ${product.description}` : ''),
         quantity: 1,
         unitPrice: product.price,
+        discount: 0,
       },
     ]);
   };
@@ -542,7 +552,12 @@ function CreateInvoiceModal({
     setSaving(true);
     try {
       // Prepare line items for saving (strip timeEntryIds)
-      const lineItemsToSave = lineItems.map(({ ...item }) => item);
+      const lineItemsToSave = lineItems.map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        discount: item.discount || 0,
+      }));
 
       // Collect IDs to mark as billed from the remaining line items
       const idsToMarkBilled = lineItems.reduce<string[]>((acc, item) => {
@@ -659,7 +674,10 @@ function CreateInvoiceModal({
           <div className='space-y-2'>
             <label className='text-sm font-medium'>Item Tagihan</label>
             {lineItems.map((item, index) => (
-              <div key={index} className='flex gap-2 items-start'>
+              <div
+                key={index}
+                className='grid grid-cols-[minmax(0,1fr)_5rem_6rem_6rem_2.5rem] gap-2 items-start'
+              >
                 <Input
                   placeholder='Deskripsi'
                   value={item.description}
@@ -689,6 +707,21 @@ function CreateInvoiceModal({
                     handleLineItemChange(
                       index,
                       'unitPrice',
+                      e.target.value === '' ? 0 : parseFloat(e.target.value),
+                    )
+                  }
+                  className='w-24'
+                  min={0}
+                  step={0.01}
+                />
+                <Input
+                  type='number'
+                  placeholder='Diskon'
+                  value={item.discount || ''}
+                  onChange={(e) =>
+                    handleLineItemChange(
+                      index,
+                      'discount',
                       e.target.value === '' ? 0 : parseFloat(e.target.value),
                     )
                   }
@@ -763,7 +796,7 @@ function CreateInvoiceModal({
           </div>
 
           <Input
-            label='Pajak (%)'
+            label='PPN (%)'
             type='number'
             value={taxRate || ''}
             onChange={(e) => setTaxRate(e.target.value === '' ? 0 : parseFloat(e.target.value))}
@@ -797,7 +830,7 @@ function CreateInvoiceModal({
               </span>
             </div>
             <div className='flex justify-between text-sm'>
-              <span>Pajak ({taxRate}%):</span>
+              <span>PPN ({taxRate}%):</span>
               <span>
                 {formatCurrency(totals.taxAmount, clients.find((c) => c.id === clientId)?.currency)}
               </span>
@@ -810,7 +843,7 @@ function CreateInvoiceModal({
                 </span>
               </div>
             )}
-            <div className='flex justify-between font-medium mt-2 pt-2 border-t border-border'>
+            <div className='flex justify-between font-bold text-base text-primary mt-2 pt-2 border-t border-border'>
               <span>{downPayment > 0 ? 'Sisa Tagihan:' : 'Total:'}</span>
               <span>
                 {formatCurrency(totals.total, clients.find((c) => c.id === clientId)?.currency)}
@@ -859,487 +892,13 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
   };
 
   const handleExportPDF = async () => {
-    invoiceLogger.info('Exporting invoice to PDF', { invoiceNumber: invoice.invoiceNumber });
     setExporting(true);
 
     try {
-      const { jsPDF } = await import('jspdf');
-
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const MARGIN = 15;
-      const CONTENT_WIDTH = pageWidth - MARGIN * 2;
-      const MARGIN_BOTTOM = 30;
-      let y = 20;
-
-      // Color constants
-      const TEAL: [number, number, number] = [13, 148, 136];
-      const GRAY_TEXT: [number, number, number] = [107, 114, 128];
-      const GRAY_BG: [number, number, number] = [243, 244, 246];
-      const BLACK: [number, number, number] = [0, 0, 0];
-      const WHITE: [number, number, number] = [255, 255, 255];
-
-      const invoiceCurrency = clients.find((c) => c.id === invoice.clientId)?.currency || 'IDR';
-      const formatInvoiceMoney = (amount: number) => formatCurrency(amount, invoiceCurrency);
-
-      const checkPageBreak = (currentY: number, requiredSpace: number): number => {
-        if (currentY + requiredSpace > pageHeight - MARGIN_BOTTOM) {
-          doc.addPage();
-          return 20;
-        }
-        return currentY;
-      };
-
-      // === HEADER: Logo (left) + title (right) ===
-      let headerRightY = y;
-      if (settings?.businessLogo) {
-        try {
-          doc.addImage(settings.businessLogo, 'PNG', MARGIN, y, 40, 20);
-        } catch (e) {
-          invoiceLogger.warn('Failed to add logo to PDF', { error: e });
-        }
+      const filePath = await exportInvoicePdf({ invoice, clients, settings });
+      if (filePath) {
+        alert(`Invoice disimpan di:\n${filePath}`);
       }
-      // Invoice title (right-aligned, teal)
-      doc.setFontSize(28);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...TEAL);
-      doc.text('INVOICE', pageWidth - MARGIN, headerRightY + 8, { align: 'right' });
-      // Invoice number below title
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...GRAY_TEXT);
-      doc.text(`#${invoice.invoiceNumber}`, pageWidth - MARGIN, headerRightY + 16, {
-        align: 'right',
-      });
-
-      y = Math.max(y + 25, headerRightY + 22);
-
-      // === TEAL DIVIDER LINE ===
-      doc.setDrawColor(...TEAL);
-      doc.setLineWidth(0.8);
-      doc.line(MARGIN, y, pageWidth - MARGIN, y);
-      y += 10;
-
-      // === FROM / BILL TO (side by side) ===
-      const halfWidth = CONTENT_WIDTH / 2 - 5;
-      const fromX = MARGIN;
-      const billToX = MARGIN + halfWidth + 10;
-
-      // FROM label
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...TEAL);
-      doc.text('DARI', fromX, y);
-
-      // BILL TO label
-      doc.text('TAGIH KE', billToX, y);
-      y += 5;
-
-      // FROM details
-      let fromY = y;
-      doc.setTextColor(...BLACK);
-      doc.setFontSize(10);
-      if (settings?.businessName) {
-        doc.setFont('helvetica', 'bold');
-        doc.text(settings.businessName, fromX, fromY);
-        fromY += 5;
-      }
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      if (settings?.businessTagline) {
-        doc.setTextColor(...GRAY_TEXT);
-        doc.text(settings.businessTagline, fromX, fromY);
-        fromY += 4;
-      }
-      doc.setTextColor(...BLACK);
-      if (settings?.businessWebsite) {
-        doc.text(settings.businessWebsite, fromX, fromY);
-        fromY += 4;
-      }
-      if (settings?.businessEmail) {
-        doc.text(settings.businessEmail, fromX, fromY);
-        fromY += 4;
-      }
-      if (settings?.businessPhone) {
-        doc.text(settings.businessPhone, fromX, fromY);
-        fromY += 4;
-      }
-      if (settings?.businessAddress) {
-        const lines = settings.businessAddress.split('\n');
-        lines.forEach((line) => {
-          doc.text(line, fromX, fromY);
-          fromY += 4;
-        });
-      }
-      if (settings?.businessVatNumber) {
-        doc.text(`NPWP: ${settings.businessVatNumber}`, fromX, fromY);
-        fromY += 4;
-      }
-
-      // BILL TO details
-      let billY = y;
-      doc.setTextColor(...BLACK);
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.text(invoice.clientName, billToX, billY);
-      billY += 5;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      if (invoice.clientAddress) {
-        const lines = invoice.clientAddress.split('\n');
-        lines.forEach((line) => {
-          doc.text(line, billToX, billY);
-          billY += 4;
-        });
-      }
-      if (invoice.clientEmail) {
-        doc.text(invoice.clientEmail, billToX, billY);
-        billY += 4;
-      }
-      if (invoice.clientPhone) {
-        doc.text(invoice.clientPhone, billToX, billY);
-        billY += 4;
-      }
-      if (invoice.clientVatNumber) {
-        doc.text(`NPWP: ${invoice.clientVatNumber}`, billToX, billY);
-        billY += 4;
-      }
-
-      y = Math.max(fromY, billY) + 10;
-
-      // === DATE BAR (light gray background) ===
-      y = checkPageBreak(y, 16);
-      doc.setFillColor(...GRAY_BG);
-      doc.rect(MARGIN, y - 4, CONTENT_WIDTH, 12, 'F');
-
-      // Calculate due date
-      let displayDueDate = formatDate(invoice.dueDate);
-      if (!displayDueDate && invoice.issueDate) {
-        const issueDate = new Date(invoice.issueDate);
-        const dueDate = new Date(issueDate);
-        dueDate.setDate(issueDate.getDate() + 30);
-        displayDueDate = formatDate(dueDate.toISOString());
-      }
-
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...GRAY_TEXT);
-      const thirdWidth = CONTENT_WIDTH / 3;
-      doc.text(`Tanggal Invoice: ${formatDate(invoice.issueDate)}`, MARGIN + 4, y + 2);
-      doc.text(`Tanggal Layanan: ${formatDate(invoice.issueDate)}`, MARGIN + thirdWidth + 4, y + 2);
-      doc.text(`Jatuh Tempo: ${displayDueDate}`, MARGIN + thirdWidth * 2 + 4, y + 2);
-      y += 14;
-
-      // === LINE ITEMS TABLE ===
-      y = checkPageBreak(y, 20);
-
-      // Table header (teal background)
-      const colDesc = MARGIN;
-      const colRate = pageWidth - MARGIN - 90;
-      const colQty = pageWidth - MARGIN - 50;
-      const colAmount = pageWidth - MARGIN;
-
-      const drawTableHeader = (atY: number): number => {
-        doc.setFillColor(...TEAL);
-        doc.rect(MARGIN, atY - 5, CONTENT_WIDTH, 10, 'F');
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...WHITE);
-        doc.text('DESKRIPSI', colDesc + 4, atY);
-        doc.text('HARGA', colRate, atY, { align: 'right' });
-        doc.text('JML', colQty + 8, atY, { align: 'right' });
-        doc.text('JUMLAH', colAmount, atY, { align: 'right' });
-        return atY + 8;
-      };
-
-      y = drawTableHeader(y);
-
-      // Table body
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...BLACK);
-      invoice.lineItems.forEach((item, index) => {
-        const prevY = y;
-        y = checkPageBreak(y, 8);
-        if (y < prevY) {
-          y = drawTableHeader(y);
-        }
-
-        // Alternating background
-        if (index % 2 === 0) {
-          doc.setFillColor(249, 250, 251);
-          doc.rect(MARGIN, y - 4, CONTENT_WIDTH, 7, 'F');
-        }
-
-        doc.setFontSize(9);
-        doc.setTextColor(...BLACK);
-        const descText = doc.splitTextToSize(item.description, colRate - colDesc - 20);
-        doc.text(descText[0] || item.description.substring(0, 50), colDesc + 4, y);
-        doc.text(formatInvoiceMoney(item.unitPrice), colRate, y, { align: 'right' });
-        doc.text(formatNumber(item.quantity, 2), colQty + 8, y, { align: 'right' });
-        doc.text(formatInvoiceMoney(item.quantity * item.unitPrice), colAmount, y, {
-          align: 'right',
-        });
-        y += 7;
-      });
-
-      // Separator line below items
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.3);
-      doc.line(MARGIN, y, pageWidth - MARGIN, y);
-      y += 8;
-
-      // === TOTALS (right-aligned) ===
-      y = checkPageBreak(y, 30);
-      const totalsX = pageWidth - MARGIN - 60;
-      const totalsValX = pageWidth - MARGIN;
-
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...GRAY_TEXT);
-      doc.text('Subtotal', totalsX, y);
-      doc.setTextColor(...BLACK);
-      doc.text(formatInvoiceMoney(invoice.subtotal), totalsValX, y, { align: 'right' });
-      y += 6;
-
-      if (invoice.taxRate > 0) {
-        doc.setTextColor(...GRAY_TEXT);
-        doc.text(`Pajak (${formatNumber(invoice.taxRate * 100, 1)}%)`, totalsX, y);
-        doc.setTextColor(...BLACK);
-        doc.text(formatInvoiceMoney(invoice.taxAmount), totalsValX, y, { align: 'right' });
-        y += 8;
-      }
-
-      if (invoice.downPayment > 0) {
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(...GRAY_TEXT);
-        doc.text('Uang Muka', totalsX, y);
-        doc.setTextColor(22, 163, 74); // green-600
-        doc.text(`-${formatInvoiceMoney(invoice.downPayment)}`, totalsValX, y, { align: 'right' });
-        doc.setTextColor(...BLACK);
-        y += 8;
-      }
-
-      // Total due (teal, bold, larger)
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...TEAL);
-      doc.text(invoice.downPayment > 0 ? 'Sisa Tagihan' : 'Total Tagihan', totalsX, y);
-      doc.text(formatInvoiceMoney(invoice.total), totalsValX, y, { align: 'right' });
-      doc.setTextColor(...BLACK);
-      y += 15;
-
-      // === NOTES ===
-      if (invoice.notes) {
-        y = checkPageBreak(y, 20);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...TEAL);
-        doc.text('CATATAN', MARGIN, y);
-        y += 5;
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(...BLACK);
-        const noteLines = doc.splitTextToSize(invoice.notes, CONTENT_WIDTH);
-        doc.text(noteLines, MARGIN, y);
-        y += noteLines.length * 4 + 8;
-      }
-
-      // === PAYMENT DETAILS BOX ===
-      y = checkPageBreak(y, 60);
-      const boxY = y;
-      const boxPadding = 8;
-
-      // Calculate box height dynamically
-      let paymentContentHeight = 10; // header
-      if (settings?.paymentTerms) {
-        const termLines = doc.splitTextToSize(
-          settings.paymentTerms,
-          settings?.paymentQrCode ? CONTENT_WIDTH - 55 : CONTENT_WIDTH - boxPadding * 2,
-        );
-        paymentContentHeight += termLines.length * 4 + 4;
-      }
-      if (settings?.paymentBankDetails) {
-        const bankLines = doc.splitTextToSize(
-          settings.paymentBankDetails,
-          settings?.paymentQrCode ? CONTENT_WIDTH - 55 : CONTENT_WIDTH - boxPadding * 2,
-        );
-        paymentContentHeight += bankLines.length * 4 + 8;
-      }
-      if (settings?.paymentLink || settings?.paymentLink2) paymentContentHeight += 12;
-      paymentContentHeight += 8; // Invoice ref line
-      const qrHeight = settings?.paymentQrCode ? 45 : 0;
-      const boxHeight = Math.max(
-        paymentContentHeight + boxPadding * 2,
-        qrHeight + boxPadding * 2 + 10,
-      );
-
-      // Box border (rounded corners via rect)
-      doc.setDrawColor(...TEAL);
-      doc.setLineWidth(0.5);
-      doc.roundedRect(MARGIN, boxY, CONTENT_WIDTH, boxHeight, 3, 3, 'S');
-
-      // PAYMENT DETAILS header
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...TEAL);
-      doc.text('DETAIL PEMBAYARAN', MARGIN + boxPadding, boxY + boxPadding + 3);
-      let payY = boxY + boxPadding + 10;
-
-      // QR Code (left side if present)
-      const textStartX = settings?.paymentQrCode ? MARGIN + boxPadding + 48 : MARGIN + boxPadding;
-
-      if (settings?.paymentQrCode) {
-        try {
-          doc.addImage(settings.paymentQrCode, 'PNG', MARGIN + boxPadding, payY - 2, 40, 40);
-        } catch (e) {
-          invoiceLogger.warn('Failed to add QR code to PDF', { error: e });
-        }
-      }
-
-      // Payment text (right of QR or full width)
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(...BLACK);
-      const textWidth = settings?.paymentQrCode
-        ? CONTENT_WIDTH - 55 - boxPadding
-        : CONTENT_WIDTH - boxPadding * 2;
-
-      if (settings?.paymentTerms) {
-        const termLines = doc.splitTextToSize(settings.paymentTerms, textWidth);
-        doc.text(termLines, textStartX, payY);
-        payY += termLines.length * 4 + 4;
-      }
-
-      if (settings?.paymentBankDetails) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8);
-        doc.text('Transfer Bank:', textStartX, payY);
-        payY += 4;
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        const bankLines = doc.splitTextToSize(settings.paymentBankDetails, textWidth);
-        doc.text(bankLines, textStartX, payY);
-        payY += bankLines.length * 4 + 4;
-      }
-
-      // Payment links
-      if (settings?.paymentLink) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8);
-        doc.text(settings.paymentLinkTitle || 'Tautan Pembayaran:', textStartX, payY);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(0, 0, 238);
-        doc.textWithLink(
-          settings.paymentLink,
-          textStartX + doc.getTextWidth((settings.paymentLinkTitle || 'Tautan Pembayaran:') + ' '),
-          payY,
-          { url: settings.paymentLink },
-        );
-        doc.setTextColor(...BLACK);
-        payY += 5;
-      }
-      if (settings?.paymentLink2) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8);
-        doc.text(settings.paymentLink2Title || 'Tautan Pembayaran 2:', textStartX, payY);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(0, 0, 238);
-        doc.textWithLink(
-          settings.paymentLink2,
-          textStartX +
-            doc.getTextWidth((settings.paymentLink2Title || 'Tautan Pembayaran 2:') + ' '),
-          payY,
-          { url: settings.paymentLink2 },
-        );
-        doc.setTextColor(...BLACK);
-        payY += 5;
-      }
-
-      // Invoice reference
-      doc.setFontSize(8);
-      doc.setTextColor(...GRAY_TEXT);
-      doc.text(`Referensi: ${invoice.invoiceNumber}`, textStartX, payY + 2);
-
-      y = boxY + boxHeight + 10;
-
-      // === FOOTER (on every page) ===
-      const totalPages = doc.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-
-        // Thin separator
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.3);
-        doc.line(MARGIN, pageHeight - 18, pageWidth - MARGIN, pageHeight - 18);
-
-        // Footer text
-        doc.setFontSize(7);
-        doc.setTextColor(...GRAY_TEXT);
-        const footerParts: string[] = [];
-        if (settings?.businessName) footerParts.push(settings.businessName);
-        if (settings?.businessTagline) footerParts.push(settings.businessTagline);
-        if (settings?.businessWebsite) footerParts.push(settings.businessWebsite);
-        if (settings?.businessEmail) footerParts.push(settings.businessEmail);
-        const footerText = footerParts.join(' • ') || 'Dibuat dengan yuk-kerja';
-        doc.text(footerText, pageWidth / 2, pageHeight - 12, { align: 'center' });
-
-        // Page number
-        if (totalPages > 1) {
-          doc.text(`Halaman ${i} dari ${totalPages}`, pageWidth - MARGIN, pageHeight - 12, {
-            align: 'right',
-          });
-        }
-
-        doc.setTextColor(...BLACK);
-      }
-
-      // Get PDF as bytes
-      const pdfOutput = doc.output('arraybuffer');
-
-      // Check if we're in Tauri environment
-      const isTauri = '__TAURI__' in window || '__TAURI_INTERNALS__' in window;
-
-      if (isTauri) {
-        const { save } = await import('@tauri-apps/plugin-dialog');
-        const { writeFile } = await import('@tauri-apps/plugin-fs');
-
-        invoiceLogger.debug('Opening save dialog...');
-        const filePath = await save({
-          defaultPath: `${invoice.invoiceNumber}.pdf`,
-          filters: [{ name: 'File PDF', extensions: ['pdf'] }],
-        });
-
-        invoiceLogger.debug('Save dialog returned', { filePath });
-
-        if (filePath) {
-          invoiceLogger.debug('Writing file...', { path: filePath, size: pdfOutput.byteLength });
-          try {
-            await writeFile(filePath, new Uint8Array(pdfOutput));
-            invoiceLogger.info('PDF saved successfully', { path: filePath });
-            alert(`Invoice disimpan di:\n${filePath}`);
-          } catch (writeError) {
-            invoiceLogger.error('writeFile failed', writeError);
-            throw writeError;
-          }
-        } else {
-          invoiceLogger.info('Save dialog cancelled');
-        }
-      } else {
-        invoiceLogger.info('Not in Tauri environment, using browser download');
-        const blob = new Blob([pdfOutput], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${invoice.invoiceNumber}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-
-      invoiceLogger.info('PDF export completed successfully');
     } catch (error) {
       invoiceLogger.error('Failed to export PDF:', error);
       alert(`Gagal mengekspor PDF: ${(error as Error).message}`);
@@ -1348,37 +907,41 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
     }
   };
 
+  const invoiceCurrency = clients.find((c) => c.id === invoice.clientId)?.currency;
+
   return (
     <Modal isOpen={true} onClose={onClose} title={invoice.invoiceNumber} size='lg'>
-      <div className='space-y-4 text-sm'>
+      <div className='min-w-0 space-y-4 text-sm'>
         {/* Business Header */}
         {settings && (settings.businessName || settings.businessLogo) && (
           <div className='pb-4 border-b border-border'>
-            <div className='flex items-start gap-4'>
+            <div className='flex items-start gap-4 min-w-0'>
               {settings.businessLogo && (
                 <img
                   src={settings.businessLogo}
                   alt='Logo bisnis'
-                  className='w-16 h-16 object-contain'
+                  className='w-16 h-16 object-contain shrink-0'
                 />
               )}
-              <div>
+              <div className='min-w-0 flex-1'>
                 {settings.businessName && (
-                  <p className='font-bold text-lg text-foreground'>{settings.businessName}</p>
+                  <p className='font-bold text-lg text-foreground break-words'>
+                    {settings.businessName}
+                  </p>
                 )}
                 {settings.businessAddress && (
-                  <p className='text-muted-foreground whitespace-pre-line text-xs'>
+                  <p className='text-muted-foreground whitespace-pre-wrap break-words text-xs'>
                     {settings.businessAddress}
                   </p>
                 )}
                 {settings.businessEmail && (
-                  <p className='text-muted-foreground text-xs'>{settings.businessEmail}</p>
+                  <p className='text-muted-foreground text-xs break-words'>{settings.businessEmail}</p>
                 )}
                 {settings.businessPhone && (
-                  <p className='text-muted-foreground text-xs'>{settings.businessPhone}</p>
+                  <p className='text-muted-foreground text-xs break-words'>{settings.businessPhone}</p>
                 )}
                 {settings.businessVatNumber && (
-                  <p className='text-muted-foreground text-xs'>
+                  <p className='text-muted-foreground text-xs break-words'>
                     NPWP: {settings.businessVatNumber}
                   </p>
                 )}
@@ -1388,97 +951,94 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         )}
 
         {/* Invoice Info Row */}
-        <div className='flex justify-between'>
-          <div>
+        <div className='grid grid-cols-[minmax(0,1fr)_auto] gap-6'>
+          <div className='min-w-0'>
             <p className='font-medium text-foreground'>Tagih ke:</p>
-            <p className='text-muted-foreground'>{invoice.clientName}</p>
+            <p className='text-muted-foreground break-words'>{invoice.clientName}</p>
             {invoice.clientAddress && (
-              <p className='text-muted-foreground whitespace-pre-line'>{invoice.clientAddress}</p>
+              <p className='text-muted-foreground whitespace-pre-wrap break-words'>
+                {invoice.clientAddress}
+              </p>
             )}
             {invoice.clientVatNumber && (
-              <p className='text-muted-foreground'>NPWP: {invoice.clientVatNumber}</p>
+              <p className='text-muted-foreground break-words'>NPWP: {invoice.clientVatNumber}</p>
             )}
           </div>
-          <div className='text-right'>
-            <StatusBadge status={invoice.status} />
-            <p className='mt-2 text-muted-foreground'>Tanggal: {formatDate(invoice.issueDate)}</p>
+          <div className='text-right shrink-0'>
+            <p className='font-semibold text-foreground'>{invoice.invoiceNumber}</p>
+            <p className='text-muted-foreground'>Tanggal: {formatDate(invoice.issueDate)}</p>
+            <div className='mt-2'>
+              <StatusBadge status={invoice.status} />
+            </div>
             <p className='text-muted-foreground'>Jatuh Tempo: {formatDate(invoice.dueDate)}</p>
           </div>
         </div>
 
         {/* Line Items */}
-        <table className='w-full'>
+        <table className='w-full table-fixed'>
           <thead>
             <tr className='border-b border-border text-left'>
-              <th className='py-2'>Deskripsi</th>
-              <th className='py-2 text-right'>Jumlah</th>
-              <th className='py-2 text-right'>Harga</th>
-              <th className='py-2 text-right'>Total</th>
+              <th className='w-10 py-2 pr-2 align-top'>No</th>
+              <th className='py-2 pr-3 align-top'>Deskripsi</th>
+              <th className='w-16 py-2 pl-2 text-right align-top'>Qty</th>
+              <th className='w-24 py-2 pl-2 text-right align-top'>Harga</th>
+              <th className='w-24 py-2 pl-2 text-right align-top'>Diskon</th>
+              <th className='w-24 py-2 pl-2 text-right align-top'>Jumlah</th>
             </tr>
           </thead>
           <tbody>
-            {invoice.lineItems.map((item) => (
-              <tr key={item.id} className='border-b border-border'>
-                <td className='py-2'>{item.description}</td>
-                <td className='py-2 text-right'>{item.quantity}</td>
-                <td className='py-2 text-right'>
-                  {formatCurrency(
-                    item.unitPrice,
-                    clients.find((c) => c.id === invoice.clientId)?.currency,
-                  )}
-                </td>
-                <td className='py-2 text-right'>
-                  {formatCurrency(
-                    item.quantity * item.unitPrice,
-                    clients.find((c) => c.id === invoice.clientId)?.currency,
-                  )}
-                </td>
-              </tr>
-            ))}
+            {invoice.lineItems.map((item, index) => {
+              const discountAmount = item.discount || 0;
+              const lineTotal = Math.max(0, item.quantity * item.unitPrice - discountAmount);
+
+              return (
+                <tr key={item.id} className='border-b border-border'>
+                  <td className='py-2 pr-2 align-top'>{index + 1}</td>
+                  <td className='py-2 pr-3 align-top whitespace-pre-wrap break-words'>
+                    {item.description || '-'}
+                  </td>
+                  <td className='py-2 pl-2 text-right align-top whitespace-nowrap'>
+                    {formatNumber(item.quantity, 2)}
+                  </td>
+                  <td className='py-2 pl-2 text-right align-top whitespace-nowrap'>
+                    {formatCurrency(item.unitPrice, invoiceCurrency)}
+                  </td>
+                  <td className='py-2 pl-2 text-right align-top whitespace-nowrap'>
+                    {discountAmount > 0
+                      ? `-${formatCurrency(discountAmount, invoiceCurrency)}`
+                      : formatCurrency(0, invoiceCurrency)}
+                  </td>
+                  <td className='py-2 pl-2 text-right align-top whitespace-nowrap'>
+                    {formatCurrency(lineTotal, invoiceCurrency)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
         {/* Totals */}
         <div className='flex justify-end'>
-          <div className='w-48'>
+          <div className='w-64 max-w-full'>
             <div className='flex justify-between py-1'>
               <span>Subtotal:</span>
-              <span>
-                {formatCurrency(
-                  invoice.subtotal,
-                  clients.find((c) => c.id === invoice.clientId)?.currency,
-                )}
-              </span>
+              <span className='text-right'>{formatCurrency(invoice.subtotal, invoiceCurrency)}</span>
             </div>
             <div className='flex justify-between py-1'>
-              <span>Pajak ({formatNumber(invoice.taxRate * 100, 1)}%):</span>
-              <span>
-                {formatCurrency(
-                  invoice.taxAmount,
-                  clients.find((c) => c.id === invoice.clientId)?.currency,
-                )}
-              </span>
+              <span>PPN ({formatNumber(invoice.taxRate * 100, 1)}%):</span>
+              <span className='text-right'>{formatCurrency(invoice.taxAmount, invoiceCurrency)}</span>
             </div>
             {invoice.downPayment > 0 && (
               <div className='flex justify-between py-1 text-green-600 dark:text-green-400'>
                 <span>Uang Muka:</span>
-                <span>
-                  -
-                  {formatCurrency(
-                    invoice.downPayment,
-                    clients.find((c) => c.id === invoice.clientId)?.currency,
-                  )}
+                <span className='text-right'>
+                  -{formatCurrency(invoice.downPayment, invoiceCurrency)}
                 </span>
               </div>
             )}
-            <div className='flex justify-between py-2 border-t border-border font-medium'>
+            <div className='flex justify-between py-2 border-t border-border font-bold text-base text-primary'>
               <span>{invoice.downPayment > 0 ? 'Sisa Tagihan:' : 'Total:'}</span>
-              <span>
-                {formatCurrency(
-                  invoice.total,
-                  clients.find((c) => c.id === invoice.clientId)?.currency,
-                )}
-              </span>
+              <span className='text-right'>{formatCurrency(invoice.total, invoiceCurrency)}</span>
             </div>
           </div>
         </div>
@@ -1486,14 +1046,16 @@ function InvoicePreview({ invoice, onClose, clients }: InvoicePreviewProps) {
         {invoice.notes && (
           <div className='pt-4 border-t border-border'>
             <p className='font-medium'>Catatan:</p>
-            <p className='text-muted-foreground whitespace-pre-line'>{invoice.notes}</p>
+            <p className='text-muted-foreground whitespace-pre-wrap break-words'>{invoice.notes}</p>
           </div>
         )}
 
         {settings?.paymentTerms && (
           <div className='pt-4 border-t border-border'>
             <p className='font-medium'>Syarat Pembayaran:</p>
-            <p className='text-muted-foreground whitespace-pre-line'>{settings.paymentTerms}</p>
+            <p className='text-muted-foreground whitespace-pre-wrap break-words'>
+              {settings.paymentTerms}
+            </p>
           </div>
         )}
 

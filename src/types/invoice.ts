@@ -22,6 +22,7 @@ export interface InvoiceLineItem {
   description: string;
   quantity: number;
   unitPrice: number;
+  discount: number;
 }
 
 export interface InvoiceWithDetails extends Invoice {
@@ -72,7 +73,11 @@ export function calculateInvoiceTotals(
   taxRate: number,
   downPayment: number = 0,
 ) {
-  const subtotal = lineItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+  const subtotal = lineItems.reduce((sum, item) => {
+    const lineGross = item.quantity * item.unitPrice;
+    const lineDiscount = item.discount || 0;
+    return sum + Math.max(0, lineGross - lineDiscount);
+  }, 0);
   const taxAmount = subtotal * taxRate;
   const total = subtotal + taxAmount - downPayment;
   return { subtotal, taxAmount, total };
